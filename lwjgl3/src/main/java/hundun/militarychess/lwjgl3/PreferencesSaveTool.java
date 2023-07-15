@@ -9,10 +9,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import hundun.gdxgame.corelib.base.save.AbstractSaveDataSaveTool;
 
 
-/**
- * @author hundun
- * Created on 2021/11/10
- */
 public class PreferencesSaveTool extends AbstractSaveDataSaveTool<Void> {
 
     private final ObjectMapper objectMapper;

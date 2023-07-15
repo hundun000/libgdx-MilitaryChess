@@ -50,15 +50,18 @@ public abstract class BasePageableTable extends MyWindow {
             Table pageRootTable
     ) {
 
-        TextButton button = new TextButton(buttonText, screen.getGame().getMainSkin());
-        button.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
-                updateByState(pageKey);
-            }
-        });
-        horizontalGroup.addActor(button);
+        if (buttonText != null) {
+            TextButton button = new TextButton(buttonText, screen.getGame().getMainSkin());
+            button.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    super.clicked(event, x, y);
+                    updateByState(pageKey);
+                }
+            });
+            horizontalGroup.addActor(button);
+        }
+
 
         pageRootTableMap.put(pageKey, pageRootTable);
     }

@@ -4,9 +4,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.generic.GenericPosData;
@@ -16,10 +19,7 @@ import hundun.militarychess.ui.other.CameraMouseListener;
 import hundun.militarychess.ui.screen.AbstractComikeScreen;
 import lombok.Getter;
 
-/**
- * @author hundun
- * Created on 2023/05/09
- */
+
 public class DeskAreaVM extends Table {
     public AbstractComikeScreen screen;
     @Getter
@@ -43,30 +43,25 @@ public class DeskAreaVM extends Table {
 
         Image background = new Image();
 
-        background.setDrawable(DrawableFactory.getSimpleBoardBackground());
+        background.setDrawable(new TextureRegionDrawable(new Texture(Gdx.files.internal("棋盘.jpg"))));
 
-        int roomWidth = 5000;
-        int roomHeight = 5000;
+        int roomWidth = screen.getGame().getScreenContext().getLayoutConst().PLAY_WIDTH;
+        int roomHeight = screen.getGame().getScreenContext().getLayoutConst().PLAY_HEIGHT;
 
         background.setBounds(0, 0, roomWidth, roomHeight);
 
         this.addActor(background);
-        this.addListener(new CameraGestureListener(cameraDataPackage));
-        this.addListener(new CameraMouseListener(cameraDataPackage));
-        this.getCameraDataPackage().forceSet(roomWidth / 2.0f, roomHeight/ 2.0f, null);
+        //this.addListener(new CameraGestureListener(cameraDataPackage));
+        //this.addListener(new CameraMouseListener(cameraDataPackage));
+        this.getCameraDataPackage().forceSet(
+            roomWidth / 2.0f + 800,
+            roomHeight/ 2.0f,
+            null);
 
         chessRuntimeDataList.forEach(deskData -> {
 
-            ChessVM actor = ChessVM.typeMain(this, deskData, deskData.getMainLocation());
+            ChessVM actor = new ChessVM(this, deskData);
             nodes.put(deskData, actor);
-
-            GenericPosData roomPos = deskData.getMainLocation();
-            actor.setBounds(
-                    roomPos.getX(),
-                    roomPos.getY(),
-                    screen.getGame().getScreenContext().getLayoutConst().DESK_WIDTH,
-                    screen.getGame().getScreenContext().getLayoutConst().DESK_HEIGHT
-                    );
             actor.addListener(new DeskClickListener(screen, actor));
             this.addActor(actor);
 

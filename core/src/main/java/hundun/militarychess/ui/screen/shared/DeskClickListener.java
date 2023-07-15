@@ -21,6 +21,6 @@ public class DeskClickListener extends ClickListener {
     @Override
     public void clicked(InputEvent event, float x, float y) {
         screen.onDeskClicked(vm);
-        game.getFrontend().log(this.getClass().getSimpleName(), vm.getDeskData().getUiName() + " has been clicked.");
+        game.getFrontend().log(this.getClass().getSimpleName(), vm.getDeskData().getChessType().name() + " has been clicked.");
     }
 }

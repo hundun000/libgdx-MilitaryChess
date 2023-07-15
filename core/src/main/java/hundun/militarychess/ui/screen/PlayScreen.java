@@ -1,36 +1,26 @@
 package hundun.militarychess.ui.screen;
 
-import java.util.ArrayList;
-import java.util.function.Function;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-import hundun.gdxgame.corelib.base.util.DrawableFactory;
+import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
-import hundun.militarychess.logic.data.RoomRuntimeData;
+import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.chess.ChessRule.FightResultType;
+import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.builder.BuilderMainBoardVM;
 import hundun.militarychess.ui.screen.shared.ChessVM;
 import hundun.militarychess.ui.screen.shared.DeskAreaVM;
 
-/**
- * @author hundun
- * Created on 2023/05/09
- */
+import java.util.ArrayList;
+import java.util.List;
+
+
 public class PlayScreen extends AbstractComikeScreen {
 
 
@@ -69,7 +59,12 @@ public class PlayScreen extends AbstractComikeScreen {
         deskStage.setScrollFocus(deskAreaVM);
 
         // ------ UI layer ------
-
+        mainBoardVM = new BuilderMainBoardVM(this);
+        uiRootTable.add(mainBoardVM)
+            .expandX()
+            .growY()
+            .right()
+        ;
 
         // ------ image previewer layer ------
 
@@ -114,16 +109,12 @@ public class PlayScreen extends AbstractComikeScreen {
     @Override
     public void updateUIAfterRoomChanged() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        // for newest DeskDatas
-        RoomRuntimeData currentRoomData = crossScreenDataPackage.getCurrentRoomData();
-        if (currentRoomData != null) {
-            deskAreaVM.updateDeskDatas(
-                    currentRoomData.getChessRuntimeDataList()
-            );
-        } else {
 
-        }
+        List<ChessRuntimeData> allChessRuntimeDataList = new ArrayList<>();
+        crossScreenDataPackage.getArmyMap().values().forEach(it -> allChessRuntimeDataList.addAll(it.getChessRuntimeDataList()));
+        deskAreaVM.updateDeskDatas(allChessRuntimeDataList);
 
+        mainBoardVM.getAllButtonPageVM().updateForNewSide(crossScreenDataPackage.getCurrentSide());
         mainBoardVM.updateForShow();
     }
 
@@ -132,8 +123,50 @@ public class PlayScreen extends AbstractComikeScreen {
 
     }
 
-    @Override
-    public void onDeskClicked(ChessVM vm) {
 
+
+    @Override
+    public void onDeskClicked(ChessVM chessVM) {
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        switch (crossScreenDataPackage.getCurrentState()) {
+            case WAIT_SELECT_FROM:
+                if (chessVM.getDeskData().getChessSide() == crossScreenDataPackage.getCurrentSide()) {
+                    mainBoardVM.getAllButtonPageVM().setFrom(chessVM);
+                    crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_TO);
+                }
+                break;
+            case WAIT_SELECT_TO:
+                if (chessVM.getDeskData().getChessSide() != crossScreenDataPackage.getCurrentSide()) {
+                    FightResultType fightResultPreview = ChessRule.canMove(
+                        mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
+                        chessVM.getDeskData()
+                        );
+
+                    mainBoardVM.getAllButtonPageVM().setTo(chessVM, fightResultPreview);
+                    crossScreenDataPackage.setCurrentState(ChessState.WAIT_COMMIT);
+                }
+                break;
+            default:
+        }
+    }
+
+    public void onCommitButtonClicked() {
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        ChessRule.fight(
+            mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
+            mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData()
+        );
+        crossScreenDataPackage.afterFight();
+        mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUI();
+        mainBoardVM.getAllButtonPageVM().getToChessVM().updateUI();
+        mainBoardVM.getAllButtonPageVM().updateForNewSide(crossScreenDataPackage.getCurrentSide());
+        crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_FROM);
+    }
+
+    public void onClearButtonClicked() {
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        mainBoardVM.getAllButtonPageVM().setFrom(null);
+        mainBoardVM.getAllButtonPageVM().setTo(null, null);
+        crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_FROM);
     }
 }

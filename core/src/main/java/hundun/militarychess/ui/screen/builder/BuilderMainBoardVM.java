@@ -3,11 +3,14 @@ package hundun.militarychess.ui.screen.builder;
 import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.screen.PlayScreen;
 import hundun.militarychess.ui.screen.shared.BasePageableTable;
+import hundun.militarychess.ui.screen.shared.ChessVM;
+import lombok.Getter;
 
 public class BuilderMainBoardVM extends BasePageableTable {
 
     PlayScreen builderScreen;
 
+    @Getter
     AllButtonPageVM allButtonPageVM;
 
 
@@ -18,14 +21,14 @@ public class BuilderMainBoardVM extends BasePageableTable {
 
     public BuilderMainBoardVM(PlayScreen screen) {
         super(screen);
-        init("builder", screen.getGame());
+        init("", screen.getGame());
 
         this.builderScreen = screen;
 
         this.allButtonPageVM = new AllButtonPageVM(screen);
 
         addPage(BuilderMainBoardState.PAGE1.name(),
-                "读写数据",
+                null,
                 allButtonPageVM
         );
 

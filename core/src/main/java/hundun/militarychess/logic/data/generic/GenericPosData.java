@@ -10,27 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class GenericPosData {
-    String room;
-    String area;
-    int areaIndex;
+    int row;
+    int col;
     int x;
     int y;
 
-    public static class Extension {
-        public static String SPLIT = ";";
-
-        public static String toLine(String room, String area, int areaIndex) {
-            return room + SPLIT + area + SPLIT + areaIndex;
-        }
-
-        public static String toLine(GenericPosData thiz) {
-            return thiz.getRoom() + SPLIT + thiz.getArea() + SPLIT + thiz.getAreaIndex();
-        }
-    }
-
-    public static class Factory {
-
-
-
+    public String toText() {
+        char rowChar = (char)('A' + row);
+        return "(" + rowChar + col + ")";
     }
 }

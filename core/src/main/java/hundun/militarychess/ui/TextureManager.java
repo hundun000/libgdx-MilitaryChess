@@ -13,10 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
 import lombok.Getter;
 
-/**
- * @author hundun
- * Created on 2023/06/07
- */
+
 public class TextureManager {
     MilitaryChessGame game;
 

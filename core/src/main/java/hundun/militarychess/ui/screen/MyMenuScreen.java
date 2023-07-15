@@ -22,10 +22,7 @@ import hundun.gdxgame.corelib.starter.StarterMenuScreen;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.ui.MilitaryChessGame;
 
-/**
- * @author hundun
- * Created on 2023/01/13
- */
+
 public class MyMenuScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
 
     int BUTTON_WIDTH = 100;
@@ -42,7 +39,7 @@ public class MyMenuScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         super(game, game.getSharedViewport());
 
         Label titleLabel = new Label(
-            JavaFeatureForGwt.stringFormat("     %s     ", "ComikeHelper"),
+            JavaFeatureForGwt.stringFormat("     %s     ", "军旗游戏"),
             game.getMainSkin());
         titleLabel.setFontScale(1.5f);
 

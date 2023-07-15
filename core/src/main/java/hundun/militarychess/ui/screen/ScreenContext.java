@@ -4,10 +4,7 @@ import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.militarychess.ui.MilitaryChessGame;
 import lombok.Getter;
 
-/**
- * @author hundun
- * Created on 2021/11/02
- */
+
 @Getter
 public class ScreenContext {
     PlayScreen playScreen;
