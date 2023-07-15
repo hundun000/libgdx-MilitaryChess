@@ -1,0 +1,26 @@
+package hundun.militarychess.ui.screen.shared;
+
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+
+import hundun.militarychess.ui.MilitaryChessGame;
+import hundun.militarychess.ui.screen.AbstractComikeScreen;
+
+
+public class DeskClickListener extends ClickListener {
+    MilitaryChessGame game;
+    AbstractComikeScreen screen;
+    private final ChessVM vm;
+
+    public DeskClickListener(AbstractComikeScreen screen, ChessVM vm) {
+        this.game = screen.getGame();
+        this.screen = screen;
+        this.vm = vm;
+    }
+
+    @Override
+    public void clicked(InputEvent event, float x, float y) {
+        screen.onDeskClicked(vm);
+        game.getFrontend().log(this.getClass().getSimpleName(), vm.getDeskData().getUiName() + " has been clicked.");
+    }
+}
