@@ -1,9 +1,11 @@
 package hundun.militarychess.ui.screen.builder;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
@@ -47,20 +49,18 @@ public class AllButtonPageVM extends Table {
         this.add(fightResultPreviewLabel).padBottom(pad).row();
 
         this.commitButton = new TextButton("确认", screen.getGame().getMainSkin());
-        this.commitButton.addListener(new ClickListener(){
+        this.commitButton.addListener(new ChangeListener(){
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
+            public void changed(ChangeEvent event, Actor actor) {
                 screen.onCommitButtonClicked();
             }
         });
         this.add(commitButton).padBottom(pad).row();
 
         this.clearButton = new TextButton("清空", screen.getGame().getMainSkin());
-        this.clearButton.addListener(new ClickListener(){
+        this.clearButton.addListener(new ChangeListener(){
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                super.clicked(event, x, y);
+            public void changed(ChangeEvent event, Actor actor) {
                 screen.onClearButtonClicked();
             }
         });
