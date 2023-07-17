@@ -1,5 +1,7 @@
 package hundun.militarychess.logic.chess;
 
+import hundun.militarychess.logic.LogicContext.AiAction;
+import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import lombok.Getter;
@@ -83,5 +85,21 @@ public class ChessRule {
         } else {
             return FightResultType.BOTH_DIE;
         }
+    }
+
+    public static AiAction generateAiAction(ArmyRuntimeData fromArmy, ArmyRuntimeData toArmy) {
+        return AiAction.builder()
+            .from(fromArmy.getChessRuntimeDataList().stream()
+                .filter(it -> it.getChessType() != ChessType.EMPTY)
+                .filter(it -> it.getChessType().canMove)
+                .findFirst()
+                .get()
+            )
+            .to(toArmy.getChessRuntimeDataList().stream()
+                .filter(it -> it.getChessType() != ChessType.EMPTY)
+                .findFirst()
+                .get()
+            )
+            .build();
     }
 }

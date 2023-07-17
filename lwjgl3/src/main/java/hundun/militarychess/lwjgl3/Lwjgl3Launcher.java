@@ -20,7 +20,6 @@ public class Lwjgl3Launcher {
         configuration.useVsync(true);
         configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate);
         configuration.setWindowedMode(1080, 720);
-        throw new RuntimeException();
-        //return configuration;
+        return configuration;
     }
 }

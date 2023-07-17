@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import hundun.gdxgame.gamelib.base.LogicFrameHelper;
 import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule;
@@ -40,7 +41,7 @@ public class PlayScreen extends AbstractComikeScreen {
 
         this.deskCamera = new OrthographicCamera();
         this.deskStage = new Stage(new ScreenViewport(deskCamera), game.getBatch());
-
+        this.logicFrameHelper = new LogicFrameHelper(1);
     }
 
 
@@ -123,7 +124,31 @@ public class PlayScreen extends AbstractComikeScreen {
 
     }
 
+    private ChessVM findVM(ChessRuntimeData chessRuntimeData) {
+        return deskAreaVM.getNodes().get(chessRuntimeData);
+    }
 
+
+    @Override
+    protected void onLogicFrame() {
+        super.onLogicFrame();
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        if (crossScreenDataPackage.getAiAction() == null) {
+            return;
+        }
+        switch (crossScreenDataPackage.getCurrentState()) {
+            case WAIT_SELECT_FROM:
+                onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getFrom()));
+                break;
+            case WAIT_SELECT_TO:
+                onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getTo()));
+                break;
+            case WAIT_COMMIT:
+                onCommitButtonClicked();
+                break;
+            default:
+        }
+    }
 
     @Override
     public void onDeskClicked(ChessVM chessVM) {
@@ -156,11 +181,15 @@ public class PlayScreen extends AbstractComikeScreen {
             mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
             mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData()
         );
-        crossScreenDataPackage.afterFight();
+        this.afterFight();
+    }
+
+    private void afterFight() {
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUI();
         mainBoardVM.getAllButtonPageVM().getToChessVM().updateUI();
         mainBoardVM.getAllButtonPageVM().updateForNewSide(crossScreenDataPackage.getCurrentSide());
-        crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_FROM);
+        crossScreenDataPackage.afterFight();
     }
 
     public void onClearButtonClicked() {

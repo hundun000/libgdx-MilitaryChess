@@ -1,5 +1,6 @@
 package hundun.militarychess.logic;
 
+import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -29,16 +30,26 @@ public class LogicContext {
     @Setter
     @AllArgsConstructor
     @Builder
+    public static class AiAction {
+        ChessRuntimeData from;
+        ChessRuntimeData to;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @Builder
     public static class CrossScreenDataPackage {
         MilitaryChessGame game;
+
+        PlayerMode playerMode;
         ChessSide currentSide;
         ChessState currentState;
         Map<ChessSide, ArmyRuntimeData> armyMap;
 
-        @Getter
         ChessVM fromChessVM;
-        @Getter
         ChessVM toChessVM;
+        AiAction aiAction;
 
         public void afterFight() {
             if (currentSide == ChessSide.MY_SIDE) {
@@ -46,7 +57,20 @@ public class LogicContext {
             } else {
                 currentSide = ChessSide.MY_SIDE;
             }
+            this.setCurrentState(ChessState.WAIT_SELECT_FROM);
+            if (playerMode == PlayerMode.PVC) {
+                if (currentSide == ChessSide.OTHER_SIDE) {
+                    aiAction = ChessRule.generateAiAction(
+                        armyMap.get(ChessSide.OTHER_SIDE),
+                        armyMap.get(ChessSide.MY_SIDE)
+                    );
+                } else {
+                    aiAction = null;
+                }
+            }
         }
+
+
     }
 
     public enum ChessState {
@@ -57,12 +81,21 @@ public class LogicContext {
 
     }
 
+    public enum PlayerMode {
+        PVP,
+        PVC,
+        ;
+
+    }
+
+
     public void loadEmpty() {
     }
 
     public void updateCrossScreenDataPackage() {
         this.crossScreenDataPackage = CrossScreenDataPackage.builder()
             .game(game)
+            .playerMode(PlayerMode.PVC)
             .currentSide(ChessSide.MY_SIDE)
             .currentState(ChessState.WAIT_SELECT_FROM)
             .armyMap(Map.of(
