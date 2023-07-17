@@ -6,9 +6,6 @@ import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import lombok.Getter;
 
-import java.util.List;
-import java.util.Vector;
-
 public class ChessRule {
 
 

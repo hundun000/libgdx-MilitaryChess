@@ -52,17 +52,17 @@ public class LogicContext {
         AiAction aiAction;
 
         public void afterFight() {
-            if (currentSide == ChessSide.MY_SIDE) {
-                currentSide = ChessSide.OTHER_SIDE;
+            if (currentSide == ChessSide.FIRST_SIDE) {
+                currentSide = ChessSide.SECOND_SIDE;
             } else {
-                currentSide = ChessSide.MY_SIDE;
+                currentSide = ChessSide.FIRST_SIDE;
             }
             this.setCurrentState(ChessState.WAIT_SELECT_FROM);
             if (playerMode == PlayerMode.PVC) {
-                if (currentSide == ChessSide.OTHER_SIDE) {
+                if (currentSide == ChessSide.SECOND_SIDE) {
                     aiAction = ChessRule.generateAiAction(
-                        armyMap.get(ChessSide.OTHER_SIDE),
-                        armyMap.get(ChessSide.MY_SIDE)
+                        armyMap.get(ChessSide.SECOND_SIDE),
+                        armyMap.get(ChessSide.FIRST_SIDE)
                     );
                 } else {
                     aiAction = null;
@@ -96,22 +96,22 @@ public class LogicContext {
         this.crossScreenDataPackage = CrossScreenDataPackage.builder()
             .game(game)
             .playerMode(PlayerMode.PVC)
-            .currentSide(ChessSide.MY_SIDE)
+            .currentSide(ChessSide.FIRST_SIDE)
             .currentState(ChessState.WAIT_SELECT_FROM)
             .armyMap(Map.of(
-                    ChessSide.MY_SIDE,
+                    ChessSide.FIRST_SIDE,
                     ArmyRuntimeData.builder()
                     .chessRuntimeDataList(ChessRuntimeData.fromCodes(
                         "abccddeeffggghhhiiijjkklj",
                         game.getScreenContext().getLayoutConst(),
-                        ChessSide.MY_SIDE))
+                        ChessSide.FIRST_SIDE))
                         .build(),
-                    ChessSide.OTHER_SIDE,
+                    ChessSide.SECOND_SIDE,
                     ArmyRuntimeData.builder()
                         .chessRuntimeDataList(ChessRuntimeData.fromCodes(
                             "jlkkijiiihhhgggffeeddccba",
                             game.getScreenContext().getLayoutConst(),
-                            ChessSide.OTHER_SIDE))
+                            ChessSide.SECOND_SIDE))
                             .build()
             ))
             .build();

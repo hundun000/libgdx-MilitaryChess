@@ -1,18 +1,13 @@
 package hundun.militarychess.ui.screen.shared;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
-import hundun.militarychess.logic.data.generic.GenericPosData;
 import hundun.militarychess.ui.MilitaryChessGame;
 
 import lombok.Getter;
@@ -53,17 +48,16 @@ public class ChessVM extends Table {
 
     public void updateUI(){
         this.mainLabel.setText(deskData.getChessType().getChinese());
-        if (deskData.getChessSide() == ChessSide.MY_SIDE) {
+        if (deskData.getChessSide() == ChessSide.FIRST_SIDE) {
             image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.RED, 0.8f));
-        } else if (deskData.getChessSide() == ChessSide.OTHER_SIDE) {
+        } else if (deskData.getChessSide() == ChessSide.SECOND_SIDE) {
             image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.BLUE, 0.8f));
         } else {
             image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
         }
-        GenericPosData roomPos = deskData.getMainLocation();
         this.setBounds(
-            roomPos.getX(),
-            roomPos.getY(),
+            deskData.getUiX(),
+            deskData.getUiY(),
             game.getScreenContext().getLayoutConst().DESK_WIDTH,
             game.getScreenContext().getLayoutConst().DESK_HEIGHT
         );

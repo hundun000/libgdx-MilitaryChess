@@ -10,12 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import hundun.gdxgame.corelib.base.util.DrawableFactory;
 import hundun.militarychess.logic.data.ChessRuntimeData;
-import hundun.militarychess.logic.data.generic.GenericPosData;
 import hundun.militarychess.ui.other.CameraDataPackage;
-import hundun.militarychess.ui.other.CameraGestureListener;
-import hundun.militarychess.ui.other.CameraMouseListener;
 import hundun.militarychess.ui.screen.AbstractComikeScreen;
 import lombok.Getter;
 

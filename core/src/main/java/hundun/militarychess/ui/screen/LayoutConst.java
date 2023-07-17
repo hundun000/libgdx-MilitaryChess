@@ -1,6 +1,6 @@
 package hundun.militarychess.ui.screen;
 
-import hundun.militarychess.logic.data.generic.GenericPosData;
+import hundun.militarychess.logic.data.ChessRuntimeData;
 
 public class LayoutConst {
 
@@ -31,15 +31,15 @@ public class LayoutConst {
     public final int PLAY_HEIGHT = 12 * DESK_HEIGHT + RIVER_HEIGHT;
 
     public static void updatePos(
-        GenericPosData thiz,
+        ChessRuntimeData thiz,
         LayoutConst layoutConst
     ) {
-        int x = thiz.getCol() * layoutConst.DESK_WIDTH;
-        int y = (12 - thiz.getRow()) * layoutConst.DESK_HEIGHT;
-        if (thiz.getRow() >= 6) {
+        int x = thiz.getMainLocation().getPos().getCol() * layoutConst.DESK_WIDTH;
+        int y = (12 - thiz.getMainLocation().getPos().getRow()) * layoutConst.DESK_HEIGHT;
+        if (thiz.getMainLocation().getPos().getRow() >= 6) {
             y -= layoutConst.RIVER_HEIGHT;
         }
-        thiz.setX(x);
-        thiz.setY(y);
+        thiz.setUiX(x);
+        thiz.setUiY(y);
     }
 }
