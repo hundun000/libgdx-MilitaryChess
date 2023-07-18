@@ -13,6 +13,22 @@ import java.util.*;
 
 public class PosRule {
 
+    public static Map<Integer, SimplePos> simplePosMap;
+    public static Map<SimplePos, PosRelationData> relationMap;
+    static {
+
+        simplePosMap = new HashMap<>();
+        for (int row = 0; row <= 11; row++) {
+            for (int col = 0; col <= 4; col++) {
+                simplePosMap.put(simplePosMapKey(row, col), new SimplePos(row, col));
+            }
+        }
+
+        relationMap = new HashMap<>();
+        simplePosMap.values().forEach(it -> {
+            relationMap.put(it, baseRelation(it));
+        });
+    }
 
     public static List<SimplePos> XING_YING_POS_MAP = List.of(
             new SimplePos(7, 1),
@@ -44,111 +60,8 @@ public class PosRule {
         return row * 100 + col;
     }
 
-/*    public static final List<SimplePos> HORIZON_RAIL_1_POS_LIST = List.of(
-        new SimplePos(1, 0),
-        new SimplePos(1, 1),
-        new SimplePos(1, 2),
-        new SimplePos(1, 3),
-        new SimplePos(1, 4)
-        );
-    public static final List<SimplePos> HORIZON_RAIL_5_POS_LIST = List.of(
-        new SimplePos(5, 0),
-        new SimplePos(5, 1),
-        new SimplePos(5, 2),
-        new SimplePos(5, 3),
-        new SimplePos(5, 4)
-        );
-    public static final List<SimplePos> HORIZON_RAIL_6_POS_LIST = List.of(
-        new SimplePos(6, 0),
-        new SimplePos(6, 1),
-        new SimplePos(6, 2),
-        new SimplePos(6, 3),
-        new SimplePos(6, 4)
-    );
-    public static final List<SimplePos> HORIZON_RAIL_10_POS_LIST = List.of(
-        new SimplePos(10, 0),
-        new SimplePos(10, 1),
-        new SimplePos(10, 2),
-        new SimplePos(10, 3),
-        new SimplePos(10, 4)
-    );
-    public static final List<SimplePos> VERTICAL_RAIL_UP_LEFT_POS_LIST = List.of(
-        new SimplePos(1, 0),
-        new SimplePos(2, 0),
-        new SimplePos(3, 0),
-        new SimplePos(4, 0),
-        new SimplePos(5, 0)
-    );
-    public static final List<SimplePos> VERTICAL_RAIL_DOWN_LEFT_POS_LIST = List.of(
-        new SimplePos(6, 0),
-        new SimplePos(7, 0),
-        new SimplePos(8, 0),
-        new SimplePos(9, 0),
-        new SimplePos(10, 0)
-    );
-    public static final List<SimplePos> VERTICAL_RAIL_UP_RIGHT_POS_LIST = List.of(
-        new SimplePos(1, 4),
-        new SimplePos(2, 4),
-        new SimplePos(3, 4),
-        new SimplePos(4, 4),
-        new SimplePos(5, 4)
-    );
-    public static final List<SimplePos> VERTICAL_RAIL_DOWN_RIGHT_POS_LIST = List.of(
-        new SimplePos(6, 4),
-        new SimplePos(7, 4),
-        new SimplePos(8, 4),
-        new SimplePos(9, 4),
-        new SimplePos(10, 4)
-    );
-    public static final List<SimplePos> VERTICAL_RAIL_BRIDGE_LEFT_POS_LIST = List.of(
-        new SimplePos(5, 0),
-        new SimplePos(6, 0)
-    );
-    public static final List<SimplePos> VERTICAL_RAIL_BRIDGE_MID_POS_LIST = List.of(
-        new SimplePos(5, 2),
-        new SimplePos(6, 2)
-    );
-    public static final List<SimplePos> VERTICAL_RAIL_BRIDGE_RIGHT_POS_LIST = List.of(
-        new SimplePos(5, 4),
-        new SimplePos(6, 4)
-    );
 
-    public static final List<SimplePos> VERTICAL_RAIL_LONG_LEFT_POS_LIST;
-    public static final List<SimplePos> VERTICAL_RAIL_LONG_RIGHT_POS_LIST;
-    public static final List<List<SimplePos>> ALL_RAIL;*/
-    public static Map<Integer, SimplePos> simplePosMap;
-    public static Map<SimplePos, PosRelationData> relationMap;
-    static {
-/*        VERTICAL_RAIL_LONG_LEFT_POS_LIST = new ArrayList<>();
-        VERTICAL_RAIL_LONG_LEFT_POS_LIST.addAll(VERTICAL_RAIL_UP_LEFT_POS_LIST);
-        VERTICAL_RAIL_LONG_LEFT_POS_LIST.addAll(VERTICAL_RAIL_DOWN_LEFT_POS_LIST);
 
-        VERTICAL_RAIL_LONG_RIGHT_POS_LIST = new ArrayList<>();
-        VERTICAL_RAIL_LONG_RIGHT_POS_LIST.addAll(VERTICAL_RAIL_UP_RIGHT_POS_LIST);
-        VERTICAL_RAIL_LONG_RIGHT_POS_LIST.addAll(VERTICAL_RAIL_DOWN_RIGHT_POS_LIST);
-
-        ALL_RAIL = List.of(
-            HORIZON_RAIL_1_POS_LIST,
-            HORIZON_RAIL_5_POS_LIST,
-            HORIZON_RAIL_6_POS_LIST,
-            HORIZON_RAIL_10_POS_LIST,
-            VERTICAL_RAIL_LONG_LEFT_POS_LIST,
-            VERTICAL_RAIL_LONG_RIGHT_POS_LIST,
-            VERTICAL_RAIL_BRIDGE_MID_POS_LIST
-        );*/
-
-        simplePosMap = new HashMap<>();
-        for (int row = 0; row <= 11; row++) {
-            for (int col = 0; col <= 4; col++) {
-                simplePosMap.put(simplePosMapKey(row, col), new SimplePos(row, col));
-            }
-        }
-
-        relationMap = new HashMap<>();
-        simplePosMap.values().forEach(it -> {
-            relationMap.put(it, baseRelation(it));
-        });
-    }
     private static void addNeighbour(PosRelationData thiz, SimplePos pos, ChessPosType chessPosType) {
         if (pos.getCol() - 1 >= 0) {
             thiz.getNeighbourMap().put(Direction.LEFT, findSimplePos(pos.getRow(), pos.getCol() - 1));
@@ -270,9 +183,10 @@ public class PosRule {
         Set<SimplePos> dirtyRailPosList = new HashSet<>();
         Set<SimplePos> result = new HashSet<>();
 
-        SimplePos currentPos = fromChess.getMainLocation().getPos();
+        SimplePos currentPos = fromChess.getPos();
         boolean canTurnDirection = fromChess.getChessType() == ChessType.GONG_BING;
         PosRelationData currentPosRelationData = PosRule.relationMap.get(currentPos);
+        // 搜索相邻的可移动目的地
         currentPosRelationData.getNeighbourMap().values().forEach(checkingPos -> {
             ChessRuntimeData checkingChess = crossScreenDataPackage.findAtPos(checkingPos);
             if (checkingChess != null && ChessRule.canMove(fromChess, checkingChess)) {
@@ -280,12 +194,15 @@ public class PosRule {
             }
         });
 
-        findAloneRail(fromChess, null, currentPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
+        findRailMoveCandidates(fromChess, null, currentPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
         result.remove(currentPos);
         return result;
     }
 
-    private static void findAloneRail(
+    /**
+     * 搜索铁路上的可移动目的地
+     */
+    private static void findRailMoveCandidates(
         ChessRuntimeData fromChess,
         @Null Direction currentDirection,
         SimplePos currentPos,
@@ -300,6 +217,7 @@ public class PosRule {
         result.add(currentPos);
         dirtyRailPosList.add(currentPos);
         PosRelationData currentPosRelationData = PosRule.relationMap.get(currentPos);
+        // 对于铁路，只尝试4种方向
         for (Direction direction : Direction.XYValues) {
             SimplePos checkingPos = currentPosRelationData.getNeighbourMap().get(direction);
             if (checkingPos == null) {
@@ -307,13 +225,17 @@ public class PosRule {
             }
             PosRelationData checkingPosRelationData = PosRule.relationMap.get(checkingPos);
             ChessRuntimeData checkingChess = crossScreenDataPackage.findAtPos(checkingPos);
+            // checkingPos不是铁路或不可移动则不需继续检查
             if (checkingPosRelationData.getChessPosType() != ChessPosType.RAIL || !ChessRule.canMove(fromChess, checkingChess)) {
                 continue;
             }
+            // 检查checkingPos是否属于同一条铁路
             if (currentDirection == null || direction == currentDirection || Direction.getXYOpposite(direction) == currentDirection) {
                 if (checkingChess.getChessSide() == ChessSide.EMPTY) {
-                    findAloneRail(fromChess, direction, checkingPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
+                    // 以它为起点，继续以该方向搜索
+                    findRailMoveCandidates(fromChess, direction, checkingPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
                 } else {
+                    // 它为终点，本方向搜索结束
                     if (!dirtyRailPosList.contains(checkingPos)) {
                         result.add(currentPos);
                         dirtyRailPosList.add(currentPos);
@@ -322,7 +244,7 @@ public class PosRule {
             } else {
                 if (canTurnDirection) {
                     if (checkingChess.getChessSide() == ChessSide.EMPTY) {
-                        findAloneRail(fromChess, direction, checkingPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
+                        findRailMoveCandidates(fromChess, direction, checkingPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
                     }  else {
                         if (!dirtyRailPosList.contains(checkingPos)) {
                             result.add(currentPos);

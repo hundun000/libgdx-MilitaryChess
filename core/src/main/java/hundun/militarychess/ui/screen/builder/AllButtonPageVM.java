@@ -84,7 +84,7 @@ public class AllButtonPageVM extends Table {
         if (fromChessVM != null) {
             this.fromLabel.setText("发起者: "
                 + fromChessVM.getDeskData().getChessType().getChinese()
-                + fromChessVM.getDeskData().getMainLocation().toText()
+                + fromChessVM.getDeskData().toText()
             );
         } else {
             this.fromLabel.setText("发起者: 待选择");
@@ -92,7 +92,7 @@ public class AllButtonPageVM extends Table {
         if (toChessVM != null) {
             this.toLabel.setText("目标: "
                 + toChessVM.getDeskData().getChessType().getChinese()
-                + toChessVM.getDeskData().getMainLocation().toText()
+                + toChessVM.getDeskData().toText()
             );
         } else {
             this.toLabel.setText("目标: 待选择");

@@ -5,7 +5,6 @@ import hundun.militarychess.logic.chess.PosRule;
 import hundun.militarychess.logic.chess.PosRule.ChessPosType;
 import hundun.militarychess.logic.chess.PosRule.PosRelationData;
 import hundun.militarychess.logic.chess.PosRule.SimplePos;
-import hundun.militarychess.logic.data.generic.ChessPosData;
 import hundun.militarychess.ui.screen.LayoutConst;
 import lombok.*;
 
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChessRuntimeData {
-    ChessPosData mainLocation;
+    SimplePos pos;
     int uiX;
     int uiY;
     ChessType chessType;
@@ -25,7 +24,19 @@ public class ChessRuntimeData {
 
     public String toText() {
         return this.getChessType().name()
-            + this.getMainLocation().toText();
+            + this.getPos().toText();
+    }
+
+    public void updateUiPos(
+        LayoutConst layoutConst
+    ) {
+        int x = this.getPos().getCol() * layoutConst.DESK_WIDTH;
+        int y = (12 - this.getPos().getRow()) * layoutConst.DESK_HEIGHT;
+        if (this.getPos().getRow() >= 6) {
+            y -= layoutConst.RIVER_HEIGHT;
+        }
+        this.setUiX(x);
+        this.setUiY(y);
     }
 
     @Getter
@@ -50,9 +61,6 @@ public class ChessRuntimeData {
         int row = chessSide == ChessSide.FIRST_SIDE ? 6 : 0;
         int col = 0;
         for (int i = 0; i < codes.length(); ) {
-            ChessPosData mainLocation = ChessPosData.builder()
-                .pos(new SimplePos(row, col))
-                .build();
             ChessRuntimeData chessRuntimeData;
             ChessType chessType;
             final int tempCol = col;
@@ -61,7 +69,7 @@ public class ChessRuntimeData {
                 && it.getCurrentPos().getRow() == tempRow)) {
                 chessType = ChessType.EMPTY;
                 chessRuntimeData = ChessRuntimeData.builder()
-                    .mainLocation(mainLocation)
+                    .pos(new SimplePos(row, col))
                     .chessType(chessType)
                     .chessSide(ChessSide.EMPTY)
                     .build();
@@ -70,13 +78,13 @@ public class ChessRuntimeData {
                 String code = String.valueOf(codes.charAt(i));
                 chessType = ChessType.fromCode(code);
                 chessRuntimeData = ChessRuntimeData.builder()
-                    .mainLocation(mainLocation)
+                    .pos(new SimplePos(row, col))
                     .chessType(chessType)
                     .chessSide(chessSide)
                     .build();
                 i++;
             }
-            LayoutConst.updatePos(chessRuntimeData, layoutConst);
+            chessRuntimeData.updateUiPos(layoutConst);
             result.add(chessRuntimeData);
             col++;
             if (col > 4) {

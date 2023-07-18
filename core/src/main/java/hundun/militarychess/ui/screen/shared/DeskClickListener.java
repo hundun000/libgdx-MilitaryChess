@@ -26,7 +26,7 @@ public class DeskClickListener extends ClickListener {
         stringBuilder.append(vm.getDeskData().toText()
             + " has been clicked."
         );
-        var relation = PosRule.relationMap.get(vm.getDeskData().getMainLocation().getPos());
+        var relation = PosRule.relationMap.get(vm.getDeskData().getPos());
         stringBuilder.append("NeighbourMap{");
         relation.getNeighbourMap().forEach((k, v) -> stringBuilder.append(k).append("=").append(v != null ? v.toText() : "null"));
         stringBuilder.append("}");

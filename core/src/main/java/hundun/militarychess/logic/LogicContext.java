@@ -55,7 +55,7 @@ public class LogicContext {
         public ChessRuntimeData findAtPos(SimplePos pos) {
             for (var armyRuntimeData : armyMap.values()) {
                 var result = armyRuntimeData.getChessRuntimeDataList().stream()
-                    .filter(chessRuntimeData -> chessRuntimeData.getMainLocation().getPos().equals(pos))
+                    .filter(chessRuntimeData -> chessRuntimeData.getPos().equals(pos))
                     .findAny()
                     .orElse(null);
                 if (result != null) {

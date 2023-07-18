@@ -60,9 +60,9 @@ public class ChessRule {
     }
 
     private static void switchPos(ChessRuntimeData from, ChessRuntimeData to) {
-        var temp = from.getMainLocation();
-        from.setMainLocation(to.getMainLocation());
-        to.setMainLocation(temp);
+        var temp = from.getPos();
+        from.setPos(to.getPos());
+        to.setPos(temp);
     }
 
     private static FightResultType getFightResult(ChessRuntimeData from, ChessRuntimeData to) {

@@ -14,6 +14,7 @@ import hundun.militarychess.logic.chess.PosRule.SimplePos;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.AbstractComikeScreen;
+import hundun.militarychess.ui.screen.LayoutConst;
 import lombok.Getter;
 
 
@@ -71,7 +72,7 @@ public class DeskAreaVM extends Table {
         CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
         nodes.values().forEach(it -> {
             Set<SimplePos> all = PosRule.calculateCurrent(from.getDeskData(), crossScreenDataPackage);
-            it.updateMask(all.contains(it.getDeskData().getMainLocation().getPos()));
+            it.updateMask(all.contains(it.getDeskData().getPos()));
         });
     }
 

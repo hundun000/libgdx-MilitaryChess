@@ -11,7 +11,6 @@ import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
 
-import hundun.militarychess.ui.screen.LayoutConst;
 import lombok.Getter;
 
 
@@ -62,7 +61,7 @@ public class ChessVM extends Table {
         } else {
             image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
         }
-        LayoutConst.updatePos(this.getDeskData(), game.getScreenContext().getLayoutConst());
+        this.getDeskData().updateUiPos(game.getScreenContext().getLayoutConst());
         this.setBounds(
             deskData.getUiX(),
             deskData.getUiY(),

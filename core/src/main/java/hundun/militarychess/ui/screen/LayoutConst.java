@@ -32,16 +32,5 @@ public class LayoutConst {
     public final int RIVER_HEIGHT = (int) (DESK_HEIGHT * 1);
     public final int PLAY_HEIGHT = 12 * DESK_HEIGHT + RIVER_HEIGHT;
 
-    public static void updatePos(
-        ChessRuntimeData thiz,
-        LayoutConst layoutConst
-    ) {
-        int x = thiz.getMainLocation().getPos().getCol() * layoutConst.DESK_WIDTH;
-        int y = (12 - thiz.getMainLocation().getPos().getRow()) * layoutConst.DESK_HEIGHT;
-        if (thiz.getMainLocation().getPos().getRow() >= 6) {
-            y -= layoutConst.RIVER_HEIGHT;
-        }
-        thiz.setUiX(x);
-        thiz.setUiY(y);
-    }
+
 }
