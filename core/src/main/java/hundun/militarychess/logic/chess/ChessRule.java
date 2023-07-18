@@ -112,19 +112,5 @@ public class ChessRule {
         }
     }
 
-    public static AiAction generateAiAction(ArmyRuntimeData fromArmy, ArmyRuntimeData toArmy) {
-        return AiAction.builder()
-            .from(fromArmy.getChessRuntimeDataList().stream()
-                .filter(it -> it.getChessType() != ChessType.EMPTY)
-                .filter(it -> it.getChessType().canMove)
-                .findFirst()
-                .get()
-            )
-            .to(toArmy.getChessRuntimeDataList().stream()
-                .filter(it -> it.getChessType() != ChessType.EMPTY)
-                .findFirst()
-                .get()
-            )
-            .build();
-    }
+
 }

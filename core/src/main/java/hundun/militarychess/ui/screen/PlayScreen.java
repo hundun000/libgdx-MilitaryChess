@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PlayScreen extends AbstractComikeScreen {
+public class PlayScreen extends AbstractMilitaryChessScreen {
 
 
 
@@ -138,6 +138,10 @@ public class PlayScreen extends AbstractComikeScreen {
         }
         switch (crossScreenDataPackage.getCurrentState()) {
             case WAIT_SELECT_FROM:
+                game.getFrontend().log(this.getClass().getSimpleName(),
+                    "AiAction score = %s",
+                    crossScreenDataPackage.getAiAction().getScore()
+                );
                 onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getFrom()));
                 break;
             case WAIT_SELECT_TO:

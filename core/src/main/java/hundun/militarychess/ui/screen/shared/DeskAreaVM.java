@@ -13,18 +13,18 @@ import hundun.militarychess.logic.chess.GameboardPosRule;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
-import hundun.militarychess.ui.screen.AbstractComikeScreen;
+import hundun.militarychess.ui.screen.AbstractMilitaryChessScreen;
 import lombok.Getter;
 
 
 public class DeskAreaVM extends Table {
-    public AbstractComikeScreen screen;
+    public AbstractMilitaryChessScreen screen;
     @Getter
     Map<ChessRuntimeData, ChessVM> nodes = new LinkedHashMap<>();
     @Getter
     CameraDataPackage cameraDataPackage;
 
-    public DeskAreaVM(AbstractComikeScreen screen) {
+    public DeskAreaVM(AbstractMilitaryChessScreen screen) {
         this.screen = screen;
         this.cameraDataPackage = new CameraDataPackage();
 

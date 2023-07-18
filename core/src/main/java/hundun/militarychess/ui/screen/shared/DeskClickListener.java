@@ -5,15 +5,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import hundun.militarychess.logic.chess.GameboardPosRule;
 import hundun.militarychess.ui.MilitaryChessGame;
-import hundun.militarychess.ui.screen.AbstractComikeScreen;
+import hundun.militarychess.ui.screen.AbstractMilitaryChessScreen;
 
 
 public class DeskClickListener extends ClickListener {
     MilitaryChessGame game;
-    AbstractComikeScreen screen;
+    AbstractMilitaryChessScreen screen;
     private final ChessVM vm;
 
-    public DeskClickListener(AbstractComikeScreen screen, ChessVM vm) {
+    public DeskClickListener(AbstractMilitaryChessScreen screen, ChessVM vm) {
         this.game = screen.getGame();
         this.screen = screen;
         this.vm = vm;

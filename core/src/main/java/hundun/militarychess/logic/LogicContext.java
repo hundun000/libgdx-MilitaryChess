@@ -1,5 +1,6 @@
 package hundun.militarychess.logic;
 
+import hundun.militarychess.logic.chess.AiLogic;
 import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
@@ -32,6 +33,11 @@ public class LogicContext {
     @AllArgsConstructor
     @Builder
     public static class AiAction {
+        /**
+         * 认输
+         */
+        boolean failed;
+        int score;
         ChessRuntimeData from;
         ChessRuntimeData to;
     }
@@ -75,9 +81,10 @@ public class LogicContext {
             this.setCurrentState(ChessState.WAIT_SELECT_FROM);
             if (playerMode == PlayerMode.PVC) {
                 if (currentSide == ChessSide.SECOND_SIDE) {
-                    aiAction = ChessRule.generateAiAction(
+                    aiAction = AiLogic.generateAiAction(
                         armyMap.get(ChessSide.SECOND_SIDE),
-                        armyMap.get(ChessSide.FIRST_SIDE)
+                        armyMap.get(ChessSide.FIRST_SIDE),
+                        this
                     );
                 } else {
                     aiAction = null;

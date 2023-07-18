@@ -12,15 +12,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import hundun.militarychess.ui.MilitaryChessGame;
-import hundun.militarychess.ui.screen.AbstractComikeScreen;
+import hundun.militarychess.ui.screen.AbstractMilitaryChessScreen;
 
 
 public abstract class BasePageableTable extends MyWindow {
-    protected final AbstractComikeScreen screen;
+    protected final AbstractMilitaryChessScreen screen;
     private final Container<Table> currentTableContainer;
     private final Map<String, Table> pageRootTableMap = new HashMap<>();
     private final HorizontalGroup horizontalGroup = new HorizontalGroup();
-    public BasePageableTable(AbstractComikeScreen screen) {
+    public BasePageableTable(AbstractMilitaryChessScreen screen) {
         this.screen = screen;
 
         this.currentTableContainer = new Container<>();
