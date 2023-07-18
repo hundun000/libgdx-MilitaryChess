@@ -50,9 +50,8 @@ public class MyMenuScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                game.getLogicContext().loadEmpty();
                 game.getLogicContext().updateCrossScreenDataPackage();
-                game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
+                game.getScreenManager().pushScreen(PrepareScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
             }
         });
 

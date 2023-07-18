@@ -15,7 +15,25 @@ import java.util.*;
  * 和棋盘位置有关的规则
  */
 public class GameboardPosRule {
+    private static final List<SimplePos> XING_YING_POS_MAP = List.of(
+        new SimplePos(7, 1),
+        new SimplePos(7, 3),
+        new SimplePos(8, 2),
+        new SimplePos(9, 1),
+        new SimplePos(9, 3),
+        new SimplePos(2, 1),
+        new SimplePos(2, 3),
+        new SimplePos(3, 2),
+        new SimplePos(4, 1),
+        new SimplePos(4, 3)
+    );
 
+    private static final List<SimplePos> DA_BEN_YING_POS_MAP = List.of(
+        new SimplePos(11, 1),
+        new SimplePos(11, 3),
+        new SimplePos(0, 1),
+        new SimplePos(0, 3)
+    );
     public static Map<Integer, SimplePos> simplePosMap;
     public static Map<SimplePos, GameboardPos> gameboardPosMap;
     static {
@@ -33,25 +51,7 @@ public class GameboardPosRule {
         });
     }
 
-    private static List<SimplePos> XING_YING_POS_MAP = List.of(
-            new SimplePos(7, 1),
-            new SimplePos(7, 3),
-            new SimplePos(8, 2),
-            new SimplePos(9, 1),
-            new SimplePos(9, 3),
-            new SimplePos(2, 1),
-            new SimplePos(2, 3),
-            new SimplePos(3, 2),
-            new SimplePos(4, 1),
-            new SimplePos(4, 3)
-    );
 
-    private static List<SimplePos> DA_BEN_YING_POS_MAP = List.of(
-            new SimplePos(11, 1),
-            new SimplePos(11, 3),
-            new SimplePos(0, 1),
-            new SimplePos(0, 3)
-    );
 
 
 

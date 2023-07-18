@@ -103,16 +103,19 @@ public class LogicContext {
 
     }
 
+    @Getter
     public enum PlayerMode {
-        PVP,
-        PVC,
+        PVP("双人对战"),
+        PVC("人机对战"),
         ;
-
+        final String chinese;
+        PlayerMode(String chinese){
+            this.chinese = chinese;
+        }
     }
 
 
-    public void loadEmpty() {
-    }
+
 
     public void updateCrossScreenDataPackage() {
         this.crossScreenDataPackage = CrossScreenDataPackage.builder()
