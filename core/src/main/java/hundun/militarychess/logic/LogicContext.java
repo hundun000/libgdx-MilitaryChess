@@ -1,6 +1,7 @@
 package hundun.militarychess.logic;
 
 import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.chess.PosRule.SimplePos;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -51,6 +52,20 @@ public class LogicContext {
         ChessVM toChessVM;
         AiAction aiAction;
 
+        public ChessRuntimeData findAtPos(SimplePos pos) {
+            for (var armyRuntimeData : armyMap.values()) {
+                var result = armyRuntimeData.getChessRuntimeDataList().stream()
+                    .filter(chessRuntimeData -> chessRuntimeData.getMainLocation().getPos().equals(pos))
+                    .findAny()
+                    .orElse(null);
+                if (result != null) {
+                    return result;
+                }
+            }
+            return null;
+        }
+
+
         public void afterFight() {
             if (currentSide == ChessSide.FIRST_SIDE) {
                 currentSide = ChessSide.SECOND_SIDE;
@@ -95,7 +110,7 @@ public class LogicContext {
     public void updateCrossScreenDataPackage() {
         this.crossScreenDataPackage = CrossScreenDataPackage.builder()
             .game(game)
-            .playerMode(PlayerMode.PVC)
+            .playerMode(PlayerMode.PVP)
             .currentSide(ChessSide.FIRST_SIDE)
             .currentState(ChessState.WAIT_SELECT_FROM)
             .armyMap(Map.of(

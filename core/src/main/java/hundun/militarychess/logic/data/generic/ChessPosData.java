@@ -15,7 +15,6 @@ public class ChessPosData {
 
 
     public String toText() {
-        char rowChar = (char)('A' + pos.getRow());
-        return "(" + rowChar + pos.getCol() + ")";
+        return pos.toText();
     }
 }

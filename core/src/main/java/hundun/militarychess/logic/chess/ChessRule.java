@@ -9,13 +9,18 @@ import lombok.Getter;
 public class ChessRule {
 
 
-
-
-    public static FightResultType canMove(ChessRuntimeData from, ChessRuntimeData to) {
+    public static boolean canMove(ChessRuntimeData from, ChessRuntimeData to) {
         if (from.getChessSide() == to.getChessSide()) {
-            return FightResultType.CAN_NOT;
+            return false;
         }
         if (!from.getChessType().isCanMove()) {
+            return false;
+        }
+        return true;
+    }
+
+    public static FightResultType fightResultPreview(ChessRuntimeData from, ChessRuntimeData to) {
+        if (!canMove(from, to)) {
             return FightResultType.CAN_NOT;
         }
         return getFightResult(from, to);

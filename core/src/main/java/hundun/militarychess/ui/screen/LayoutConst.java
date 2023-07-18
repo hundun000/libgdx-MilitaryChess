@@ -10,6 +10,8 @@ public class LayoutConst {
     public final int DESK_WIDTH = 400;
     public final int DESK_HEIGHT = 200;
 
+    public final int CHESS_AND_DESK_SPACE = 20;
+
     public final int DESK_STAR_SIZE = 50;
     public final int GOOD_IMAGE_SIZE = 150;
     public final int GOOD_NODE_HEIGHT = GOOD_IMAGE_SIZE + 50;

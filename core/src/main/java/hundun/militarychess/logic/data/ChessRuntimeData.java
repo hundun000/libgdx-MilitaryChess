@@ -23,6 +23,11 @@ public class ChessRuntimeData {
     ChessType chessType;
     ChessSide chessSide;
 
+    public String toText() {
+        return this.getChessType().name()
+            + this.getMainLocation().toText();
+    }
+
     @Getter
     public enum ChessSide {
         FIRST_SIDE("红方"),
@@ -44,46 +49,41 @@ public class ChessRuntimeData {
         List<ChessRuntimeData> result = new ArrayList<>();
         int row = chessSide == ChessSide.FIRST_SIDE ? 6 : 0;
         int col = 0;
-        for (int i = 0; i < codes.length(); i++) {
-            String code = String.valueOf(codes.charAt(i));
-            ChessType chessType = ChessType.fromCode(code);
-            ChessPosData mainLocation =  ChessPosData.builder()
+        for (int i = 0; i < codes.length(); ) {
+            ChessPosData mainLocation = ChessPosData.builder()
                 .pos(new SimplePos(row, col))
                 .build();
+            ChessRuntimeData chessRuntimeData;
+            ChessType chessType;
+            final int tempCol = col;
+            final int tempRow = row;
+            if (xingyingList.stream().anyMatch(it -> it.getCurrentPos().getCol() == tempCol
+                && it.getCurrentPos().getRow() == tempRow)) {
+                chessType = ChessType.EMPTY;
+                chessRuntimeData = ChessRuntimeData.builder()
+                    .mainLocation(mainLocation)
+                    .chessType(chessType)
+                    .chessSide(ChessSide.EMPTY)
+                    .build();
 
-            ChessRuntimeData chessRuntimeData = ChessRuntimeData.builder()
-                .mainLocation(mainLocation)
-                .chessType(chessType)
-                .chessSide(chessSide)
-                .build();
+            } else {
+                String code = String.valueOf(codes.charAt(i));
+                chessType = ChessType.fromCode(code);
+                chessRuntimeData = ChessRuntimeData.builder()
+                    .mainLocation(mainLocation)
+                    .chessType(chessType)
+                    .chessSide(chessSide)
+                    .build();
+                i++;
+            }
             LayoutConst.updatePos(chessRuntimeData, layoutConst);
             result.add(chessRuntimeData);
-            boolean needUpdate = true;
-            while (needUpdate) {
-                col++;
-                if (col > 4) {
-                    col = 0;
-                    row++;
-                }
-                final int tempCol = col;
-                final int tempRow = row;
-                needUpdate = xingyingList.stream().anyMatch(it -> it.getCurrentPos().getCol() == tempCol
-                    && it.getCurrentPos().getRow() == tempRow);
+            col++;
+            if (col > 4) {
+                col = 0;
+                row++;
             }
         }
-        xingyingList.forEach(it -> {
-                    ChessType chessType = ChessType.EMPTY;
-                    ChessPosData mainLocation = ChessPosData.builder()
-                        .pos(it.getCurrentPos())
-                        .build();
-                    ChessRuntimeData chessRuntimeData = ChessRuntimeData.builder()
-                        .mainLocation(mainLocation)
-                        .chessType(chessType)
-                        .chessSide(ChessSide.EMPTY)
-                        .build();
-                    LayoutConst.updatePos(chessRuntimeData, layoutConst);
-                    result.add(chessRuntimeData);
-                });
         return result;
     }
 

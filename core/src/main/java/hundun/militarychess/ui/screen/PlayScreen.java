@@ -157,16 +157,16 @@ public class PlayScreen extends AbstractComikeScreen {
             case WAIT_SELECT_FROM:
                 if (chessVM.getDeskData().getChessSide() == crossScreenDataPackage.getCurrentSide()) {
                     mainBoardVM.getAllButtonPageVM().setFrom(chessVM);
+                    deskAreaVM.updateMask(chessVM);
                     crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_TO);
                 }
                 break;
             case WAIT_SELECT_TO:
                 if (chessVM.getDeskData().getChessSide() != crossScreenDataPackage.getCurrentSide()) {
-                    FightResultType fightResultPreview = ChessRule.canMove(
+                    FightResultType fightResultPreview = ChessRule.fightResultPreview(
                         mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
                         chessVM.getDeskData()
                         );
-
                     mainBoardVM.getAllButtonPageVM().setTo(chessVM, fightResultPreview);
                     crossScreenDataPackage.setCurrentState(ChessState.WAIT_COMMIT);
                 }
@@ -185,17 +185,24 @@ public class PlayScreen extends AbstractComikeScreen {
     }
 
     private void afterFight() {
+        game.getFrontend().log(this.getClass().getSimpleName(),
+            "afterFight, from = {0}, to = {1}",
+            mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData().toText(),
+            mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData().toText()
+            );
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        crossScreenDataPackage.afterFight();
         mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUI();
         mainBoardVM.getAllButtonPageVM().getToChessVM().updateUI();
         mainBoardVM.getAllButtonPageVM().updateForNewSide(crossScreenDataPackage.getCurrentSide());
-        crossScreenDataPackage.afterFight();
+        deskAreaVM.afterFightOrClear();
     }
 
     public void onClearButtonClicked() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         mainBoardVM.getAllButtonPageVM().setFrom(null);
         mainBoardVM.getAllButtonPageVM().setTo(null, null);
+        deskAreaVM.afterFightOrClear();
         crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_FROM);
     }
 }

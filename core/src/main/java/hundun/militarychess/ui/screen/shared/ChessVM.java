@@ -5,11 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
 
+import hundun.militarychess.ui.screen.LayoutConst;
 import lombok.Getter;
 
 
@@ -31,7 +33,12 @@ public class ChessVM extends Table {
 
 
         this.image = new Image();
-        image.setBounds(0, 0, this.game.getScreenContext().getLayoutConst().DESK_WIDTH, this.game.getScreenContext().getLayoutConst().DESK_HEIGHT);
+        image.setBounds(
+            this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE,
+            this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE,
+            this.game.getScreenContext().getLayoutConst().DESK_WIDTH - this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE * 2,
+            this.game.getScreenContext().getLayoutConst().DESK_HEIGHT - this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE * 2
+        );
         this.addActor(image);
         /*this.setBackground(new TextureRegionDrawable(new TextureRegion(TextureFactory.getSimpleBoardBackground(
                 this.game.getScreenContext().getLayoutConst().DESK_WIDTH,
@@ -55,6 +62,7 @@ public class ChessVM extends Table {
         } else {
             image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
         }
+        LayoutConst.updatePos(this.getDeskData(), game.getScreenContext().getLayoutConst());
         this.setBounds(
             deskData.getUiX(),
             deskData.getUiY(),
@@ -64,4 +72,11 @@ public class ChessVM extends Table {
     }
 
 
+    public void updateMask(boolean type) {
+        if (type) {
+            this.setBackground(DrawableFactory.createAlphaBoard(1, 1, Color.YELLOW, 0.5f));
+        } else {
+            this.setBackground((Drawable) null);
+        }
+    }
 }
