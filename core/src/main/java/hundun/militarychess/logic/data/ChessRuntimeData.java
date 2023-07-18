@@ -1,10 +1,10 @@
 package hundun.militarychess.logic.data;
 
 import hundun.militarychess.logic.chess.ChessType;
-import hundun.militarychess.logic.chess.PosRule;
-import hundun.militarychess.logic.chess.PosRule.ChessPosType;
-import hundun.militarychess.logic.chess.PosRule.PosRelationData;
-import hundun.militarychess.logic.chess.PosRule.SimplePos;
+import hundun.militarychess.logic.chess.GameboardPosRule;
+import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
+import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
+import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.ui.screen.LayoutConst;
 import lombok.*;
 
@@ -53,8 +53,8 @@ public class ChessRuntimeData {
     }
 
     public static List<ChessRuntimeData> fromCodes(String codes, LayoutConst layoutConst, ChessSide chessSide) {
-        List<PosRelationData> xingyingList = PosRule.relationMap.values().stream()
-            .filter(it -> it.getChessPosType() == ChessPosType.XING_YING)
+        List<GameboardPos> xingyingList = GameboardPosRule.gameboardPosMap.values().stream()
+            .filter(it -> it.getGameboardPosType() == GameboardPosType.XING_YING)
             .collect(Collectors.toList());
 
         List<ChessRuntimeData> result = new ArrayList<>();
@@ -65,8 +65,8 @@ public class ChessRuntimeData {
             ChessType chessType;
             final int tempCol = col;
             final int tempRow = row;
-            if (xingyingList.stream().anyMatch(it -> it.getCurrentPos().getCol() == tempCol
-                && it.getCurrentPos().getRow() == tempRow)) {
+            if (xingyingList.stream().anyMatch(it -> it.getPos().getCol() == tempCol
+                && it.getPos().getRow() == tempRow)) {
                 chessType = ChessType.EMPTY;
                 chessRuntimeData = ChessRuntimeData.builder()
                     .pos(new SimplePos(row, col))

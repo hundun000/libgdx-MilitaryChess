@@ -3,7 +3,7 @@ package hundun.militarychess.ui.screen.shared;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
-import hundun.militarychess.logic.chess.PosRule;
+import hundun.militarychess.logic.chess.GameboardPosRule;
 import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.screen.AbstractComikeScreen;
 
@@ -26,7 +26,7 @@ public class DeskClickListener extends ClickListener {
         stringBuilder.append(vm.getDeskData().toText()
             + " has been clicked."
         );
-        var relation = PosRule.relationMap.get(vm.getDeskData().getPos());
+        var relation = GameboardPosRule.gameboardPosMap.get(vm.getDeskData().getPos());
         stringBuilder.append("NeighbourMap{");
         relation.getNeighbourMap().forEach((k, v) -> stringBuilder.append(k).append("=").append(v != null ? v.toText() : "null"));
         stringBuilder.append("}");

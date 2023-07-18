@@ -1,19 +1,36 @@
 package hundun.militarychess.logic.chess;
 
 import hundun.militarychess.logic.LogicContext.AiAction;
+import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
+import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import lombok.Getter;
 
+/**
+ * 行走和战斗规则
+ */
 public class ChessRule {
 
 
     public static boolean canMove(ChessRuntimeData from, ChessRuntimeData to) {
+        // 不能重叠自己的棋子
         if (from.getChessSide() == to.getChessSide()) {
             return false;
         }
+        // 某些ChessType不可移动
         if (!from.getChessType().isCanMove()) {
+            return false;
+        }
+        GameboardPos fromGameboardPos = GameboardPosRule.gameboardPosMap.get(from.getPos());
+        GameboardPos toGameboardPos = GameboardPosRule.gameboardPosMap.get(to.getPos());
+        // 不能从大本营移出
+        if (fromGameboardPos.getGameboardPosType() == GameboardPosType.DA_BEN_YING) {
+            return false;
+        }
+        // 不能移入非空行营
+        if (toGameboardPos.getGameboardPosType() == GameboardPosType.XING_YING && to.getChessSide() != ChessSide.EMPTY) {
             return false;
         }
         return true;
@@ -54,11 +71,17 @@ public class ChessRule {
         }
     }
 
+    /**
+     * 死亡即变成空地
+     */
     private static void setAsDead(ChessRuntimeData target) {
         target.setChessSide(ChessSide.EMPTY);
         target.setChessType(ChessType.EMPTY);
     }
 
+    /**
+     * 交换位置。和空地交换位置即为移动。
+     */
     private static void switchPos(ChessRuntimeData from, ChessRuntimeData to) {
         var temp = from.getPos();
         from.setPos(to.getPos());

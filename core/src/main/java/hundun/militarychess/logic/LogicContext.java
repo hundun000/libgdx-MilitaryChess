@@ -1,7 +1,7 @@
 package hundun.militarychess.logic;
 
 import hundun.militarychess.logic.chess.ChessRule;
-import hundun.militarychess.logic.chess.PosRule.SimplePos;
+import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;

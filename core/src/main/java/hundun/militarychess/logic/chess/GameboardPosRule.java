@@ -11,10 +11,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.*;
 
-public class PosRule {
+/**
+ * 和棋盘位置有关的规则
+ */
+public class GameboardPosRule {
 
     public static Map<Integer, SimplePos> simplePosMap;
-    public static Map<SimplePos, PosRelationData> relationMap;
+    public static Map<SimplePos, GameboardPos> gameboardPosMap;
     static {
 
         simplePosMap = new HashMap<>();
@@ -24,13 +27,13 @@ public class PosRule {
             }
         }
 
-        relationMap = new HashMap<>();
+        gameboardPosMap = new HashMap<>();
         simplePosMap.values().forEach(it -> {
-            relationMap.put(it, baseRelation(it));
+            gameboardPosMap.put(it, buildGameboardSimplePos(it));
         });
     }
 
-    public static List<SimplePos> XING_YING_POS_MAP = List.of(
+    private static List<SimplePos> XING_YING_POS_MAP = List.of(
             new SimplePos(7, 1),
             new SimplePos(7, 3),
             new SimplePos(8, 2),
@@ -43,7 +46,7 @@ public class PosRule {
             new SimplePos(4, 3)
     );
 
-    public static List<SimplePos> DA_BEN_YING_POS_MAP = List.of(
+    private static List<SimplePos> DA_BEN_YING_POS_MAP = List.of(
             new SimplePos(11, 1),
             new SimplePos(11, 3),
             new SimplePos(0, 1),
@@ -62,7 +65,7 @@ public class PosRule {
 
 
 
-    private static void addNeighbour(PosRelationData thiz, SimplePos pos, ChessPosType chessPosType) {
+    private static void buildGameboardNeighbour(GameboardPos thiz, SimplePos pos, GameboardPosType gameboardPosType) {
         if (pos.getCol() - 1 >= 0) {
             thiz.getNeighbourMap().put(Direction.LEFT, findSimplePos(pos.getRow(), pos.getCol() - 1));
         }
@@ -106,38 +109,38 @@ public class PosRule {
     }
 
 
-    private static PosRelationData baseRelation(SimplePos pos) {
+    private static GameboardPos buildGameboardSimplePos(SimplePos pos) {
 
-        PosRelationData result = PosRelationData.builder()
-            .currentPos(pos)
+        GameboardPos result = GameboardPos.builder()
+            .pos(pos)
             .neighbourMap(new HashMap<>())
             .build();
 
 
         final int row = pos.getRow();
         final int col = pos.getCol();
-        ChessPosType chessPosType;
+        GameboardPosType gameboardPosType;
         if (row <= 0 || row >= 11) {
             if (DA_BEN_YING_POS_MAP.contains(pos)) {
-                chessPosType = ChessPosType.DA_BEN_YING;
+                gameboardPosType = GameboardPosType.DA_BEN_YING;
             } else {
-                chessPosType = ChessPosType.BACK_NORMAL;
+                gameboardPosType = GameboardPosType.BACK_NORMAL;
             }
         } else if (row == 1 || row == 5 || row == 6 || row == 10) {
-            chessPosType = ChessPosType.RAIL;
+            gameboardPosType = GameboardPosType.RAIL;
         } else {
             if (col == 0 || col == 5) {
-                chessPosType = ChessPosType.RAIL;
+                gameboardPosType = GameboardPosType.RAIL;
             } else {
                 if (XING_YING_POS_MAP.contains(pos)) {
-                    chessPosType = ChessPosType.XING_YING;
+                    gameboardPosType = GameboardPosType.XING_YING;
                 } else {
-                    chessPosType = ChessPosType.FRONT_NORMAL;
+                    gameboardPosType = GameboardPosType.FRONT_NORMAL;
                 }
             }
         }
-        addNeighbour(result, pos, chessPosType);
-        result.setChessPosType(chessPosType);
+        buildGameboardNeighbour(result, pos, gameboardPosType);
+        result.setGameboardPosType(gameboardPosType);
         return result;
     }
 
@@ -176,7 +179,10 @@ public class PosRule {
         }
     }
 
-    public static Set<SimplePos> calculateCurrent(
+    /**
+     * 搜索完整的可移动目的地
+     */
+    public static Set<SimplePos> finaAllMoveCandidates(
         ChessRuntimeData fromChess,
         CrossScreenDataPackage crossScreenDataPackage
     ) {
@@ -185,9 +191,9 @@ public class PosRule {
 
         SimplePos currentPos = fromChess.getPos();
         boolean canTurnDirection = fromChess.getChessType() == ChessType.GONG_BING;
-        PosRelationData currentPosRelationData = PosRule.relationMap.get(currentPos);
+        GameboardPos currentGameboardPos = GameboardPosRule.gameboardPosMap.get(currentPos);
         // 搜索相邻的可移动目的地
-        currentPosRelationData.getNeighbourMap().values().forEach(checkingPos -> {
+        currentGameboardPos.getNeighbourMap().values().forEach(checkingPos -> {
             ChessRuntimeData checkingChess = crossScreenDataPackage.findAtPos(checkingPos);
             if (checkingChess != null && ChessRule.canMove(fromChess, checkingChess)) {
                 result.add(checkingPos);
@@ -216,17 +222,17 @@ public class PosRule {
         }
         result.add(currentPos);
         dirtyRailPosList.add(currentPos);
-        PosRelationData currentPosRelationData = PosRule.relationMap.get(currentPos);
+        GameboardPos currentGameboardPos = GameboardPosRule.gameboardPosMap.get(currentPos);
         // 对于铁路，只尝试4种方向
         for (Direction direction : Direction.XYValues) {
-            SimplePos checkingPos = currentPosRelationData.getNeighbourMap().get(direction);
+            SimplePos checkingPos = currentGameboardPos.getNeighbourMap().get(direction);
             if (checkingPos == null) {
                 continue;
             }
-            PosRelationData checkingPosRelationData = PosRule.relationMap.get(checkingPos);
+            GameboardPos checkingGameboardPos = GameboardPosRule.gameboardPosMap.get(checkingPos);
             ChessRuntimeData checkingChess = crossScreenDataPackage.findAtPos(checkingPos);
             // checkingPos不是铁路或不可移动则不需继续检查
-            if (checkingPosRelationData.getChessPosType() != ChessPosType.RAIL || !ChessRule.canMove(fromChess, checkingChess)) {
+            if (checkingGameboardPos.getGameboardPosType() != GameboardPosType.RAIL || !ChessRule.canMove(fromChess, checkingChess)) {
                 continue;
             }
             // 检查checkingPos是否属于同一条铁路
@@ -257,17 +263,21 @@ public class PosRule {
         }
     }
 
+    /**
+     * 棋盘上的位置。
+     * 除了(x, y)，还包含邻居关系，地形。
+     */
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class PosRelationData {
-        SimplePos currentPos;
+    public static class GameboardPos {
+        SimplePos pos;
         Map<Direction, SimplePos> neighbourMap;
-        ChessPosType chessPosType;
+        GameboardPosType gameboardPosType;
     }
 
-    public enum ChessPosType {
+    public enum GameboardPosType {
         RAIL,
         FRONT_NORMAL,
         XING_YING,
