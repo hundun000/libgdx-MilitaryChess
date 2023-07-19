@@ -125,7 +125,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     }
 
     private ChessVM findVM(ChessRuntimeData chessRuntimeData) {
-        return deskAreaVM.getNodes().get(chessRuntimeData);
+        return deskAreaVM.getNodes().get(chessRuntimeData.getId());
     }
 
 

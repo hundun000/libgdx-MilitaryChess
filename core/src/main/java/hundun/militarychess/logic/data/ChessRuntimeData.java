@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChessRuntimeData {
+    String id;
     SimplePos pos;
     int uiX;
     int uiY;
@@ -65,10 +66,12 @@ public class ChessRuntimeData {
             ChessType chessType;
             final int tempCol = col;
             final int tempRow = row;
+            final String id = UUID.randomUUID().toString();
             if (xingyingList.stream().anyMatch(it -> it.getPos().getCol() == tempCol
                 && it.getPos().getRow() == tempRow)) {
                 chessType = ChessType.EMPTY;
                 chessRuntimeData = ChessRuntimeData.builder()
+                    .id(id)
                     .pos(new SimplePos(row, col))
                     .chessType(chessType)
                     .chessSide(ChessSide.EMPTY)
@@ -78,6 +81,7 @@ public class ChessRuntimeData {
                 String code = String.valueOf(codes.charAt(i));
                 chessType = ChessType.fromCode(code);
                 chessRuntimeData = ChessRuntimeData.builder()
+                    .id(id)
                     .pos(new SimplePos(row, col))
                     .chessType(chessType)
                     .chessSide(chessSide)

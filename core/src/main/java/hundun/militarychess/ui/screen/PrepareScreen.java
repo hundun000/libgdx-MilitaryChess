@@ -16,6 +16,7 @@ import hundun.militarychess.logic.LogicContext.PlayerMode;
 import hundun.militarychess.ui.MilitaryChessGame;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 
@@ -42,7 +43,7 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         backImage.setFillParent(true);
         backUiStage.addActor(backImage);
 
-        Map<CheckBox, PlayerMode> playerModeCheckBoxMap = new HashMap<>();
+        Map<CheckBox, PlayerMode> playerModeCheckBoxMap = new LinkedHashMap<>();
         playerModeCheckBoxMap.put(new CheckBox(PlayerMode.PVP.getChinese(), game.getMainSkin()), PlayerMode.PVP);
         playerModeCheckBoxMap.put(new CheckBox(PlayerMode.PVC.getChinese(), game.getMainSkin()), PlayerMode.PVC);
         ButtonGroup<CheckBox> playerModeButtonGroup = new ButtonGroup<>();

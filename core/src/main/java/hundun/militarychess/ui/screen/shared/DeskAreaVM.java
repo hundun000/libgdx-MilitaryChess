@@ -20,7 +20,7 @@ import lombok.Getter;
 public class DeskAreaVM extends Table {
     public AbstractMilitaryChessScreen screen;
     @Getter
-    Map<ChessRuntimeData, ChessVM> nodes = new LinkedHashMap<>();
+    Map<String, ChessVM> nodes = new LinkedHashMap<>();
     @Getter
     CameraDataPackage cameraDataPackage;
 
@@ -58,7 +58,7 @@ public class DeskAreaVM extends Table {
         chessRuntimeDataList.forEach(deskData -> {
 
             ChessVM actor = new ChessVM(this, deskData);
-            nodes.put(deskData, actor);
+            nodes.put(deskData.getId(), actor);
             actor.addListener(new DeskClickListener(screen, actor));
             this.addActor(actor);
 
