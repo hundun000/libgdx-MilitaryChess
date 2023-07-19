@@ -80,7 +80,7 @@ public class LogicContext {
             currentChessShowSides.clear();
             currentChessShowSides.add(ChessSide.EMPTY);
             if (chessShowMode == ChessShowMode.MING_QI) {
-                currentChessShowSides.add(currentSide);
+                currentChessShowSides.addAll(armyMap.keySet());
             } else {
                 if (playerMode == PlayerMode.PVP) {
                     currentChessShowSides.add(currentSide);

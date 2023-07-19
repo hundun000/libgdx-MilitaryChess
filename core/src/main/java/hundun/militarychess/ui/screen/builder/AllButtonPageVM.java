@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
+import hundun.militarychess.logic.LogicContext.ChessShowMode;
+import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.screen.PlayScreen;
@@ -81,26 +83,40 @@ public class AllButtonPageVM extends Table {
 
 
     public void updateUI() {
+        CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
         if (fromChessVM != null) {
-            this.fromLabel.setText("发起者: "
-                + fromChessVM.getDeskData().getChessType().getChinese()
-                + fromChessVM.getDeskData().toText()
-            );
+            if (crossScreenDataPackage.getCurrentChessShowSides().contains(fromChessVM.getDeskData().getChessSide())) {
+                this.fromLabel.setText("发起者: "
+                    + fromChessVM.getDeskData().toText()
+                );
+            } else {
+                this.fromLabel.setText("发起者: 已隐藏");
+            }
         } else {
             this.fromLabel.setText("发起者: 待选择");
         }
         if (toChessVM != null) {
-            this.toLabel.setText("目标: "
-                + toChessVM.getDeskData().getChessType().getChinese()
-                + toChessVM.getDeskData().toText()
-            );
+            if (crossScreenDataPackage.getCurrentChessShowSides().contains(toChessVM.getDeskData().getChessSide())) {
+                this.toLabel.setText("目标: "
+                    + toChessVM.getDeskData().toText()
+                );
+            } else {
+                this.toLabel.setText("目标: 已隐藏");
+            }
         } else {
             this.toLabel.setText("目标: 待选择");
         }
         if (fightResultPreview != null) {
-            this.fightResultPreviewLabel.setText("预测: "
-                + fightResultPreview.getChinese()
-            );
+            if (crossScreenDataPackage.getChessShowMode() == ChessShowMode.MING_QI
+                || fightResultPreview == FightResultType.JUST_MOVE
+                || fightResultPreview == FightResultType.CAN_NOT
+            ) {
+                this.fightResultPreviewLabel.setText("预测: "
+                    + fightResultPreview.getChinese()
+                );
+            } else {
+                this.fightResultPreviewLabel.setText("预测: 已隐藏");
+            }
         } else {
             this.fightResultPreviewLabel.setText("");
         }

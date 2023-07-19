@@ -60,6 +60,7 @@ public class AiLogic {
             }
             for (var entry : scoreMap.entrySet()) {
                 if (entry.getValue() > maxScore) {
+                    maxScore = entry.getValue();
                     maxScoreFromChess = checkingFromChess;
                     maxScoreToPos = entry.getKey();
                 }

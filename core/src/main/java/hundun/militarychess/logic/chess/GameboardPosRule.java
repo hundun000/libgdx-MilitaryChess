@@ -139,7 +139,7 @@ public class GameboardPosRule {
         } else if (row == 1 || row == 5 || row == 6 || row == 10) {
             gameboardPosType = GameboardPosType.RAIL;
         } else {
-            if (col == 0 || col == 5) {
+            if (col == 0 || col == 4) {
                 gameboardPosType = GameboardPosType.RAIL;
             } else {
                 if (XING_YING_POS_MAP.contains(pos)) {
@@ -209,8 +209,9 @@ public class GameboardPosRule {
                 result.add(checkingPos);
             }
         });
-
-        findRailMoveCandidates(fromChess, null, currentPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
+        if (currentGameboardPos.getGameboardPosType() == GameboardPosType.RAIL) {
+            findRailMoveCandidates(fromChess, null, currentPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
+        }
         result.remove(currentPos);
         return result;
     }

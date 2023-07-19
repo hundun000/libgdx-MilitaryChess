@@ -24,7 +24,7 @@ public class ChessRuntimeData {
     ChessSide chessSide;
 
     public String toText() {
-        return this.getChessType().name()
+        return this.getChessType().getChinese()
             + this.getPos().toText();
     }
 
