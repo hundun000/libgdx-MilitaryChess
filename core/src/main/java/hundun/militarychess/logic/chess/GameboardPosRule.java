@@ -84,12 +84,37 @@ public class GameboardPosRule {
                 thiz.getNeighbourMap().put(Direction.DOWN, findSimplePos(pos.getRow() + 1, pos.getCol()));
             }
         }
-        // 特别的，行营额外连接斜向
-        if (XING_YING_POS_MAP.contains(pos)) {
-            thiz.getNeighbourMap().put(Direction.LEFT_UP, findSimplePos(pos.getRow() - 1, pos.getCol() - 1));
-            thiz.getNeighbourMap().put(Direction.RIGHT_UP, findSimplePos(pos.getRow() - 1, pos.getCol() + 1));
-            thiz.getNeighbourMap().put(Direction.LEFT_DOWN, findSimplePos(pos.getRow() + 1, pos.getCol() - 1));
-            thiz.getNeighbourMap().put(Direction.RIGHT_DOWN, findSimplePos(pos.getRow() + 1, pos.getCol() + 1));
+        // 并且和行营相邻的位置不连接斜向
+        int minDistance = XING_YING_POS_MAP.stream()
+            .map(it -> Math.abs(it.getRow() - pos.getRow()) + Math.abs(it.getCol() - pos.getCol()))
+            .sorted()
+            .findFirst()
+            .get();
+        if (minDistance != 1) {
+            // 特别的，1/6/11行不连接LEFT_UP和RIGHT_UP
+            if (pos.getRow() - 1 >= 0 && pos.getCol() - 1 >= 0) {
+                if (pos.getRow() != 1 && pos.getRow() != 6 && pos.getRow() != 11) {
+
+
+                    thiz.getNeighbourMap().put(Direction.LEFT_UP, findSimplePos(pos.getRow() - 1, pos.getCol() - 1));
+                }
+            }
+            if (pos.getRow() - 1 >= 0 && pos.getCol() + 1 >= 0) {
+                if (pos.getRow() != 1 && pos.getRow() != 6 && pos.getRow() != 11) {
+                    thiz.getNeighbourMap().put(Direction.RIGHT_UP, findSimplePos(pos.getRow() - 1, pos.getCol() + 1));
+                }
+            }
+            // 特别的，0/5/10行不连接LEFT_DOWN和RIGHT_DOWN
+            if (pos.getRow() + 1 <= 11 && pos.getCol() - 1 >= 0) {
+                if (pos.getRow() != 0 && pos.getRow() != 5 && pos.getRow() != 10) {
+                    thiz.getNeighbourMap().put(Direction.LEFT_DOWN, findSimplePos(pos.getRow() + 1, pos.getCol() - 1));
+                }
+            }
+            if (pos.getRow() + 1 <= 11 && pos.getCol() + 1 >= 0) {
+                if (pos.getRow() != 0 && pos.getRow() != 5 && pos.getRow() != 10) {
+                    thiz.getNeighbourMap().put(Direction.RIGHT_DOWN, findSimplePos(pos.getRow() + 1, pos.getCol() + 1));
+                }
+            }
         }
     }
 

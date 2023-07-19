@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
+import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
@@ -53,14 +54,27 @@ public class ChessVM extends Table {
 
 
     public void updateUI(){
-        this.mainLabel.setText(deskData.getChessType().getChinese());
-        if (deskData.getChessSide() == ChessSide.FIRST_SIDE) {
-            image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.RED, 0.8f));
-        } else if (deskData.getChessSide() == ChessSide.SECOND_SIDE) {
-            image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.BLUE, 0.8f));
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+
+        if (crossScreenDataPackage.getCurrentChessShowSides().contains(deskData.getChessSide())) {
+            this.mainLabel.setText(deskData.getChessType().getChinese());
+            if (deskData.getChessSide() == ChessSide.FIRST_SIDE) {
+                image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.RED, 0.8f));
+            } else if (deskData.getChessSide() == ChessSide.SECOND_SIDE) {
+                image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.BLUE, 0.8f));
+            } else {
+                image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
+            }
         } else {
-            image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
+            if (deskData.getChessSide() != ChessSide.EMPTY) {
+                this.mainLabel.setText("");
+                image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.GRAY, 0.8f));
+            } else {
+                this.mainLabel.setText(deskData.getChessType().getChinese());
+                image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
+            }
         }
+
         this.getDeskData().updateUiPos(game.getScreenContext().getLayoutConst());
         this.setBounds(
             deskData.getUiX(),
@@ -72,10 +86,12 @@ public class ChessVM extends Table {
 
 
     public void updateMask(boolean type) {
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         if (type) {
             this.setBackground(DrawableFactory.createAlphaBoard(1, 1, Color.YELLOW, 0.5f));
         } else {
             this.setBackground((Drawable) null);
         }
+
     }
 }

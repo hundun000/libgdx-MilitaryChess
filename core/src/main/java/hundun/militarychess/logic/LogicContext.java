@@ -1,7 +1,6 @@
 package hundun.militarychess.logic;
 
 import hundun.militarychess.logic.chess.AiLogic;
-import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
@@ -14,10 +13,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Map;
+import java.util.Set;
 
 public class LogicContext {
 
     MilitaryChessGame game;
+    @Setter
     @Getter
     CrossScreenDataPackage crossScreenDataPackage;
 
@@ -50,8 +51,11 @@ public class LogicContext {
         MilitaryChessGame game;
 
         PlayerMode playerMode;
+        ChessShowMode chessShowMode;
+        ChessSide pvcPlayerSide;
         ChessSide currentSide;
         ChessState currentState;
+        Set<ChessSide> currentChessShowSides;
         Map<ChessSide, ArmyRuntimeData> armyMap;
 
         ChessVM fromChessVM;
@@ -71,14 +75,31 @@ public class LogicContext {
             return null;
         }
 
+        public void update() {
+            // 更新暗棋影响
+            currentChessShowSides.clear();
+            currentChessShowSides.add(ChessSide.EMPTY);
+            if (chessShowMode == ChessShowMode.MING_QI) {
+                currentChessShowSides.add(currentSide);
+            } else {
+                if (playerMode == PlayerMode.PVP) {
+                    currentChessShowSides.add(currentSide);
+                } else {
+                    currentChessShowSides.add(pvcPlayerSide);
+                }
+            }
+        }
 
         public void afterFight() {
+            // 更新当前方
             if (currentSide == ChessSide.FIRST_SIDE) {
                 currentSide = ChessSide.SECOND_SIDE;
             } else {
                 currentSide = ChessSide.FIRST_SIDE;
             }
+            // 更新阶段
             this.setCurrentState(ChessState.WAIT_SELECT_FROM);
+            // PVC时生成aiAction
             if (playerMode == PlayerMode.PVC) {
                 if (currentSide == ChessSide.SECOND_SIDE) {
                     aiAction = AiLogic.generateAiAction(
@@ -90,6 +111,7 @@ public class LogicContext {
                     aiAction = null;
                 }
             }
+            update();
         }
 
 
@@ -114,31 +136,17 @@ public class LogicContext {
         }
     }
 
-
-
-
-    public void updateCrossScreenDataPackage() {
-        this.crossScreenDataPackage = CrossScreenDataPackage.builder()
-            .game(game)
-            .playerMode(PlayerMode.PVP)
-            .currentSide(ChessSide.FIRST_SIDE)
-            .currentState(ChessState.WAIT_SELECT_FROM)
-            .armyMap(Map.of(
-                    ChessSide.FIRST_SIDE,
-                    ArmyRuntimeData.builder()
-                    .chessRuntimeDataList(ChessRuntimeData.fromCodes(
-                        "abccddeeffggghhhiiijjkklj",
-                        game.getScreenContext().getLayoutConst(),
-                        ChessSide.FIRST_SIDE))
-                        .build(),
-                    ChessSide.SECOND_SIDE,
-                    ArmyRuntimeData.builder()
-                        .chessRuntimeDataList(ChessRuntimeData.fromCodes(
-                            "jlkkijiiihhhgggffeeddccba",
-                            game.getScreenContext().getLayoutConst(),
-                            ChessSide.SECOND_SIDE))
-                            .build()
-            ))
-            .build();
+    @Getter
+    public enum ChessShowMode {
+        MING_QI("明棋"),
+        AN_QI("暗棋"),
+        ;
+        final String chinese;
+        ChessShowMode(String chinese){
+            this.chinese = chinese;
+        }
     }
+
+
+
 }

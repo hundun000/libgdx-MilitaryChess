@@ -11,11 +11,17 @@ import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.corelib.base.BaseHundunScreen;
 import hundun.gdxgame.corelib.base.util.TextureFactory;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
+import hundun.militarychess.logic.LogicContext.ChessShowMode;
+import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.LogicContext.PlayerMode;
+import hundun.militarychess.logic.data.ArmyRuntimeData;
+import hundun.militarychess.logic.data.ChessRuntimeData;
+import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -55,13 +61,52 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         });
         uiRootTable.row();
 
+        Map<CheckBox, ChessShowMode> chessShowModeCheckBoxMap = new LinkedHashMap<>();
+        chessShowModeCheckBoxMap.put(new CheckBox(ChessShowMode.MING_QI.getChinese(), game.getMainSkin()), ChessShowMode.MING_QI);
+        chessShowModeCheckBoxMap.put(new CheckBox(ChessShowMode.AN_QI.getChinese(), game.getMainSkin()), ChessShowMode.AN_QI);
+        ButtonGroup<CheckBox> chessShowModeButtonGroup = new ButtonGroup<>();
+        chessShowModeButtonGroup.setMaxCheckCount(1);
+        chessShowModeButtonGroup.setUncheckLast(true);
+        chessShowModeCheckBoxMap.keySet().forEach(it -> {
+            chessShowModeButtonGroup.add(it);
+            uiRootTable.add(it);
+        });
+        uiRootTable.row();
+
         TextButton buttonNewGame = new TextButton("开始", game.getMainSkin());
         buttonNewGame.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-                crossScreenDataPackage.setPlayerMode(playerModeCheckBoxMap.get(playerModeButtonGroup.getChecked()));
+                var playerMode = playerModeCheckBoxMap.get(playerModeButtonGroup.getChecked());
+                var chessShowMode = chessShowModeCheckBoxMap.get(chessShowModeButtonGroup.getChecked());
+                var crossScreenDataPackage = CrossScreenDataPackage.builder()
+                    .game(game)
+                    .playerMode(playerMode)
+                    .chessShowMode(chessShowMode)
+                    .currentChessShowSides(new HashSet<>())
+                    .pvcPlayerSide(playerMode == PlayerMode.PVC ? ChessSide.FIRST_SIDE : null)
+                    .currentSide(ChessSide.FIRST_SIDE)
+                    .currentState(ChessState.WAIT_SELECT_FROM)
+                    .armyMap(Map.of(
+                        ChessSide.FIRST_SIDE,
+                        ArmyRuntimeData.builder()
+                            .chessRuntimeDataList(ChessRuntimeData.fromCodes(
+                                "abccddeeffggghhhiiijjkklj",
+                                game.getScreenContext().getLayoutConst(),
+                                ChessSide.FIRST_SIDE))
+                            .build(),
+                        ChessSide.SECOND_SIDE,
+                        ArmyRuntimeData.builder()
+                            .chessRuntimeDataList(ChessRuntimeData.fromCodes(
+                                "jlkkijiiihhhgggffeeddccba",
+                                game.getScreenContext().getLayoutConst(),
+                                ChessSide.SECOND_SIDE))
+                            .build()
+                    ))
+                    .build();
+                crossScreenDataPackage.update();
+                game.getLogicContext().setCrossScreenDataPackage(crossScreenDataPackage);
                 game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
             }
         });

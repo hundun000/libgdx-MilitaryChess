@@ -69,14 +69,17 @@ public class DeskAreaVM extends Table {
 
     public void updateMask(ChessVM from) {
         CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
-        nodes.values().forEach(it -> {
-            Set<SimplePos> all = GameboardPosRule.finaAllMoveCandidates(from.getDeskData(), crossScreenDataPackage);
-            it.updateMask(all.contains(it.getDeskData().getPos()));
-        });
+        if (crossScreenDataPackage.getCurrentChessShowSides().contains(from.getDeskData().getChessSide())) {
+            nodes.values().forEach(it -> {
+                Set<SimplePos> all = GameboardPosRule.finaAllMoveCandidates(from.getDeskData(), crossScreenDataPackage);
+                it.updateMask(all.contains(it.getDeskData().getPos()));
+            });
+        }
     }
 
     public void afterFightOrClear() {
         nodes.values().forEach(it -> {
+            it.updateUI();
             it.updateMask(false);
         });
     }
