@@ -254,8 +254,8 @@ public class GameboardPosRule {
                 } else {
                     // 它为终点，本方向搜索结束
                     if (!dirtyRailPosList.contains(checkingPos)) {
-                        result.add(currentPos);
-                        dirtyRailPosList.add(currentPos);
+                        result.add(checkingPos);
+                        dirtyRailPosList.add(checkingPos);
                     }
                 }
             } else {
@@ -264,8 +264,8 @@ public class GameboardPosRule {
                         findRailMoveCandidates(fromChess, direction, checkingPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
                     }  else {
                         if (!dirtyRailPosList.contains(checkingPos)) {
-                            result.add(currentPos);
-                            dirtyRailPosList.add(currentPos);
+                            result.add(checkingPos);
+                            dirtyRailPosList.add(checkingPos);
                         }
                     }
                 }

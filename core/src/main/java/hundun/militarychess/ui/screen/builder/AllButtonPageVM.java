@@ -68,7 +68,6 @@ public class AllButtonPageVM extends Table {
             }
         });
         this.add(clearButton).padBottom(pad).row();
-
         this.capitulateButton = new TextButton("认输", screen.getGame().getMainSkin());
         this.capitulateButton.addListener(new ChangeListener(){
             @Override
@@ -76,7 +75,7 @@ public class AllButtonPageVM extends Table {
                 screen.onCapitulated();
             }
         });
-        this.add(capitulateButton).padBottom(pad).row();
+        this.add(capitulateButton).padTop(pad * 3).row();
     }
 
     public void setFrom(ChessVM chessVM) {
