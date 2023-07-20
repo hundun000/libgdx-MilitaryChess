@@ -42,11 +42,11 @@ public class ChessRuntimeData {
 
     @Getter
     public enum ChessSide {
-        FIRST_SIDE("红方"),
-        SECOND_SIDE("蓝方"),
-        EMPTY("空方"),
+        RED_SIDE("红方"),
+        BLUE_SIDE("蓝方"),
+        EMPTY(""),
         ;
-        ;
+
         final String chinese;
         ChessSide(String chinese){
             this.chinese = chinese;
@@ -59,7 +59,7 @@ public class ChessRuntimeData {
             .collect(Collectors.toList());
 
         List<ChessRuntimeData> result = new ArrayList<>();
-        int row = chessSide == ChessSide.FIRST_SIDE ? 6 : 0;
+        int row = chessSide == ChessSide.RED_SIDE ? 6 : 0;
         int col = 0;
         for (int i = 0; i < codes.length(); ) {
             ChessRuntimeData chessRuntimeData;

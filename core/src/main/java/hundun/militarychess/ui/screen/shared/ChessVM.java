@@ -58,9 +58,9 @@ public class ChessVM extends Table {
 
         if (crossScreenDataPackage.getCurrentChessShowSides().contains(deskData.getChessSide())) {
             this.mainLabel.setText(deskData.getChessType().getChinese());
-            if (deskData.getChessSide() == ChessSide.FIRST_SIDE) {
+            if (deskData.getChessSide() == ChessSide.RED_SIDE) {
                 image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.RED, 0.8f));
-            } else if (deskData.getChessSide() == ChessSide.SECOND_SIDE) {
+            } else if (deskData.getChessSide() == ChessSide.BLUE_SIDE) {
                 image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.BLUE, 0.8f));
             } else {
                 image.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
@@ -85,10 +85,18 @@ public class ChessVM extends Table {
     }
 
 
-    public void updateMask(boolean type) {
+    public enum MaskType {
+        EMPTY,
+        MOVE_CANDIDATE,
+        FROM
+    }
+
+    public void updateMask(MaskType maskType) {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        if (type) {
+        if (maskType == MaskType.MOVE_CANDIDATE) {
             this.setBackground(DrawableFactory.createAlphaBoard(1, 1, Color.YELLOW, 0.5f));
+        } else if (maskType == MaskType.FROM) {
+            this.setBackground(DrawableFactory.createAlphaBoard(1, 1, Color.ORANGE, 0.5f));
         } else {
             this.setBackground((Drawable) null);
         }

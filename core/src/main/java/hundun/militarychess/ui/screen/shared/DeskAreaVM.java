@@ -14,6 +14,7 @@ import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.AbstractMilitaryChessScreen;
+import hundun.militarychess.ui.screen.shared.ChessVM.MaskType;
 import lombok.Getter;
 
 
@@ -72,15 +73,16 @@ public class DeskAreaVM extends Table {
         if (crossScreenDataPackage.getCurrentChessShowSides().contains(from.getDeskData().getChessSide())) {
             nodes.values().forEach(it -> {
                 Set<SimplePos> all = GameboardPosRule.finaAllMoveCandidates(from.getDeskData(), crossScreenDataPackage);
-                it.updateMask(all.contains(it.getDeskData().getPos()));
+                it.updateMask(all.contains(it.getDeskData().getPos()) ? MaskType.MOVE_CANDIDATE : MaskType.EMPTY);
             });
         }
+        from.updateMask(MaskType.FROM);
     }
 
     public void afterFightOrClear() {
         nodes.values().forEach(it -> {
             it.updateUI();
-            it.updateMask(false);
+            it.updateMask(MaskType.EMPTY);
         });
     }
 }

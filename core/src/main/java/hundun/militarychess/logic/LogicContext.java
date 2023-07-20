@@ -76,6 +76,18 @@ public class LogicContext {
         }
 
         public void update() {
+            // PVC时生成aiAction
+            if (playerMode == PlayerMode.PVC) {
+                if (currentSide != pvcPlayerSide) {
+                    aiAction = AiLogic.generateAiAction(
+                        armyMap.get(ChessSide.BLUE_SIDE),
+                        armyMap.get(ChessSide.RED_SIDE),
+                        this
+                    );
+                } else {
+                    aiAction = null;
+                }
+            }
             // 更新暗棋影响
             currentChessShowSides.clear();
             currentChessShowSides.add(ChessSide.EMPTY);
@@ -92,25 +104,13 @@ public class LogicContext {
 
         public void afterFight() {
             // 更新当前方
-            if (currentSide == ChessSide.FIRST_SIDE) {
-                currentSide = ChessSide.SECOND_SIDE;
+            if (currentSide == ChessSide.RED_SIDE) {
+                currentSide = ChessSide.BLUE_SIDE;
             } else {
-                currentSide = ChessSide.FIRST_SIDE;
+                currentSide = ChessSide.RED_SIDE;
             }
             // 更新阶段
             this.setCurrentState(ChessState.WAIT_SELECT_FROM);
-            // PVC时生成aiAction
-            if (playerMode == PlayerMode.PVC) {
-                if (currentSide == ChessSide.SECOND_SIDE) {
-                    aiAction = AiLogic.generateAiAction(
-                        armyMap.get(ChessSide.SECOND_SIDE),
-                        armyMap.get(ChessSide.FIRST_SIDE),
-                        this
-                    );
-                } else {
-                    aiAction = null;
-                }
-            }
             update();
         }
 

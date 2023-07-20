@@ -119,10 +119,6 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         mainBoardVM.updateForShow();
     }
 
-    @Override
-    protected void logicOnDraw() {
-
-    }
 
     private ChessVM findVM(ChessRuntimeData chessRuntimeData) {
         return deskAreaVM.getNodes().get(chessRuntimeData.getId());
@@ -139,8 +135,10 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         switch (crossScreenDataPackage.getCurrentState()) {
             case WAIT_SELECT_FROM:
                 game.getFrontend().log(this.getClass().getSimpleName(),
-                    "AiAction score = %s",
-                    crossScreenDataPackage.getAiAction().getScore()
+                    "AiAction score = {0}, from = {1}, to = {2}",
+                    crossScreenDataPackage.getAiAction().getScore(),
+                    crossScreenDataPackage.getAiAction().getFrom().toText(),
+                    crossScreenDataPackage.getAiAction().getTo().toText()
                 );
                 onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getFrom()));
                 break;

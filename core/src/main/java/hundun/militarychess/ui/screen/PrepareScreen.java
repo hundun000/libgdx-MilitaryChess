@@ -2,7 +2,6 @@ package hundun.militarychess.ui.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -19,8 +18,8 @@ import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
+import org.apache.poi.ss.formula.functions.T;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -49,6 +48,7 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         backImage.setFillParent(true);
         backUiStage.addActor(backImage);
 
+        HorizontalGroup playerModeHorizontalGroup = new HorizontalGroup();
         Map<CheckBox, PlayerMode> playerModeCheckBoxMap = new LinkedHashMap<>();
         playerModeCheckBoxMap.put(new CheckBox(PlayerMode.PVP.getChinese(), game.getMainSkin()), PlayerMode.PVP);
         playerModeCheckBoxMap.put(new CheckBox(PlayerMode.PVC.getChinese(), game.getMainSkin()), PlayerMode.PVC);
@@ -57,10 +57,27 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         playerModeButtonGroup.setUncheckLast(true);
         playerModeCheckBoxMap.keySet().forEach(it -> {
             playerModeButtonGroup.add(it);
-            uiRootTable.add(it);
+            playerModeHorizontalGroup.addActor(it);
         });
+        uiRootTable.add(playerModeHorizontalGroup);
         uiRootTable.row();
 
+        HorizontalGroup pvcPlayerSideHorizontalGroup = new HorizontalGroup();
+        pvcPlayerSideHorizontalGroup.addActor(new Label("（仅人机对战时有效）", game.getMainSkin()));
+        Map<CheckBox, Boolean> pvcPlayerSideCheckBoxMap = new LinkedHashMap<>();
+        pvcPlayerSideCheckBoxMap.put(new CheckBox("先手", game.getMainSkin()), Boolean.TRUE);
+        pvcPlayerSideCheckBoxMap.put(new CheckBox("后手", game.getMainSkin()), Boolean.FALSE);
+        ButtonGroup<CheckBox> pvcPlayerSideButtonGroup = new ButtonGroup<>();
+        pvcPlayerSideButtonGroup.setMaxCheckCount(1);
+        pvcPlayerSideButtonGroup.setUncheckLast(true);
+        pvcPlayerSideCheckBoxMap.keySet().forEach(it -> {
+            pvcPlayerSideButtonGroup.add(it);
+            pvcPlayerSideHorizontalGroup.addActor(it);
+        });
+        uiRootTable.add(pvcPlayerSideHorizontalGroup);
+        uiRootTable.row();
+
+        HorizontalGroup chessShowModeHorizontalGroup = new HorizontalGroup();
         Map<CheckBox, ChessShowMode> chessShowModeCheckBoxMap = new LinkedHashMap<>();
         chessShowModeCheckBoxMap.put(new CheckBox(ChessShowMode.MING_QI.getChinese(), game.getMainSkin()), ChessShowMode.MING_QI);
         chessShowModeCheckBoxMap.put(new CheckBox(ChessShowMode.AN_QI.getChinese(), game.getMainSkin()), ChessShowMode.AN_QI);
@@ -69,8 +86,23 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         chessShowModeButtonGroup.setUncheckLast(true);
         chessShowModeCheckBoxMap.keySet().forEach(it -> {
             chessShowModeButtonGroup.add(it);
-            uiRootTable.add(it);
+            chessShowModeHorizontalGroup.addActor(it);
         });
+        uiRootTable.add(chessShowModeHorizontalGroup);
+        uiRootTable.row();
+
+        Table codesHorizontalGroup;
+        codesHorizontalGroup = new Table();
+        TextField redSideTextField = new TextField("abccddeeffggghhhiiijjkklj", game.getMainSkin());
+        codesHorizontalGroup.add(new Label("红方：", game.getMainSkin()));
+        codesHorizontalGroup.add(redSideTextField).width(400);
+        uiRootTable.add(codesHorizontalGroup);
+        uiRootTable.row();
+        codesHorizontalGroup = new Table();
+        TextField blueSideTextField = new TextField("jlkkijiiihhhgggffeeddccba", game.getMainSkin());
+        codesHorizontalGroup.add(new Label("蓝方：", game.getMainSkin()));
+        codesHorizontalGroup.add(blueSideTextField).width(400);
+        uiRootTable.add(codesHorizontalGroup);
         uiRootTable.row();
 
         TextButton buttonNewGame = new TextButton("开始", game.getMainSkin());
@@ -80,28 +112,29 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
                 super.clicked(event, x, y);
                 var playerMode = playerModeCheckBoxMap.get(playerModeButtonGroup.getChecked());
                 var chessShowMode = chessShowModeCheckBoxMap.get(chessShowModeButtonGroup.getChecked());
+                var pvcPlayerAsFirst = pvcPlayerSideCheckBoxMap.get(pvcPlayerSideButtonGroup.getChecked());
                 var crossScreenDataPackage = CrossScreenDataPackage.builder()
                     .game(game)
                     .playerMode(playerMode)
                     .chessShowMode(chessShowMode)
                     .currentChessShowSides(new HashSet<>())
-                    .pvcPlayerSide(playerMode == PlayerMode.PVC ? ChessSide.FIRST_SIDE : null)
-                    .currentSide(ChessSide.FIRST_SIDE)
+                    .pvcPlayerSide(ChessSide.RED_SIDE)
+                    .currentSide(pvcPlayerAsFirst ? ChessSide.RED_SIDE : ChessSide.BLUE_SIDE)
                     .currentState(ChessState.WAIT_SELECT_FROM)
                     .armyMap(Map.of(
-                        ChessSide.FIRST_SIDE,
+                        ChessSide.RED_SIDE,
                         ArmyRuntimeData.builder()
                             .chessRuntimeDataList(ChessRuntimeData.fromCodes(
-                                "abccddeeffggghhhiiijjkklj",
+                                redSideTextField.getText(),
                                 game.getScreenContext().getLayoutConst(),
-                                ChessSide.FIRST_SIDE))
+                                ChessSide.RED_SIDE))
                             .build(),
-                        ChessSide.SECOND_SIDE,
+                        ChessSide.BLUE_SIDE,
                         ArmyRuntimeData.builder()
                             .chessRuntimeDataList(ChessRuntimeData.fromCodes(
-                                "jlkkijiiihhhgggffeeddccba",
+                                blueSideTextField.getText(),
                                 game.getScreenContext().getLayoutConst(),
-                                ChessSide.SECOND_SIDE))
+                                ChessSide.BLUE_SIDE))
                             .build()
                     ))
                     .build();

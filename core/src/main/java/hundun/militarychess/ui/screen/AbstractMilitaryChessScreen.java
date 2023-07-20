@@ -21,13 +21,11 @@ public abstract class AbstractMilitaryChessScreen extends BaseHundunScreen<Milit
         super(game, sharedViewport);
     }
     public abstract void onDeskClicked(ChessVM vm);
-    protected abstract void logicOnDraw();
     protected abstract void updateUIAfterRoomChanged();
 
 
     @Override
     protected void belowUiStageDraw(float delta) {
-        logicOnDraw();
 
         deskStage.act();
         deskStage.getViewport().getCamera().position.set(
