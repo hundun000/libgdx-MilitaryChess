@@ -39,7 +39,7 @@ public class MyMenuScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         super(game, game.getSharedViewport());
 
         Label titleLabel = new Label(
-            JavaFeatureForGwt.stringFormat("     %s     ", "军旗游戏"),
+            JavaFeatureForGwt.stringFormat("     %s     ", "军棋游戏"),
             game.getMainSkin());
         titleLabel.setFontScale(1.5f);
 

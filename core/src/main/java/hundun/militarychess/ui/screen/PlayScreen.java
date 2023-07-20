@@ -4,14 +4,19 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.gamelib.base.LogicFrameHelper;
+import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData;
+import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.builder.BuilderMainBoardVM;
@@ -111,11 +116,12 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     public void updateUIAfterRoomChanged() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
 
+        // 构造棋子
         List<ChessRuntimeData> allChessRuntimeDataList = new ArrayList<>();
         crossScreenDataPackage.getArmyMap().values().forEach(it -> allChessRuntimeDataList.addAll(it.getChessRuntimeDataList()));
         deskAreaVM.updateDeskDatas(allChessRuntimeDataList);
 
-        mainBoardVM.getAllButtonPageVM().updateForNewSide(crossScreenDataPackage.getCurrentSide());
+        mainBoardVM.getAllButtonPageVM().updateForNewSide();
         mainBoardVM.updateForShow();
     }
 
@@ -125,6 +131,9 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     }
 
 
+    /**
+     * 定时检查，若有AiAction，则执行它
+     */
     @Override
     protected void onLogicFrame() {
         super.onLogicFrame();
@@ -140,18 +149,46 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
                     crossScreenDataPackage.getAiAction().getFrom().toText(),
                     crossScreenDataPackage.getAiAction().getTo().toText()
                 );
-                onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getFrom()));
+                if (crossScreenDataPackage.getAiAction().isCapitulated()) {
+                    // 模拟Ai点击认输
+                    onCapitulated();
+                } else {
+                    // 模拟Ai点击棋子
+                    onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getFrom()));
+                }
+
                 break;
             case WAIT_SELECT_TO:
+                // 模拟Ai点击棋子
                 onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getTo()));
                 break;
             case WAIT_COMMIT:
+                // 模拟Ai点击确认
                 onCommitButtonClicked();
                 break;
             default:
         }
     }
+    /**
+     * 当认输被点击
+     */
+    public void onCapitulated() {
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
 
+        String message = JavaFeatureForGwt.stringFormat(
+            "%s已认输。\n%s胜利。",
+            crossScreenDataPackage.getCurrentSide().getChinese(),
+            ChessSide.getOpposite(crossScreenDataPackage.getCurrentSide()).getChinese()
+        );
+        startDialog(message,"对局结束", () -> {
+            // 回到菜单页
+            game.getScreenManager().pushScreen(MyMenuScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
+        });
+    }
+
+    /**
+     * 当棋子被点击
+     */
     @Override
     public void onDeskClicked(ChessVM chessVM) {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
@@ -176,7 +213,9 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
             default:
         }
     }
-
+    /**
+     * 当确认被点击
+     */
     public void onCommitButtonClicked() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         ChessRule.fight(
@@ -186,6 +225,31 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         this.afterFight();
     }
 
+    /**
+     * 构造消息弹窗
+     */
+    private void startDialog(String message, String title, Runnable callback) {
+        final Dialog dialog = new Dialog(title, game.getMainSkin(), "dialog") {
+            public void result(Object obj) {
+                boolean action = (boolean) obj;
+                if (action) {
+                    callback.run();
+                }
+            }
+        };
+        dialog.text(message);
+        dialog.button("OK", true);
+        Gdx.app.postRunnable(new Runnable() {
+            @Override
+            public void run() {
+                dialog.show(popupUiStage);
+            }
+        });
+    }
+
+    /**
+     * 战斗后的处理
+     */
     private void afterFight() {
         game.getFrontend().log(this.getClass().getSimpleName(),
             "afterFight, from = {0}, to = {1}",
@@ -193,13 +257,31 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
             mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData().toText()
             );
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        // 逻辑类更新
         crossScreenDataPackage.afterFight();
+        // 若干UI重置
         mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUI();
         mainBoardVM.getAllButtonPageVM().getToChessVM().updateUI();
-        mainBoardVM.getAllButtonPageVM().updateForNewSide(crossScreenDataPackage.getCurrentSide());
+        mainBoardVM.getAllButtonPageVM().updateForNewSide();
         deskAreaVM.afterFightOrClear();
+        // 若已对局结束，则展示
+        if (crossScreenDataPackage.getLoseSide() != null) {
+            String message = JavaFeatureForGwt.stringFormat(
+                "%s失败，原因：%s。\n%s胜利。",
+                crossScreenDataPackage.getLoseSide().getChinese(),
+                crossScreenDataPackage.getLoseReason(),
+                ChessSide.getOpposite(crossScreenDataPackage.getLoseSide()).getChinese()
+            );
+            startDialog(message,"对局结束", () -> {
+                // 回到菜单页
+                game.getScreenManager().pushScreen(MyMenuScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
+            });
+        }
     }
 
+    /**
+     * 当清空被点击
+     */
     public void onClearButtonClicked() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         mainBoardVM.getAllButtonPageVM().setFrom(null);

@@ -2,6 +2,7 @@ package hundun.militarychess.logic.data;
 
 import hundun.militarychess.logic.chess.ChessType;
 import hundun.militarychess.logic.chess.GameboardPosRule;
+import hundun.militarychess.logic.chess.GameboardPosRule.Direction;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
@@ -50,6 +51,16 @@ public class ChessRuntimeData {
         final String chinese;
         ChessSide(String chinese){
             this.chinese = chinese;
+        }
+
+        public static ChessSide getOpposite(ChessSide thiz) {
+            switch (thiz) {
+                case RED_SIDE:
+                    return BLUE_SIDE;
+                case BLUE_SIDE:
+                    return RED_SIDE;
+            }
+            return null;
         }
     }
 

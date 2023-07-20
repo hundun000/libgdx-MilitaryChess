@@ -1,6 +1,7 @@
 package hundun.militarychess.logic;
 
 import hundun.militarychess.logic.chess.AiLogic;
+import hundun.militarychess.logic.chess.ChessType;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
@@ -34,10 +35,7 @@ public class LogicContext {
     @AllArgsConstructor
     @Builder
     public static class AiAction {
-        /**
-         * 认输
-         */
-        boolean failed;
+        boolean capitulated;
         int score;
         ChessRuntimeData from;
         ChessRuntimeData to;
@@ -61,7 +59,8 @@ public class LogicContext {
         ChessVM fromChessVM;
         ChessVM toChessVM;
         AiAction aiAction;
-
+        ChessSide loseSide;
+        String loseReason;
         public ChessRuntimeData findAtPos(SimplePos pos) {
             for (var armyRuntimeData : armyMap.values()) {
                 var result = armyRuntimeData.getChessRuntimeDataList().stream()
@@ -100,6 +99,21 @@ public class LogicContext {
                     currentChessShowSides.add(pvcPlayerSide);
                 }
             }
+            // 检查是否已结束
+            armyMap.forEach((key, value) -> {
+                boolean noneCanMove = value.getChessRuntimeDataList().stream()
+                    .noneMatch(chess -> chess.getChessType().isCanMove());
+                if (noneCanMove) {
+                    loseSide = key;
+                    loseReason = "没有棋子可走";
+                }
+                boolean junqiDied = value.getChessRuntimeDataList().stream()
+                    .noneMatch(chess -> chess.getChessType() == ChessType.JUN_QI);
+                if (junqiDied) {
+                    loseSide = key;
+                    loseReason = "军棋已死亡";
+                }
+            });
         }
 
         public void afterFight() {

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.LogicContext.PlayerMode;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.screen.PlayScreen;
@@ -32,7 +33,7 @@ public class AllButtonPageVM extends Table {
     Label fightResultPreviewLabel;
     TextButton commitButton;
     TextButton clearButton;
-
+    TextButton capitulateButton;
     public AllButtonPageVM(PlayScreen screen) {
         this.screen = screen;
 
@@ -67,6 +68,15 @@ public class AllButtonPageVM extends Table {
             }
         });
         this.add(clearButton).padBottom(pad).row();
+
+        this.capitulateButton = new TextButton("认输", screen.getGame().getMainSkin());
+        this.capitulateButton.addListener(new ChangeListener(){
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                screen.onCapitulated();
+            }
+        });
+        this.add(capitulateButton).padBottom(pad).row();
     }
 
     public void setFrom(ChessVM chessVM) {
@@ -123,11 +133,21 @@ public class AllButtonPageVM extends Table {
         currentSideLabel.setText("当前操作方: " + currentSide.getChinese());
     }
 
-    public void updateForNewSide(ChessSide currentSide) {
+    /**
+     * 当前操作方变动时调用
+     */
+    public void updateForNewSide() {
+        CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
+        ChessSide currentSide = crossScreenDataPackage.getCurrentSide();
+        boolean isAiSide = crossScreenDataPackage.getPlayerMode() == PlayerMode.PVC && currentSide != crossScreenDataPackage.getPvcPlayerSide();
         this.fromChessVM = null;
         this.toChessVM = null;
         this.fightResultPreview = null;
         this.commitButton.setDisabled(true);
+        // 不能帮ai按按钮
+        this.clearButton.setDisabled(isAiSide);
+        this.capitulateButton.setDisabled(isAiSide);
+
         this.currentSide = currentSide;
         updateUI();
 
