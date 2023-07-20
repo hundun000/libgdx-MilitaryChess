@@ -1,9 +1,7 @@
 package hundun.militarychess.logic.chess;
 
-import hundun.militarychess.logic.LogicContext.AiAction;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
-import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import lombok.Getter;
@@ -58,7 +56,7 @@ public class ChessRule {
 
     }
 
-    public static void fight(ChessRuntimeData from, ChessRuntimeData to) {
+    public static FightResultType fight(ChessRuntimeData from, ChessRuntimeData to) {
         FightResultType fightResultType = getFightResult(from, to);
         if (fightResultType == FightResultType.BOTH_DIE || fightResultType == FightResultType.TO_WIN) {
             setAsDead(from);
@@ -69,6 +67,7 @@ public class ChessRule {
         if (fightResultType == FightResultType.FROM_WIN || fightResultType == FightResultType.JUST_MOVE) {
             switchPos(from, to);
         }
+        return fightResultType;
     }
 
     /**

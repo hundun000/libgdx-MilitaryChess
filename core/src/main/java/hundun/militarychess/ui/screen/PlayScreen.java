@@ -5,7 +5,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
@@ -132,12 +131,16 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
 
     /**
-     * 定时检查，若有AiAction，则执行它
+     * 每秒被调用一次
      */
     @Override
     protected void onLogicFrame() {
         super.onLogicFrame();
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        // 当前执棋方统计耗时
+        crossScreenDataPackage.currentSideAddTime(1);
+        mainBoardVM.getAllButtonPageVM().updateTime(crossScreenDataPackage);
+        // 若有AiAction，则执行它
         if (crossScreenDataPackage.getAiAction() == null) {
             return;
         }
@@ -218,11 +221,11 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      */
     public void onCommitButtonClicked() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        ChessRule.fight(
+        FightResultType fightResultType = ChessRule.fight(
             mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
             mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData()
         );
-        this.afterFight();
+        this.afterFight(fightResultType);
     }
 
     /**
@@ -250,7 +253,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     /**
      * 战斗后的处理
      */
-    private void afterFight() {
+    private void afterFight(FightResultType fightResultType) {
         game.getFrontend().log(this.getClass().getSimpleName(),
             "afterFight, from = {0}, to = {1}",
             mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData().toText(),
@@ -258,7 +261,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
             );
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         // 逻辑类更新
-        crossScreenDataPackage.afterFight();
+        crossScreenDataPackage.afterFight(fightResultType);
         // 若干UI重置
         mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUI();
         mainBoardVM.getAllButtonPageVM().getToChessVM().updateUI();

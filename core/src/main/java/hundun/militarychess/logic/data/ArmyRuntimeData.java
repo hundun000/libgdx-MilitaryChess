@@ -12,15 +12,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @author hundun
- * Created on 2023/05/09
+ * 军棋里一方的所有数据
  */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArmyRuntimeData {
+    /**
+     * 已用秒数
+     */
+    int usedTime;
 
+    /**
+     * 所有棋子
+     */
     List<ChessRuntimeData> chessRuntimeDataList;
 
 

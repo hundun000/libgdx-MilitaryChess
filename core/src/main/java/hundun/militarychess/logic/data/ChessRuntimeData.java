@@ -78,8 +78,12 @@ public class ChessRuntimeData {
             final int tempCol = col;
             final int tempRow = row;
             final String id = UUID.randomUUID().toString();
-            if (xingyingList.stream().anyMatch(it -> it.getPos().getCol() == tempCol
-                && it.getPos().getRow() == tempRow)) {
+            boolean isXingying = xingyingList.stream()
+                .anyMatch(it -> it.getPos().getCol() == tempCol
+                    && it.getPos().getRow() == tempRow
+                );
+            if (isXingying) {
+                // 向行营位置放置空白
                 chessType = ChessType.EMPTY;
                 chessRuntimeData = ChessRuntimeData.builder()
                     .id(id)
@@ -89,6 +93,7 @@ public class ChessRuntimeData {
                     .build();
 
             } else {
+                // 放置棋子
                 String code = String.valueOf(codes.charAt(i));
                 chessType = ChessType.fromCode(code);
                 chessRuntimeData = ChessRuntimeData.builder()
