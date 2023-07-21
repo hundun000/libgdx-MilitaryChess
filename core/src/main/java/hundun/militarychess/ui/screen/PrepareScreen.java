@@ -62,7 +62,7 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         uiRootTable.row();
 
         HorizontalGroup pvcPlayerSideHorizontalGroup = new HorizontalGroup();
-        pvcPlayerSideHorizontalGroup.addActor(new Label("（仅人机对战时有效）", game.getMainSkin()));
+        pvcPlayerSideHorizontalGroup.addActor(new Label("(仅人机对战时有效)", game.getMainSkin()));
         Map<CheckBox, Boolean> pvcPlayerSideCheckBoxMap = new LinkedHashMap<>();
         pvcPlayerSideCheckBoxMap.put(new CheckBox("先手", game.getMainSkin()), Boolean.TRUE);
         pvcPlayerSideCheckBoxMap.put(new CheckBox("后手", game.getMainSkin()), Boolean.FALSE);
