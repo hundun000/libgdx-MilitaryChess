@@ -21,6 +21,7 @@ import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.builder.BuilderMainBoardVM;
 import hundun.militarychess.ui.screen.shared.ChessVM;
+import hundun.militarychess.ui.screen.shared.ChessVM.MaskState;
 import hundun.militarychess.ui.screen.shared.DeskAreaVM;
 
 import java.util.ArrayList;
@@ -201,14 +202,18 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
                 }
                 break;
             case WAIT_SELECT_TO:
-                if (chessVM.getDeskData().getChessSide() != crossScreenDataPackage.getCurrentSide()) {
-                    FightResultType fightResultPreview = ChessRule.fightResultPreview(
-                        mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
-                        chessVM.getDeskData()
-                        );
-                    mainBoardVM.getAllButtonPageVM().setTo(chessVM, fightResultPreview);
-                    crossScreenDataPackage.setCurrentState(ChessState.WAIT_COMMIT);
+                if (chessVM.getDeskData().getChessSide() == crossScreenDataPackage.getCurrentSide()) {
+                    break;
                 }
+                if (chessVM.getMaskState() != MaskState.MOVE_CANDIDATE) {
+                    break;
+                }
+                FightResultType fightResultPreview = ChessRule.fightResultPreview(
+                    mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
+                    chessVM.getDeskData()
+                );
+                mainBoardVM.getAllButtonPageVM().setTo(chessVM, fightResultPreview);
+                crossScreenDataPackage.setCurrentState(ChessState.WAIT_COMMIT);
                 break;
             default:
         }

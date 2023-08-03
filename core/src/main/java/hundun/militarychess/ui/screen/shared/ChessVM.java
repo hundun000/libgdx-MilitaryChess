@@ -25,7 +25,8 @@ public class ChessVM extends Table {
 
     Label mainLabel;
     Image image;
-
+    @Getter
+    MaskState maskState;
     public ChessVM(DeskAreaVM deskAreaVM, ChessRuntimeData deskData) {
         this.game = deskAreaVM.screen.getGame();
         this.deskAreaVM = deskAreaVM;
@@ -85,17 +86,18 @@ public class ChessVM extends Table {
     }
 
 
-    public enum MaskType {
+    public enum MaskState {
         EMPTY,
         MOVE_CANDIDATE,
         FROM
     }
 
-    public void updateMask(MaskType maskType) {
+    public void updateMask(MaskState maskState) {
+        this.maskState = maskState;
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        if (maskType == MaskType.MOVE_CANDIDATE) {
+        if (maskState == MaskState.MOVE_CANDIDATE) {
             this.setBackground(DrawableFactory.createAlphaBoard(1, 1, Color.YELLOW, 0.5f));
-        } else if (maskType == MaskType.FROM) {
+        } else if (maskState == MaskState.FROM) {
             this.setBackground(DrawableFactory.createAlphaBoard(1, 1, Color.ORANGE, 0.5f));
         } else {
             this.setBackground((Drawable) null);
