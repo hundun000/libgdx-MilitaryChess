@@ -5,7 +5,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
-import com.badlogic.gdx.utils.Null;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
@@ -132,11 +131,15 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
 
     /**
-     * 定时检查，若有AiAction，则执行它
+     * 每秒被调用一次
      */
     @Override
     public void onLogicFrame() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        // 当前执棋方统计耗时
+        crossScreenDataPackage.currentSideAddTime(1);
+        mainBoardVM.getAllButtonPageVM().updateTime(crossScreenDataPackage);
+        // 若有AiAction，则执行它
         if (crossScreenDataPackage.getAiAction() == null) {
             return;
         }
@@ -247,7 +250,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     /**
      * 战斗后的处理
      */
-    private void afterFight() {
+    private void afterFight(FightResultType fightResultType) {
         game.getFrontend().log(this.getClass().getSimpleName(),
             "afterFight, from = {0}, to = {1}",
             mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData().toText(),

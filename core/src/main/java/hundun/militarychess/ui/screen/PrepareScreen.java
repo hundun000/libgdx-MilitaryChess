@@ -18,7 +18,6 @@ import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -138,7 +137,7 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
                             .build()
                     ))
                     .build();
-                crossScreenDataPackage.update();
+                crossScreenDataPackage.updateAfterFightOrStart();
                 game.getLogicContext().setCrossScreenDataPackage(crossScreenDataPackage);
                 game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
             }

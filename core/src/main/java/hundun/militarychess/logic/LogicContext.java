@@ -1,13 +1,13 @@
 package hundun.militarychess.logic;
 
 import hundun.militarychess.logic.chess.AiLogic;
+import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.chess.ChessType;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
-import hundun.militarychess.ui.screen.shared.ChessVM;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +30,9 @@ public class LogicContext {
     public void lazyInitOnCreateStage1() {
     }
 
+    /**
+     * AI的一步棋
+     */
     @Getter
     @Setter
     @AllArgsConstructor
@@ -41,6 +44,9 @@ public class LogicContext {
         ChessRuntimeData to;
     }
 
+    /**
+     * 所有逻辑类数据的集合，UI类从本类中读写数据。
+     */
     @Getter
     @Setter
     @AllArgsConstructor
@@ -55,12 +61,13 @@ public class LogicContext {
         ChessState currentState;
         Set<ChessSide> currentChessShowSides;
         Map<ChessSide, ArmyRuntimeData> armyMap;
-
-        ChessVM fromChessVM;
-        ChessVM toChessVM;
         AiAction aiAction;
         ChessSide loseSide;
         String loseReason;
+        /**
+         * 连续未吃子计数器
+         */
+        int notKillTurnCount;
 
         ChessRuntimeData battleFromChess;
         ChessRuntimeData battleToChess;
@@ -78,7 +85,10 @@ public class LogicContext {
             return null;
         }
 
-        public void update() {
+        /**
+         * 战斗后或开局时调用一次，更新数据
+         */
+        public void updateAfterFightOrStart() {
             // PVC时生成aiAction
             if (playerMode == PlayerMode.PVC) {
                 if (currentSide != pvcPlayerSide) {
@@ -117,10 +127,19 @@ public class LogicContext {
                     loseSide = key;
                     loseReason = "军棋已死亡";
                 }
+                boolean timeout = value.getUsedTime() > 30 * 60;
+                if (timeout) {
+                    loseSide = key;
+                    loseReason = "累计用时超过30分钟";
+                }
             });
+            if (notKillTurnCount == 31) {
+                loseSide = currentSide;
+                loseReason = "连续31步未吃子";
+            }
         }
 
-        public void afterFight() {
+        public void afterFight(FightResultType fightResultType) {
             // 更新当前方
             if (currentSide == ChessSide.RED_SIDE) {
                 currentSide = ChessSide.BLUE_SIDE;
@@ -129,10 +148,24 @@ public class LogicContext {
             }
             // 更新阶段
             this.setCurrentState(ChessState.WAIT_SELECT_FROM);
-            update();
+            // 更新连续未吃子计数器
+            if (fightResultType != FightResultType.FROM_WIN
+                && fightResultType != FightResultType.TO_WIN
+                && fightResultType != FightResultType.BOTH_DIE) {
+                notKillTurnCount++;
+            } else {
+                notKillTurnCount = 0;
+            }
+            updateAfterFightOrStart();
         }
 
 
+        /**
+         * 当前执棋方统计耗时
+         */
+        public void currentSideAddTime(int second) {
+            armyMap.get(currentSide).setUsedTime(armyMap.get(currentSide).getUsedTime() + second);
+        }
     }
 
     public enum ChessState {

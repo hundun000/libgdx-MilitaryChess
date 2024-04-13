@@ -1,12 +1,10 @@
 package hundun.militarychess.ui.screen.builder;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
@@ -27,6 +25,7 @@ public class AllButtonPageVM extends Table {
     FightResultType fightResultPreview;
     ChessSide currentSide;
 
+    Label timeLabel;
     Label currentSideLabel;
     Label fromLabel;
     Label toLabel;
@@ -38,6 +37,9 @@ public class AllButtonPageVM extends Table {
         this.screen = screen;
 
         int pad = 20;
+
+        this.timeLabel = new Label("", screen.getGame().getMainSkin());
+        this.add(timeLabel).padBottom(pad).row();
 
         this.currentSideLabel = new Label("", screen.getGame().getMainSkin());
         this.add(currentSideLabel).padBottom(pad).row();
@@ -80,18 +82,21 @@ public class AllButtonPageVM extends Table {
 
     public void setFrom(ChessVM chessVM) {
         this.fromChessVM = chessVM;
-        updateUI();
+        updateByChess();
     }
 
     public void setTo(ChessVM chessVM, FightResultType fightResultPreview) {
         this.toChessVM = chessVM;
         this.fightResultPreview = fightResultPreview;
         this.commitButton.setDisabled(fightResultPreview == null || fightResultPreview == FightResultType.CAN_NOT);
-        updateUI();
+        updateByChess();
     }
 
 
-    public void updateUI() {
+    /**
+     * From/To棋子设置/清空后，更新对应UI
+     */
+    private void updateByChess() {
         CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
         if (fromChessVM != null) {
             if (crossScreenDataPackage.getCurrentChessShowSides().contains(fromChessVM.getDeskData().getChessSide())) {
@@ -148,7 +153,23 @@ public class AllButtonPageVM extends Table {
         this.capitulateButton.setDisabled(isAiSide);
 
         this.currentSide = currentSide;
-        updateUI();
+        updateByChess();
 
+    }
+
+    /**
+     * 时间变化后，更新对应UI
+     */
+    public void updateTime(CrossScreenDataPackage crossScreenDataPackage) {
+        StringBuilder stringBuilder = new StringBuilder();
+        crossScreenDataPackage.getArmyMap().forEach((k, v) -> {
+            int minute = v.getUsedTime() / 60;
+            int second = v.getUsedTime() % 60;
+            stringBuilder.append(k.getChinese()).append("累计用时：")
+                .append(minute).append("分")
+                .append(second).append("秒")
+                .append("\n");
+        });
+        timeLabel.setText(stringBuilder.toString());
     }
 }
