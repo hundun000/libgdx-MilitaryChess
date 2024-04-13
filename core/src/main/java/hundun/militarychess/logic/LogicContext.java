@@ -61,6 +61,10 @@ public class LogicContext {
         AiAction aiAction;
         ChessSide loseSide;
         String loseReason;
+
+        ChessRuntimeData battleFromChess;
+        ChessRuntimeData battleToChess;
+
         public ChessRuntimeData findAtPos(SimplePos pos) {
             for (var armyRuntimeData : armyMap.values()) {
                 var result = armyRuntimeData.getChessRuntimeDataList().stream()

@@ -8,6 +8,7 @@ import lombok.Getter;
 @Getter
 public class ScreenContext {
     PlayScreen playScreen;
+    BattleScreen battleScreen;
     PrepareScreen prepareScreen;
     MyMenuScreen menuScreen;
 
@@ -21,10 +22,12 @@ public class ScreenContext {
         this.layoutConst = new LayoutConst();
         this.menuScreen = new MyMenuScreen(game);
         this.playScreen = new PlayScreen(game);
+        this.battleScreen = new BattleScreen(game);
         this.prepareScreen = new PrepareScreen(game);
 
         game.getScreenManager().addScreen(menuScreen.getClass().getSimpleName(), menuScreen);
         game.getScreenManager().addScreen(playScreen.getClass().getSimpleName(), playScreen);
+        game.getScreenManager().addScreen(battleScreen.getClass().getSimpleName(), battleScreen);
         game.getScreenManager().addScreen(prepareScreen.getClass().getSimpleName(), prepareScreen);
 
         BlendingTransition blendingTransition = new BlendingTransition(game.getBatch(), 1F);

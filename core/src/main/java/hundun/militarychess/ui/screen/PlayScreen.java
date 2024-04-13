@@ -34,7 +34,8 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
     // ------ UI layer ------
     private BuilderMainBoardVM mainBoardVM;
-
+    protected Stage deskStage;
+    protected DeskAreaVM deskAreaVM;
     // ------ image previewer layer ------
 
 
@@ -97,31 +98,31 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         //Gdx.input.setInputProcessor(uiStage);
         //game.getBatch().setProjectionMatrix(uiStage.getViewport().getCamera().combined);
 
-        updateUIForShow();
-
-
-        Gdx.app.log(this.getClass().getSimpleName(), "show done");
-    }
-
-    private void updateUIForShow() {
-
-
         deskAreaVM.getCameraDataPackage().forceSet(null, null, CameraDataPackage.DEFAULT_CAMERA_ZOOM_WEIGHT);
 
         updateUIAfterRoomChanged();
+
+
+        Gdx.app.log(this.getClass().getSimpleName(), "show done");
     }
 
     @Override
     public void updateUIAfterRoomChanged() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
 
-        // 构造棋子
-        List<ChessRuntimeData> allChessRuntimeDataList = new ArrayList<>();
-        crossScreenDataPackage.getArmyMap().values().forEach(it -> allChessRuntimeDataList.addAll(it.getChessRuntimeDataList()));
-        deskAreaVM.updateDeskDatas(allChessRuntimeDataList);
 
-        mainBoardVM.getAllButtonPageVM().updateForNewSide();
-        mainBoardVM.updateForShow();
+
+        if (crossScreenDataPackage.getBattleFromChess() != null) {
+            afterFight();
+        } else {
+            // 构造棋子
+            List<ChessRuntimeData> allChessRuntimeDataList = new ArrayList<>();
+            crossScreenDataPackage.getArmyMap().values().forEach(it -> allChessRuntimeDataList.addAll(it.getChessRuntimeDataList()));
+            deskAreaVM.updateDeskDatas(allChessRuntimeDataList);
+
+            mainBoardVM.getAllButtonPageVM().updateForNewSide();
+            mainBoardVM.updateForShow();
+        }
     }
 
 
@@ -216,11 +217,9 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      */
     public void onCommitButtonClicked() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        ChessRule.fight(
-            mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
-            mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData()
-        );
-        this.afterFight();
+        crossScreenDataPackage.setBattleFromChess(mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData());
+        crossScreenDataPackage.setBattleToChess(mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData());
+        game.getScreenManager().pushScreen(BattleScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
     }
 
     /**
@@ -255,8 +254,6 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
             mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData().toText()
             );
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        // 逻辑类更新
-        crossScreenDataPackage.afterFight();
         // 若干UI重置
         mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUI();
         mainBoardVM.getAllButtonPageVM().getToChessVM().updateUI();
@@ -286,5 +283,22 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         mainBoardVM.getAllButtonPageVM().setTo(null, null);
         deskAreaVM.afterFightOrClear();
         crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_FROM);
+    }
+
+    @Override
+    protected void belowUiStageDraw(float delta) {
+
+        deskStage.act();
+        deskStage.getViewport().getCamera().position.set(
+            deskAreaVM.getCameraDataPackage().getCurrentCameraX(),
+            deskAreaVM.getCameraDataPackage().getCurrentCameraY(),
+            0);
+        if (deskAreaVM.getCameraDataPackage().getAndClearCameraZoomDirty()) {
+            float weight = deskAreaVM.getCameraDataPackage().getCurrentCameraZoomWeight();
+            deskCamera.zoom = CameraDataPackage.cameraZoomWeightToZoomValue(weight);
+            game.getFrontend().log(this.getClass().getSimpleName(), "deskCamera.zoom = %s", deskCamera.zoom);
+        }
+        deskStage.getViewport().apply();
+        deskStage.draw();
     }
 }
