@@ -46,7 +46,6 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
         this.deskCamera = new OrthographicCamera();
         this.deskStage = new Stage(new ScreenViewport(deskCamera), game.getBatch());
-        this.logicFrameHelper = new LogicFrameHelper(1);
     }
 
 
@@ -135,8 +134,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      * 定时检查，若有AiAction，则执行它
      */
     @Override
-    protected void onLogicFrame() {
-        super.onLogicFrame();
+    public void onLogicFrame() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         if (crossScreenDataPackage.getAiAction() == null) {
             return;

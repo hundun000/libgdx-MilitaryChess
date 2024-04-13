@@ -162,5 +162,8 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
     }
 
 
+    @Override
+    public void onLogicFrame() {
 
+    }
 }

@@ -18,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.corelib.base.BaseHundunScreen;
 import hundun.gdxgame.corelib.base.util.TextureFactory;
-import hundun.gdxgame.corelib.starter.StarterMenuScreen;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.ui.MilitaryChessGame;
 
@@ -100,5 +99,10 @@ public class MyMenuScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
     @Override
     protected void create() {
         initScene2d();
+    }
+
+    @Override
+    public void onLogicFrame() {
+
     }
 }

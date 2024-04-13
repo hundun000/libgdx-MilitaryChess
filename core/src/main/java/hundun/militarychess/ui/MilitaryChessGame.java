@@ -11,6 +11,7 @@ import com.ray3k.stripe.FreeTypeSkin;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.corelib.base.BaseHundunGame;
 import hundun.gdxgame.gamelib.base.save.ISaveTool;
+import hundun.gdxgame.gamelib.starter.listerner.ILogicFrameListener;
 import hundun.militarychess.logic.LogicContext;
 import hundun.militarychess.ui.screen.MyMenuScreen;
 import hundun.militarychess.ui.screen.ScreenContext;
@@ -30,7 +31,7 @@ public class MilitaryChessGame extends BaseHundunGame<Void> {
     private final TextureManager textureManager;
 
     public MilitaryChessGame(ISaveTool<Void> saveTool) {
-        super(640, 480);
+        super(640, 480, 1);
         //this.skinFilePath = "skins/orange/skin/uiskin.json";
         debugMode = true;
 
@@ -67,5 +68,10 @@ public class MilitaryChessGame extends BaseHundunGame<Void> {
     @Override
     protected void createStage3() {
         screenManager.pushScreen(MyMenuScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
+    }
+
+    @Override
+    protected void onLogicFrame(ILogicFrameListener source) {
+        source.onLogicFrame();
     }
 }

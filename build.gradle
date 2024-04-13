@@ -34,7 +34,7 @@ subprojects {
     appName = 'MilitaryChess'
     gdxFreeTypeGwtVersion = '1.9.10.1'
     screenmanagerVersion = '0.6.8'
-    hundunLibVersion = 'f5e40d5fb1'
+    hundunLibVersion = '77780c2919'
     raeleusStripeVersion = '1.4.1'
   }
 
