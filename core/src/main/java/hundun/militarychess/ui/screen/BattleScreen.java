@@ -15,6 +15,7 @@ import hundun.gdxgame.corelib.base.util.TextureFactory;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.shared.ChessVM;
@@ -62,11 +63,11 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-                ChessRule.fight(
+                FightResultType fightResultType = ChessRule.fight(
                     crossScreenDataPackage.getBattleFromChess(),
                     crossScreenDataPackage.getBattleToChess()
                 );
-                crossScreenDataPackage.afterFight();
+                crossScreenDataPackage.afterFight(fightResultType);
                 game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
             }
         });

@@ -71,6 +71,7 @@ public class LogicContext {
 
         ChessRuntimeData battleFromChess;
         ChessRuntimeData battleToChess;
+        FightResultType fightResultType;
 
         public ChessRuntimeData findAtPos(SimplePos pos) {
             for (var armyRuntimeData : armyMap.values()) {
@@ -140,6 +141,7 @@ public class LogicContext {
         }
 
         public void afterFight(FightResultType fightResultType) {
+            this.fightResultType = fightResultType;
             // 更新当前方
             if (currentSide == ChessSide.RED_SIDE) {
                 currentSide = ChessSide.BLUE_SIDE;

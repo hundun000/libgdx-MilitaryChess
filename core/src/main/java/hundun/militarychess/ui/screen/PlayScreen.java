@@ -112,7 +112,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
 
         if (crossScreenDataPackage.getBattleFromChess() != null) {
-            afterFight();
+            afterFight(crossScreenDataPackage.getFightResultType());
         } else {
             // 构造棋子
             List<ChessRuntimeData> allChessRuntimeDataList = new ArrayList<>();
