@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
-import hundun.gdxgame.gamelib.base.LogicFrameHelper;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
@@ -33,6 +32,8 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
     // ------ UI layer ------
     private BuilderMainBoardVM mainBoardVM;
+    // ------ desk layer ------
+    protected OrthographicCamera deskCamera;
     protected Stage deskStage;
     protected DeskAreaVM deskAreaVM;
     // ------ image previewer layer ------
@@ -166,7 +167,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
                 break;
             case WAIT_COMMIT:
                 // 模拟Ai点击确认
-                onCommitButtonClicked();
+                onBattleStartButtonClicked();
                 break;
             default:
         }
@@ -191,7 +192,6 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     /**
      * 当棋子被点击
      */
-    @Override
     public void onDeskClicked(ChessVM chessVM) {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         switch (crossScreenDataPackage.getCurrentState()) {
@@ -218,7 +218,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     /**
      * 当确认被点击
      */
-    public void onCommitButtonClicked() {
+    public void onBattleStartButtonClicked() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         crossScreenDataPackage.setBattleFromChess(mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData());
         crossScreenDataPackage.setBattleToChess(mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData());

@@ -1,7 +1,9 @@
 package hundun.militarychess.logic;
 
 import hundun.militarychess.logic.chess.AiLogic;
+import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
+import hundun.militarychess.logic.chess.ChessRule.BattleResult;
 import hundun.militarychess.logic.chess.ChessType;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
@@ -140,8 +142,10 @@ public class LogicContext {
             }
         }
 
-        public void afterFight(FightResultType fightResultType) {
-            this.fightResultType = fightResultType;
+        public void commitFightResult(BattleResult battleResult) {
+            ChessRule.onBattleCommit(battleResult);
+
+            this.fightResultType = battleResult.getFightResultType();
             // 更新当前方
             if (currentSide == ChessSide.RED_SIDE) {
                 currentSide = ChessSide.BLUE_SIDE;

@@ -1,8 +1,8 @@
 package hundun.militarychess.logic.data;
 
+import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.logic.chess.ChessType;
 import hundun.militarychess.logic.chess.GameboardPosRule;
-import hundun.militarychess.logic.chess.GameboardPosRule.Direction;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
@@ -23,6 +23,7 @@ public class ChessRuntimeData {
     int uiY;
     ChessType chessType;
     ChessSide chessSide;
+    ChessBattleStatus chessBattleStatus;
 
     public String toText() {
         return this.getChessType().getChinese()
@@ -60,7 +61,7 @@ public class ChessRuntimeData {
                 case BLUE_SIDE:
                     return RED_SIDE;
             }
-            return null;
+            return EMPTY;
         }
     }
 
@@ -105,6 +106,7 @@ public class ChessRuntimeData {
                 i++;
             }
             chessRuntimeData.updateUiPos(layoutConst);
+            chessRuntimeData.setChessBattleStatus(ChessBattleStatus.createStatus(chessRuntimeData.getChessType()));
             result.add(chessRuntimeData);
             col++;
             if (col > 4) {
@@ -117,6 +119,35 @@ public class ChessRuntimeData {
 
 
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ChessBattleStatus {
+        int hp;
+        int maxHp;
+        int atk;
+        int def;
+
+        public static ChessBattleStatus createStatus(ChessType chessType) {
+            switch (chessType) {
+                case EMPTY:
+                case DI_LEI:
+                case ZHA_DAN:
+                case JUN_QI:
+                    return new ChessBattleStatus();
+                default:
+                    int maxHp = 200 - chessType.ordinal() * 10;
+                    int atk = 20 - chessType.ordinal();
+                    int def = (int) (10 - chessType.ordinal() * 0.25);
+                    return new ChessBattleStatus(maxHp, maxHp, atk, def);
+            }
+        }
+
+
+        public String getChinese() {
+            return JavaFeatureForGwt.stringFormat("%s/%s", hp, maxHp);
+        }
+    }
 
 
 

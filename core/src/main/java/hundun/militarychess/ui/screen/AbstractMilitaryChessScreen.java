@@ -12,14 +12,11 @@ import hundun.militarychess.ui.screen.shared.DeskAreaVM;
 
 public abstract class AbstractMilitaryChessScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
 
-    // ------ desk layer ------
-    protected OrthographicCamera deskCamera;
 
 
     public AbstractMilitaryChessScreen(MilitaryChessGame game, Viewport sharedViewport) {
         super(game, sharedViewport);
     }
-    public abstract void onDeskClicked(ChessVM vm);
     protected abstract void updateUIAfterRoomChanged();
 
 

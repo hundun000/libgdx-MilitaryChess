@@ -57,7 +57,7 @@ public class AllButtonPageVM extends Table {
         this.commitButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                screen.onCommitButtonClicked();
+                screen.onBattleStartButtonClicked();
             }
         });
         this.add(commitButton).padBottom(pad).row();

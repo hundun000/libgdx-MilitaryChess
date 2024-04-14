@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
@@ -14,18 +15,19 @@ import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.AbstractMilitaryChessScreen;
+import hundun.militarychess.ui.screen.PlayScreen;
 import hundun.militarychess.ui.screen.shared.ChessVM.MaskType;
 import lombok.Getter;
 
 
 public class DeskAreaVM extends Table {
-    public AbstractMilitaryChessScreen screen;
+    public PlayScreen screen;
     @Getter
     Map<String, ChessVM> nodes = new LinkedHashMap<>();
     @Getter
     CameraDataPackage cameraDataPackage;
 
-    public DeskAreaVM(AbstractMilitaryChessScreen screen) {
+    public DeskAreaVM(PlayScreen screen) {
         this.screen = screen;
         this.cameraDataPackage = new CameraDataPackage();
 
@@ -60,12 +62,24 @@ public class DeskAreaVM extends Table {
 
             ChessVM actor = new ChessVM(this, deskData);
             nodes.put(deskData.getId(), actor);
-            actor.addListener(new DeskClickListener(screen, actor));
             this.addActor(actor);
 
         });
 
-
+        nodes.values().forEach(hexCellVM -> {
+            Actor hitBox = new Image();
+            hitBox.setBounds(
+                hexCellVM.getX() + screen.getGame().getScreenContext().getLayoutConst().HIT_BOX_X,
+                hexCellVM.getY() + screen.getGame().getScreenContext().getLayoutConst().HIT_BOX_Y,
+                screen.getGame().getScreenContext().getLayoutConst().HIT_BOX_WIDTH,
+                screen.getGame().getScreenContext().getLayoutConst().HIT_BOX_HEIGHT
+            );
+            if (screen.getGame().debugMode) {
+                hitBox.debug();
+            }
+            this.addActor(hitBox);
+            hitBox.addListener(new DeskClickListener(screen, hexCellVM));
+        });
     }
 
     public void updateMask(ChessVM from) {

@@ -4,7 +4,10 @@ import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
-import lombok.Getter;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 行走和战斗规则
@@ -56,18 +59,119 @@ public class ChessRule {
 
     }
 
-    public static FightResultType fight(ChessRuntimeData from, ChessRuntimeData to) {
-        FightResultType fightResultType = getFightResult(from, to);
-        if (fightResultType == FightResultType.BOTH_DIE || fightResultType == FightResultType.TO_WIN) {
-            setAsDead(from);
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class BattleDamageFrame {
+        /**
+         * 此帧结束后的from方HP
+         */
+        int tempFromHp;
+        /**
+         * 此帧结束后的to方HP
+         */
+        int tempToHp;
+        /**
+         * from方（对to方—）造成的伤害
+         */
+        int damageFrom;
+        /**
+         * to方（对from方）造成的伤害
+         */
+        int damageTo;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class BattleResult {
+        ChessRuntimeData from;
+        ChessRuntimeData to;
+        FightResultType fightResultType;
+        List<BattleDamageFrame> frames;
+        boolean specialBattle;
+    }
+
+    public static BattleResult getFightV2Result(ChessRuntimeData from, ChessRuntimeData to) {
+        FightResultType fightResultType = null;
+        boolean specialBattle;
+        List<BattleDamageFrame> frames = new ArrayList<>();
+        BattleDamageFrame lastFrame = BattleDamageFrame.builder()
+            .tempFromHp(from.getChessBattleStatus().getHp())
+            .tempToHp(to.getChessBattleStatus().getHp())
+            .damageFrom(0)
+            .damageTo(0)
+            .build();
+        // first frame for init HUD
+        frames.add(lastFrame);
+
+        if (from.getChessType() == ChessType.ZHA_DAN || to.getChessType() == ChessType.ZHA_DAN) {
+            fightResultType = FightResultType.BOTH_DIE;
+            specialBattle = true;
+        } else if (to.getChessType() == ChessType.DI_LEI) {
+            specialBattle = true;
+            if (from.getChessType() == ChessType.GONG_BING) {
+                fightResultType = FightResultType.FROM_WIN;
+            } else {
+                fightResultType = FightResultType.BOTH_DIE;
+            }
+        } else if (to.getChessType() == ChessType.EMPTY) {
+            specialBattle = true;
+            fightResultType = FightResultType.JUST_MOVE;
+        } else {
+            specialBattle = false;
+
+            boolean nexFrame = true;
+            while (nexFrame) {
+                int damageFrom = from.getChessBattleStatus().getAtk() - to.getChessBattleStatus().getDef();
+                int damageTo = to.getChessBattleStatus().getAtk() - from.getChessBattleStatus().getDef();
+                int tempFromHp = lastFrame.getTempFromHp();
+                int tempToHp = lastFrame.getTempToHp();
+                tempFromHp = Math.max(tempFromHp - damageTo, 0);
+                tempToHp = Math.max(tempToHp - damageTo, 0);
+
+                lastFrame = BattleDamageFrame.builder()
+                    .tempFromHp(tempFromHp)
+                    .tempToHp(tempToHp)
+                    .damageFrom(damageFrom)
+                    .damageTo(damageTo)
+                    .build();
+                frames.add(lastFrame);
+
+                if (tempFromHp == 0 || tempToHp == 0) {
+                    nexFrame = false;
+                    if (tempFromHp > 0) {
+                        fightResultType = FightResultType.FROM_WIN;
+                    } else if (tempToHp > 0) {
+                        fightResultType = FightResultType.TO_WIN;
+                    } else {
+                        fightResultType = FightResultType.BOTH_DIE;
+                    }
+                }
+            }
         }
-        if (fightResultType == FightResultType.BOTH_DIE || fightResultType == FightResultType.FROM_WIN) {
-            setAsDead(to);
+        return BattleResult.builder()
+            .from(from)
+            .to(to)
+            .fightResultType(fightResultType)
+            .frames(frames)
+            .specialBattle(specialBattle)
+            .build();
+    }
+
+    public static void onBattleCommit(BattleResult battleResult) {
+        if (battleResult.fightResultType == FightResultType.BOTH_DIE || battleResult.fightResultType == FightResultType.TO_WIN) {
+            setAsDead(battleResult.from);
         }
-        if (fightResultType == FightResultType.FROM_WIN || fightResultType == FightResultType.JUST_MOVE) {
-            switchPos(from, to);
+        if (battleResult.fightResultType == FightResultType.BOTH_DIE || battleResult.fightResultType == FightResultType.FROM_WIN) {
+            setAsDead(battleResult.to);
         }
-        return fightResultType;
+        if (battleResult.fightResultType == FightResultType.FROM_WIN || battleResult.fightResultType == FightResultType.JUST_MOVE) {
+            switchPos(battleResult.from, battleResult.to);
+        }
     }
 
     /**
@@ -110,6 +214,4 @@ public class ChessRule {
             return FightResultType.BOTH_DIE;
         }
     }
-
-
 }
