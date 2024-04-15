@@ -45,6 +45,12 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
      */
     Label toSideStatusLabel;
     boolean fromSideIsLeftSide;
+    int autoPlayCount;
+    final int AUTO_PLAY_START_DELAY = -2;
+    final int AUTO_PLAY_DELTA_DELAY = 1;
+
+    final int AUTO_PLAY_END_DELAY = 3;
+    int endingPhase;
 
     public BattleScreen(MilitaryChessGame game) {
         super(game, game.getSharedViewport());
@@ -71,7 +77,12 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
             toSideStatusLabel = leftSideStatusLabel;
             fromSideIsLeftSide = false;
         }
-        playOneFrame();
+
+        autoPlayCount = AUTO_PLAY_START_DELAY;
+        endingPhase = 0;
+
+        playInit();
+
     }
 
     private String toStatusText(ChessRuntimeData data, int tempHp) {
@@ -86,8 +97,19 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
             );
     }
 
+    private void playInit() {
+        fromSideStatusLabel.setText(toStatusText(
+            battleResult.getFrom(),
+            battleResult.getFrom().getChessBattleStatus().getHp()
+        ));
+        toSideStatusLabel.setText(toStatusText(
+            battleResult.getTo(),
+            battleResult.getTo().getChessBattleStatus().getHp()
+        ));
+        damageLabel.setText("");
+    }
 
-    private void playOneFrame() {
+    private boolean playOneFrame() {
         if (!playFrameQueue.isEmpty()) {
             BattleDamageFrame frame = playFrameQueue.remove(0);
             fromSideStatusLabel.setText(toStatusText(
@@ -106,8 +128,10 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
         }
         if (playFrameQueue.isEmpty()) {
             playNextFrameButton.setDisabled(true);
+            return true;
         } else {
             playNextFrameButton.setDisabled(false);
+            return false;
         }
     }
 
@@ -150,9 +174,7 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
         this.commitFightResultButton.addListener(new ChangeListener(){
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-                crossScreenDataPackage.commitFightResult(battleResult);
-                game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
+                end();
             }
         });
         uiRootTable.add(commitFightResultButton);
@@ -167,7 +189,32 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
 
     @Override
     public void onLogicFrame() {
+        autoPlayCount++;
+        if (endingPhase == 0) {
+            if (autoPlayCount >= AUTO_PLAY_DELTA_DELAY) {
+                autoPlayCount -= AUTO_PLAY_DELTA_DELAY;
+                boolean intoEndingPhase1 = playOneFrame();
+                if (intoEndingPhase1) {
+                    endingPhase = 1;
+                }
+            }
+        } if (endingPhase == 1) {
+            if (autoPlayCount >= AUTO_PLAY_DELTA_DELAY) {
+                autoPlayCount -= AUTO_PLAY_DELTA_DELAY;
+                endingPhase = 2;
+                playInit();
+            }
+        } else {
+            if (autoPlayCount >= AUTO_PLAY_END_DELAY) {
+                end();
+            }
+        }
+    }
 
+    private void end() {
+        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        crossScreenDataPackage.commitFightResult(battleResult);
+        game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
     }
 
     @Override

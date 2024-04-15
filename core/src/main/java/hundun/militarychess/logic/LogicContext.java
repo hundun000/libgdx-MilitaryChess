@@ -152,6 +152,7 @@ public class LogicContext {
             } else {
                 currentSide = ChessSide.RED_SIDE;
             }
+            game.getFrontend().log(this.getClass().getSimpleName(), "currentSide change to " + currentSide);
             // 更新阶段
             this.setCurrentState(ChessState.WAIT_SELECT_FROM);
             // 更新连续未吃子计数器
