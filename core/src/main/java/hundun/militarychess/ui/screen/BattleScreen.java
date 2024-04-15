@@ -86,33 +86,41 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
             );
     }
 
-    private String toDamageText(BattleDamageFrame frame) {
-        String leftLine;
-        String rightLine;
-        if (fromSideIsLeftSide) {
-            leftLine = JavaFeatureForGwt.stringFormat("<-- 伤害 %s --", frame.getDamageTo());
-            rightLine = JavaFeatureForGwt.stringFormat("-- 伤害 %s -->", frame.getDamageFrom());
-        } else {
-            leftLine = JavaFeatureForGwt.stringFormat("<-- 伤害 %s --", frame.getDamageFrom());
-            rightLine = JavaFeatureForGwt.stringFormat("-- 伤害 %s -->", frame.getDamageTo());
-        }
-        return leftLine + "\n" + rightLine;
-    }
 
     private void playOneFrame() {
         if (!playFrameQueue.isEmpty()) {
             BattleDamageFrame frame = playFrameQueue.remove(0);
-            fromSideStatusLabel.setText(toStatusText(battleResult.getFrom(), frame.getTempFromHp()));
-            toSideStatusLabel.setText(toStatusText(battleResult.getTo(), frame.getTempToHp()));
+            fromSideStatusLabel.setText(toStatusText(
+                battleResult.getFrom(),
+                frame.getTempDataMapSnapshot().get(battleResult.getFrom().getId()).getHp()
+            ));
+            toSideStatusLabel.setText(toStatusText(
+                battleResult.getTo(),
+                frame.getTempDataMapSnapshot().get(battleResult.getTo().getId()).getHp()
+            ));
             if (battleResult.isSpecialBattle()) {
                 damageLabel.setText("特殊结算");
             } else {
-                damageLabel.setText(toDamageText(frame));
+                damageLabel.setText(toDamageText(battleResult.getFrom(), battleResult.getTo(), frame));
             }
         }
         if (playFrameQueue.isEmpty()) {
             playNextFrameButton.setDisabled(true);
+        } else {
+            playNextFrameButton.setDisabled(false);
         }
+    }
+
+    private String toDamageText(ChessRuntimeData from, ChessRuntimeData to, BattleDamageFrame frame) {
+        String line;
+        boolean originIsLeftSide = (fromSideIsLeftSide && frame.getOrigin().getId().equals(from.getId()))
+            || (!fromSideIsLeftSide && frame.getOrigin().getId().equals(to.getId()));
+        if (originIsLeftSide) {
+            line = JavaFeatureForGwt.stringFormat("-- 伤害 %s -->", frame.getDamage());
+        } else {
+            line = JavaFeatureForGwt.stringFormat("<-- 伤害 %s --", frame.getDamage());
+        }
+        return line;
     }
 
     @Override

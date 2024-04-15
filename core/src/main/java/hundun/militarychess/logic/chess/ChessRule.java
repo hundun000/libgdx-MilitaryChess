@@ -1,13 +1,17 @@
 package hundun.militarychess.logic.chess;
 
+import com.badlogic.gdx.utils.Json;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import lombok.*;
+import org.apache.commons.math3.util.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 行走和战斗规则
@@ -60,27 +64,42 @@ public class ChessRule {
     }
 
 
+
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class BattleFrameTempData {
+        static Json json = new Json();
+        int hp;
+
+        public static BattleFrameTempData fromRuntimeData(ChessRuntimeData runtimeData) {
+            return BattleFrameTempData.builder()
+                .hp(runtimeData.getChessBattleStatus().getHp())
+                .build();
+        }
+
+        public static Map<String, BattleFrameTempData> deepCopyMap(Map<String, BattleFrameTempData> tempDataMap) {
+            Map<String, BattleFrameTempData> map = new HashMap<>(tempDataMap.size());
+            tempDataMap.forEach((k, v) -> {
+                String str = json.toJson(v);
+                BattleFrameTempData vCopy = json.fromJson(BattleFrameTempData.class, str);
+                map.put(k, vCopy);
+            });
+            return map;
+        }
+    }
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     public static class BattleDamageFrame {
-        /**
-         * 此帧结束后的from方HP
-         */
-        int tempFromHp;
-        /**
-         * 此帧结束后的to方HP
-         */
-        int tempToHp;
-        /**
-         * from方（对to方—）造成的伤害
-         */
-        int damageFrom;
-        /**
-         * to方（对from方）造成的伤害
-         */
-        int damageTo;
+        ChessRuntimeData origin;
+        ChessRuntimeData destination;
+        int damage;
+        Map<String, BattleFrameTempData> tempDataMapSnapshot;
     }
 
     @Data
@@ -95,18 +114,26 @@ public class ChessRule {
         boolean specialBattle;
     }
 
+    private static BattleDamageFrame calculateBattleDamageSubFrame(Map<String, BattleFrameTempData> tempDataMap, ChessRuntimeData origin, ChessRuntimeData destination) {
+        int damage = origin.getChessBattleStatus().getAtk() - destination.getChessBattleStatus().getDef();
+        BattleFrameTempData tempData = tempDataMap.get(destination.getId());
+        tempData.hp = Math.max(tempData.hp - damage, 0);
+        return BattleDamageFrame.builder()
+            .origin(origin)
+            .destination(destination)
+            .damage(damage)
+            .tempDataMapSnapshot(BattleFrameTempData.deepCopyMap(tempDataMap))
+            .build();
+    }
+
     public static BattleResult getFightV2Result(ChessRuntimeData from, ChessRuntimeData to) {
         FightResultType fightResultType = null;
         boolean specialBattle;
-        List<BattleDamageFrame> frames = new ArrayList<>();
-        BattleDamageFrame lastFrame = BattleDamageFrame.builder()
-            .tempFromHp(from.getChessBattleStatus().getHp())
-            .tempToHp(to.getChessBattleStatus().getHp())
-            .damageFrom(0)
-            .damageTo(0)
-            .build();
-        // first frame for init HUD
-        frames.add(lastFrame);
+        List<BattleDamageFrame> subFrames = new ArrayList<>();
+        Map<String, BattleFrameTempData> tempDataMap = Map.of(
+            from.getId(), BattleFrameTempData.fromRuntimeData(from),
+            to.getId(), BattleFrameTempData.fromRuntimeData(to)
+        );
 
         if (from.getChessType() == ChessType.ZHA_DAN || to.getChessType() == ChessType.ZHA_DAN) {
             fightResultType = FightResultType.BOTH_DIE;
@@ -124,45 +151,50 @@ public class ChessRule {
         } else {
             specialBattle = false;
 
-            boolean nexFrame = true;
-            while (nexFrame) {
-                int damageFrom = from.getChessBattleStatus().getAtk() - to.getChessBattleStatus().getDef();
-                int damageTo = to.getChessBattleStatus().getAtk() - from.getChessBattleStatus().getDef();
-                int tempFromHp = lastFrame.getTempFromHp();
-                int tempToHp = lastFrame.getTempToHp();
-                tempFromHp = Math.max(tempFromHp - damageTo, 0);
-                tempToHp = Math.max(tempToHp - damageTo, 0);
+            List<Pair<ChessRuntimeData, ChessRuntimeData>> subFramePairs = new ArrayList<>(
+                List.of(
+                    Pair.create(from, to),
+                    Pair.create(to, from)
+                )
+            );
 
-                lastFrame = BattleDamageFrame.builder()
-                    .tempFromHp(tempFromHp)
-                    .tempToHp(tempToHp)
-                    .damageFrom(damageFrom)
-                    .damageTo(damageTo)
-                    .build();
-                frames.add(lastFrame);
+            for (int i = 0; i < subFramePairs.size(); i++) {
+                Pair<ChessRuntimeData, ChessRuntimeData> pair = subFramePairs.get(i);
+                BattleDamageFrame subFrame = calculateBattleDamageSubFrame(tempDataMap, pair.getFirst(), pair.getSecond());
+                subFrames.add(subFrame);
 
-                if (tempFromHp == 0 || tempToHp == 0) {
-                    nexFrame = false;
-                    if (tempFromHp > 0) {
+                boolean fromDead = tempDataMap.get(from.getId()).getHp() == 0;
+                boolean toDead = tempDataMap.get(to.getId()).getHp() == 0;
+
+                if (fromDead || toDead) {
+                    if (!fromDead) {
                         fightResultType = FightResultType.FROM_WIN;
-                    } else if (tempToHp > 0) {
+                    } else if (!toDead) {
                         fightResultType = FightResultType.TO_WIN;
                     } else {
                         fightResultType = FightResultType.BOTH_DIE;
                     }
+                    break;
                 }
             }
+
         }
         return BattleResult.builder()
             .from(from)
             .to(to)
             .fightResultType(fightResultType)
-            .frames(frames)
+            .frames(subFrames)
             .specialBattle(specialBattle)
             .build();
     }
 
     public static void onBattleCommit(BattleResult battleResult) {
+        if (!battleResult.getFrames().isEmpty()) {
+            Map<String, BattleFrameTempData> lastMap = battleResult.getFrames().get(battleResult.getFrames().size() - 1).getTempDataMapSnapshot();
+            battleResult.from.getChessBattleStatus().setHp(lastMap.get(battleResult.from.getId()).getHp());
+            battleResult.to.getChessBattleStatus().setHp(lastMap.get(battleResult.to.getId()).getHp());
+        }
+
         if (battleResult.fightResultType == FightResultType.BOTH_DIE || battleResult.fightResultType == FightResultType.TO_WIN) {
             setAsDead(battleResult.from);
         }
