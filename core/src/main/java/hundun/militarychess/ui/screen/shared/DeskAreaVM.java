@@ -3,18 +3,19 @@ package hundun.militarychess.ui.screen.shared;
 import java.util.*;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import hundun.gdxgame.corelib.base.util.DrawableFactory;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.GameboardPosRule;
 import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
-import hundun.militarychess.ui.screen.AbstractMilitaryChessScreen;
 import hundun.militarychess.ui.screen.PlayScreen;
 import hundun.militarychess.ui.screen.shared.ChessVM.MaskType;
 import lombok.Getter;
@@ -43,7 +44,7 @@ public class DeskAreaVM extends Table {
 
         Image background = new Image();
 
-        background.setDrawable(new TextureRegionDrawable(new Texture(Gdx.files.internal("棋盘.jpg"))));
+        background.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.GRAY, 1f));
 
         int roomWidth = screen.getGame().getScreenContext().getLayoutConst().PLAY_WIDTH;
         int roomHeight = screen.getGame().getScreenContext().getLayoutConst().PLAY_HEIGHT;
@@ -53,10 +54,10 @@ public class DeskAreaVM extends Table {
         this.addActor(background);
         //this.addListener(new CameraGestureListener(cameraDataPackage));
         //this.addListener(new CameraMouseListener(cameraDataPackage));
-        this.getCameraDataPackage().forceSet(
+/*        this.getCameraDataPackage().forceSet(
             roomWidth / 2.0f + 800,
             roomHeight/ 2.0f,
-            null);
+            null);*/
 
         chessRuntimeDataList.forEach(deskData -> {
 
@@ -95,7 +96,7 @@ public class DeskAreaVM extends Table {
 
     public void afterFightOrClear() {
         nodes.values().forEach(it -> {
-            it.updateUI();
+            it.updateUIForChessChanged();
             it.updateMask(MaskType.EMPTY);
         });
     }

@@ -35,7 +35,7 @@ public class GameboardPosRule {
         new SimplePos(0, 3)
     );
     public static Map<Integer, SimplePos> simplePosMap;
-    public static Map<SimplePos, GameboardPos> gameboardPosMap;
+    public static Map<String, GameboardPos> gameboardPosMap;
     static {
 
         simplePosMap = new HashMap<>();
@@ -47,7 +47,7 @@ public class GameboardPosRule {
 
         gameboardPosMap = new HashMap<>();
         simplePosMap.values().forEach(it -> {
-            gameboardPosMap.put(it, buildGameboardSimplePos(it));
+            gameboardPosMap.put(it.toId(), buildGameboardSimplePos(it));
         });
     }
 
@@ -66,53 +66,53 @@ public class GameboardPosRule {
 
 
     private static void buildGameboardNeighbour(GameboardPos thiz, SimplePos pos, GameboardPosType gameboardPosType) {
-        if (pos.getCol() - 1 >= 0) {
-            thiz.getNeighbourMap().put(Direction.LEFT, findSimplePos(pos.getRow(), pos.getCol() - 1));
+        if (pos.getX() - 1 >= 0) {
+            thiz.getNeighbourMap().put(Direction.LEFT, findSimplePos(pos.getY(), pos.getX() - 1));
         }
-        if (pos.getCol() + 1 <= 4) {
-            thiz.getNeighbourMap().put(Direction.RIGHT, findSimplePos(pos.getRow(), pos.getCol() + 1));
+        if (pos.getX() + 1 <= 4) {
+            thiz.getNeighbourMap().put(Direction.RIGHT, findSimplePos(pos.getY(), pos.getX() + 1));
         }
-        if (pos.getRow() - 1 >= 0) {
+        if (pos.getY() - 1 >= 0) {
             // 特别的，（6,1）和（6,3）不连接UP
-            if (!(pos.getRow() == 6 && pos.getCol() == 1) && !(pos.getRow() == 6 && pos.getCol() == 3)) {
-                thiz.getNeighbourMap().put(Direction.UP, findSimplePos(pos.getRow() - 1, pos.getCol()));
+            if (!(pos.getY() == 6 && pos.getX() == 1) && !(pos.getY() == 6 && pos.getX() == 3)) {
+                thiz.getNeighbourMap().put(Direction.UP, findSimplePos(pos.getY() - 1, pos.getX()));
             }
         }
-        if (pos.getRow() + 1 <= 11) {
+        if (pos.getY() + 1 <= 11) {
             // 特别的，（5,1）和（5,3）不连接DOWN
-            if (!(pos.getRow() == 5 && pos.getCol() == 1) && !(pos.getRow() == 5 && pos.getCol() == 3)) {
-                thiz.getNeighbourMap().put(Direction.DOWN, findSimplePos(pos.getRow() + 1, pos.getCol()));
+            if (!(pos.getY() == 5 && pos.getX() == 1) && !(pos.getY() == 5 && pos.getX() == 3)) {
+                thiz.getNeighbourMap().put(Direction.DOWN, findSimplePos(pos.getY() + 1, pos.getX()));
             }
         }
         // 并且和行营相邻的位置不连接斜向
         int minDistance = XING_YING_POS_MAP.stream()
-            .map(it -> Math.abs(it.getRow() - pos.getRow()) + Math.abs(it.getCol() - pos.getCol()))
+            .map(it -> Math.abs(it.getY() - pos.getY()) + Math.abs(it.getX() - pos.getX()))
             .sorted()
             .findFirst()
             .get();
         if (minDistance != 1) {
             // 特别的，1/6/11行不连接LEFT_UP和RIGHT_UP
-            if (pos.getRow() - 1 >= 0 && pos.getCol() - 1 >= 0) {
-                if (pos.getRow() != 1 && pos.getRow() != 6 && pos.getRow() != 11) {
+            if (pos.getY() - 1 >= 0 && pos.getX() - 1 >= 0) {
+                if (pos.getY() != 1 && pos.getY() != 6 && pos.getY() != 11) {
 
 
-                    thiz.getNeighbourMap().put(Direction.LEFT_UP, findSimplePos(pos.getRow() - 1, pos.getCol() - 1));
+                    thiz.getNeighbourMap().put(Direction.LEFT_UP, findSimplePos(pos.getY() - 1, pos.getX() - 1));
                 }
             }
-            if (pos.getRow() - 1 >= 0 && pos.getCol() + 1 >= 0) {
-                if (pos.getRow() != 1 && pos.getRow() != 6 && pos.getRow() != 11) {
-                    thiz.getNeighbourMap().put(Direction.RIGHT_UP, findSimplePos(pos.getRow() - 1, pos.getCol() + 1));
+            if (pos.getY() - 1 >= 0 && pos.getX() + 1 >= 0) {
+                if (pos.getY() != 1 && pos.getY() != 6 && pos.getY() != 11) {
+                    thiz.getNeighbourMap().put(Direction.RIGHT_UP, findSimplePos(pos.getY() - 1, pos.getX() + 1));
                 }
             }
             // 特别的，0/5/10行不连接LEFT_DOWN和RIGHT_DOWN
-            if (pos.getRow() + 1 <= 11 && pos.getCol() - 1 >= 0) {
-                if (pos.getRow() != 0 && pos.getRow() != 5 && pos.getRow() != 10) {
-                    thiz.getNeighbourMap().put(Direction.LEFT_DOWN, findSimplePos(pos.getRow() + 1, pos.getCol() - 1));
+            if (pos.getY() + 1 <= 11 && pos.getX() - 1 >= 0) {
+                if (pos.getY() != 0 && pos.getY() != 5 && pos.getY() != 10) {
+                    thiz.getNeighbourMap().put(Direction.LEFT_DOWN, findSimplePos(pos.getY() + 1, pos.getX() - 1));
                 }
             }
-            if (pos.getRow() + 1 <= 11 && pos.getCol() + 1 >= 0) {
-                if (pos.getRow() != 0 && pos.getRow() != 5 && pos.getRow() != 10) {
-                    thiz.getNeighbourMap().put(Direction.RIGHT_DOWN, findSimplePos(pos.getRow() + 1, pos.getCol() + 1));
+            if (pos.getY() + 1 <= 11 && pos.getX() + 1 >= 0) {
+                if (pos.getY() != 0 && pos.getY() != 5 && pos.getY() != 10) {
+                    thiz.getNeighbourMap().put(Direction.RIGHT_DOWN, findSimplePos(pos.getY() + 1, pos.getX() + 1));
                 }
             }
         }
@@ -127,8 +127,8 @@ public class GameboardPosRule {
             .build();
 
 
-        final int row = pos.getRow();
-        final int col = pos.getCol();
+        final int row = pos.getY();
+        final int col = pos.getX();
         GameboardPosType gameboardPosType;
         if (row <= 0 || row >= 11) {
             if (DA_BEN_YING_POS_MAP.contains(pos)) {
@@ -201,7 +201,7 @@ public class GameboardPosRule {
 
         SimplePos currentPos = fromChess.getPos();
         boolean canTurnDirection = fromChess.getChessType() == ChessType.GONG_BING;
-        GameboardPos currentGameboardPos = GameboardPosRule.gameboardPosMap.get(currentPos);
+        GameboardPos currentGameboardPos = GameboardPosRule.gameboardPosMap.get(currentPos.toId());
         // 搜索相邻的可移动目的地
         currentGameboardPos.getNeighbourMap().values().forEach(checkingPos -> {
             ChessRuntimeData checkingChess = crossScreenDataPackage.findAtPos(checkingPos);
@@ -233,14 +233,14 @@ public class GameboardPosRule {
         }
         result.add(currentPos);
         dirtyRailPosList.add(currentPos);
-        GameboardPos currentGameboardPos = GameboardPosRule.gameboardPosMap.get(currentPos);
+        GameboardPos currentGameboardPos = GameboardPosRule.gameboardPosMap.get(currentPos.toId());
         // 对于铁路，只尝试4种方向
         for (Direction direction : Direction.XYValues) {
             SimplePos checkingPos = currentGameboardPos.getNeighbourMap().get(direction);
             if (checkingPos == null) {
                 continue;
             }
-            GameboardPos checkingGameboardPos = GameboardPosRule.gameboardPosMap.get(checkingPos);
+            GameboardPos checkingGameboardPos = GameboardPosRule.gameboardPosMap.get(checkingPos.toId());
             ChessRuntimeData checkingChess = crossScreenDataPackage.findAtPos(checkingPos);
             // checkingPos不是铁路或不可移动则不需继续检查
             if (checkingGameboardPos.getGameboardPosType() != GameboardPosType.RAIL || !ChessRule.canMove(fromChess, checkingChess)) {
@@ -301,12 +301,16 @@ public class GameboardPosRule {
     @NoArgsConstructor
     @Builder
     public static class SimplePos {
-        int row;
-        int col;
+        int y;
+        int x;
+
+        public String toId() {
+            return "(" + x + "," + y + ")";
+        }
 
         public String toText() {
-            char rowChar = (char)('A' + this.getRow());
-            return "(" + rowChar + this.getCol() + ")";
+            char rowChar = (char)('A' + this.getY());
+            return "(" + rowChar + this.getX() + ")";
         }
 
     }

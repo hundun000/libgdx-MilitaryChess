@@ -1,21 +1,19 @@
 package hundun.militarychess.ui.screen;
 
-import hundun.militarychess.logic.data.ChessRuntimeData;
-
 public class LayoutConst {
 
 
     public final int DESK_SMALL_COL_PADDING = 30;
     public final int DESK_BIG_COL_PADDING = 200;
-    public final int DESK_WIDTH = 400;
-    public final int DESK_HEIGHT = 200;
+    public final int TILE_WIDTH = 400;
+    public final int TILE_HEIGHT = 400;
 
     public final int CHESS_AND_DESK_SPACE = 50;
 
     public int HIT_BOX_X = 4;
     public int HIT_BOX_Y = 4;
-    public int HIT_BOX_WIDTH = DESK_WIDTH - HIT_BOX_X * 2;
-    public int HIT_BOX_HEIGHT = DESK_HEIGHT - HIT_BOX_Y * 2;
+    public int HIT_BOX_WIDTH = TILE_WIDTH - HIT_BOX_X * 2;
+    public int HIT_BOX_HEIGHT = TILE_HEIGHT - HIT_BOX_Y * 2;
 
     public final int DESK_STAR_SIZE = 50;
     public final int GOOD_IMAGE_SIZE = 150;
@@ -33,9 +31,8 @@ public class LayoutConst {
     public final int ROOM_SWITCH_NODE_WIDTH = 250;
     public final int ROOM_SWITCH_NODE_HEIGHT = 75;
 
-    public final int PLAY_WIDTH = 5 * DESK_WIDTH;
-    public final int RIVER_HEIGHT = (int) (DESK_HEIGHT * 1);
-    public final int PLAY_HEIGHT = 12 * DESK_HEIGHT + RIVER_HEIGHT;
+    public final int PLAY_WIDTH = 7 * TILE_WIDTH;
+    public final int PLAY_HEIGHT = 14 * TILE_HEIGHT;
 
 
 }

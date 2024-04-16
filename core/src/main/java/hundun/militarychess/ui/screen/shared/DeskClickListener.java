@@ -24,10 +24,8 @@ public class DeskClickListener extends ClickListener {
     public void clicked(InputEvent event, float x, float y) {
         screen.onDeskClicked(vm);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(vm.getDeskData().toText()
-            + " has been clicked."
-        );
-        var relation = GameboardPosRule.gameboardPosMap.get(vm.getDeskData().getPos());
+        stringBuilder.append(vm.getDeskData().toText()).append(" has been clicked.");
+        var relation = GameboardPosRule.gameboardPosMap.get(vm.getDeskData().getPos().toId());
         stringBuilder.append("NeighbourMap{");
         relation.getNeighbourMap().forEach((k, v) -> stringBuilder.append(k).append("=").append(v != null ? v.toText() : "null"));
         stringBuilder.append("}");

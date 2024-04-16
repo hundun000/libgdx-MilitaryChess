@@ -52,7 +52,7 @@ public class AiLogic {
                     int totalScore = 0;
                     for (ChessRuntimeData it : toArmy.getChessRuntimeDataList()) {
                         FightResultType fightResultType = ChessRule.fightResultPreview(checkingFromChess, it);
-                        int distance = Math.abs(it.getPos().getRow() - checkingTo.getRow()) + Math.abs(it.getPos().getCol() - checkingTo.getCol());
+                        int distance = Math.abs(it.getPos().getY() - checkingTo.getY()) + Math.abs(it.getPos().getX() - checkingTo.getX());
                         int distanceScore = 21 - distance;
                         int baseKillScore;
                         if (fightResultType == FightResultType.FROM_WIN) {

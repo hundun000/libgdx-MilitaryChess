@@ -28,8 +28,8 @@ public class ChessRule {
         if (!from.getChessType().isCanMove()) {
             return false;
         }
-        GameboardPos fromGameboardPos = GameboardPosRule.gameboardPosMap.get(from.getPos());
-        GameboardPos toGameboardPos = GameboardPosRule.gameboardPosMap.get(to.getPos());
+        GameboardPos fromGameboardPos = GameboardPosRule.gameboardPosMap.get(from.getPos().toId());
+        GameboardPos toGameboardPos = GameboardPosRule.gameboardPosMap.get(to.getPos().toId());
         // 不能从大本营移出
         if (fromGameboardPos.getGameboardPosType() == GameboardPosType.DA_BEN_YING) {
             return false;

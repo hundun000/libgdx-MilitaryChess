@@ -1,6 +1,7 @@
 package hundun.militarychess.ui.screen.shared;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -9,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.chess.GameboardPosRule;
+import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
@@ -26,22 +29,31 @@ public class ChessVM extends Table {
 
     Label chessTypeLabel;
     Label chessStatusLabel;
-    Image mainImage;
+    Image tileImage;
+    Image colorImage;
 
     public ChessVM(DeskAreaVM deskAreaVM, ChessRuntimeData deskData) {
         this.game = deskAreaVM.screen.getGame();
         this.deskAreaVM = deskAreaVM;
         this.deskData = deskData;
 
-
-        this.mainImage = new Image();
-        mainImage.setBounds(
-            this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE,
-            this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE,
-            this.game.getScreenContext().getLayoutConst().DESK_WIDTH - this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE * 2,
-            this.game.getScreenContext().getLayoutConst().DESK_HEIGHT - this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE * 2
+        this.tileImage = new Image();
+        tileImage.setBounds(
+            0,
+            0,
+            this.game.getScreenContext().getLayoutConst().TILE_WIDTH,
+            this.game.getScreenContext().getLayoutConst().TILE_HEIGHT
         );
-        this.addActor(mainImage);
+        this.addActor(tileImage);
+
+        this.colorImage = new Image();
+        colorImage.setBounds(
+            this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE,
+            this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE,
+            this.game.getScreenContext().getLayoutConst().TILE_WIDTH - this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE * 2,
+            this.game.getScreenContext().getLayoutConst().TILE_HEIGHT - this.game.getScreenContext().getLayoutConst().CHESS_AND_DESK_SPACE * 2
+        );
+        this.addActor(colorImage);
 
         /*this.setBackground(new TextureRegionDrawable(new TextureRegion(TextureFactory.getSimpleBoardBackground(
                 this.game.getScreenContext().getLayoutConst().DESK_WIDTH,
@@ -53,14 +65,18 @@ public class ChessVM extends Table {
         this.chessStatusLabel = new Label("", game.getMainSkin());
         this.add(chessStatusLabel);
 
-        updateUI();
+        updateUIForChessChanged();
+        // ------ ui for tile ------
+        GameboardPos gameboardPos = GameboardPosRule.gameboardPosMap.get(deskData.getPos().toId());
+        TextureRegion textureRegion = game.getTextureManager().getTileImage(gameboardPos);
+        tileImage.setDrawable(new TextureRegionDrawable(textureRegion));
     }
 
 
     private void updateUIAsEmpty() {
         this.chessTypeLabel.setText("");
         chessStatusLabel.setText("");
-        mainImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
+        colorImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
     }
 
     private void updateUIAsNotEmpty(CrossScreenDataPackage crossScreenDataPackage) {
@@ -68,18 +84,18 @@ public class ChessVM extends Table {
             chessTypeLabel.setText(deskData.getChessType().getChinese());
             chessStatusLabel.setText(deskData.getChessBattleStatus().getChinese());
             if (deskData.getChessSide() == ChessSide.RED_SIDE) {
-                mainImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.RED, 0.8f));
+                colorImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.RED, 0.8f));
             } else if (deskData.getChessSide() == ChessSide.BLUE_SIDE) {
-                mainImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.BLUE, 0.8f));
+                colorImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.BLUE, 0.8f));
             }
         } else {
             chessTypeLabel.setText("");
             chessStatusLabel.setText("");
-            mainImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.GRAY, 0.8f));
+            colorImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.GRAY, 0.8f));
         }
     }
 
-    public void updateUI(){
+    public void updateUIForChessChanged(){
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
 
         if (deskData.getChessSide() == ChessSide.EMPTY) {
@@ -92,8 +108,8 @@ public class ChessVM extends Table {
         this.setBounds(
             deskData.getUiX(),
             deskData.getUiY(),
-            game.getScreenContext().getLayoutConst().DESK_WIDTH,
-            game.getScreenContext().getLayoutConst().DESK_HEIGHT
+            game.getScreenContext().getLayoutConst().TILE_WIDTH,
+            game.getScreenContext().getLayoutConst().TILE_HEIGHT
         );
     }
 

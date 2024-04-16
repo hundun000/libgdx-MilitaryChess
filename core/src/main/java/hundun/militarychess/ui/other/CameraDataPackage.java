@@ -3,7 +3,7 @@ package hundun.militarychess.ui.other;
 import lombok.Getter;
 
 public class CameraDataPackage {
-    public static float DEFAULT_CAMERA_ZOOM_WEIGHT = 3.7f;
+    public static float DEFAULT_CAMERA_ZOOM_WEIGHT = 7.0f;
     @Getter
     private float currentCameraX;
     @Getter

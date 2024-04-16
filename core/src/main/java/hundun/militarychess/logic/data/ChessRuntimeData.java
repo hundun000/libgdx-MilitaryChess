@@ -33,11 +33,8 @@ public class ChessRuntimeData {
     public void updateUiPos(
         LayoutConst layoutConst
     ) {
-        int x = this.getPos().getCol() * layoutConst.DESK_WIDTH;
-        int y = (12 - this.getPos().getRow()) * layoutConst.DESK_HEIGHT;
-        if (this.getPos().getRow() >= 6) {
-            y -= layoutConst.RIVER_HEIGHT;
-        }
+        int x = this.getPos().getX() * layoutConst.TILE_WIDTH;
+        int y =  (12 - this.getPos().getY()) * layoutConst.TILE_HEIGHT;
         this.setUiX(x);
         this.setUiY(y);
     }
@@ -80,8 +77,8 @@ public class ChessRuntimeData {
             final int tempRow = row;
             final String id = UUID.randomUUID().toString();
             boolean isXingying = xingyingList.stream()
-                .anyMatch(it -> it.getPos().getCol() == tempCol
-                    && it.getPos().getRow() == tempRow
+                .anyMatch(it -> it.getPos().getX() == tempCol
+                    && it.getPos().getY() == tempRow
                 );
             if (isXingying) {
                 // 向行营位置放置空白

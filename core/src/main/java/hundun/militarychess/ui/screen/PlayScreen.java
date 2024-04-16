@@ -97,8 +97,14 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
         //Gdx.input.setInputProcessor(uiStage);
         //game.getBatch().setProjectionMatrix(uiStage.getViewport().getCamera().combined);
+        int roomWidth = this.getGame().getScreenContext().getLayoutConst().PLAY_WIDTH;
+        int roomHeight = this.getGame().getScreenContext().getLayoutConst().PLAY_HEIGHT;
 
-        deskAreaVM.getCameraDataPackage().forceSet(null, null, CameraDataPackage.DEFAULT_CAMERA_ZOOM_WEIGHT);
+        deskAreaVM.getCameraDataPackage().forceSet(
+            roomWidth * 0.9f,
+            roomHeight * 0.5f,
+            CameraDataPackage.DEFAULT_CAMERA_ZOOM_WEIGHT
+        );
 
         updateUIAfterRoomChanged();
 
@@ -258,8 +264,8 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
             );
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         // 若干UI重置
-        mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUI();
-        mainBoardVM.getAllButtonPageVM().getToChessVM().updateUI();
+        mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUIForChessChanged();
+        mainBoardVM.getAllButtonPageVM().getToChessVM().updateUIForChessChanged();
         mainBoardVM.getAllButtonPageVM().updateForNewSide();
         deskAreaVM.afterFightOrClear();
         // 若已对局结束，则展示
