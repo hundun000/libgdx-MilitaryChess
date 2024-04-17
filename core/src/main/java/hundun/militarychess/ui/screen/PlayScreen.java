@@ -17,7 +17,7 @@ import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.other.CameraDataPackage;
-import hundun.militarychess.ui.screen.builder.BuilderMainBoardVM;
+import hundun.militarychess.ui.screen.board.MainBoardVM;
 import hundun.militarychess.ui.screen.shared.ChessVM;
 import hundun.militarychess.ui.screen.shared.DeskAreaVM;
 
@@ -31,7 +31,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
 
     // ------ UI layer ------
-    private BuilderMainBoardVM mainBoardVM;
+    private MainBoardVM mainBoardVM;
     // ------ desk layer ------
     protected OrthographicCamera deskCamera;
     protected Stage deskStage;
@@ -65,7 +65,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         deskStage.setScrollFocus(deskAreaVM);
 
         // ------ UI layer ------
-        mainBoardVM = new BuilderMainBoardVM(this);
+        mainBoardVM = new MainBoardVM(this);
         uiRootTable.add(mainBoardVM)
             .expandX()
             .growY()

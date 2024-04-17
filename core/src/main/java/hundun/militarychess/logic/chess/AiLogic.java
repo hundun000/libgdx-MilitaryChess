@@ -3,7 +3,7 @@ package hundun.militarychess.logic.chess;
 import hundun.militarychess.logic.LogicContext.AiAction;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
-import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
+import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 
@@ -23,19 +23,19 @@ public class AiLogic {
     }
 
     public static AiAction generateAiAction(ArmyRuntimeData fromArmy, ArmyRuntimeData toArmy, CrossScreenDataPackage crossScreenDataPackage) {
-        Set<SimplePos> allPosOfOtherArmy = new HashSet<>();
+        Set<GridPosition> allPosOfOtherArmy = new HashSet<>();
         toArmy.getChessRuntimeDataList().forEach(it -> allPosOfOtherArmy.add(it.getPos()));
 
         // 目标是找到得分最高的From和To
         ChessRuntimeData maxScoreFromChess = null;
-        SimplePos maxScoreToPos = null;
+        GridPosition maxScoreToPos = null;
         int maxScore = -100;
         // 遍历每个我方棋子
         for (ChessRuntimeData checkingFromChess : fromArmy.getChessRuntimeDataList()) {
-            Set<SimplePos> all = GameboardPosRule.finaAllMoveCandidates(checkingFromChess, crossScreenDataPackage);
-            Map<SimplePos, Integer> scoreMap = new HashMap<>();
+            Set<GridPosition> all = GameboardPosRule.finaAllMoveCandidates(checkingFromChess, crossScreenDataPackage);
+            Map<GridPosition, Integer> scoreMap = new HashMap<>();
             // 遍历每个可移动终点
-            for (SimplePos checkingTo : all) {
+            for (GridPosition checkingTo : all) {
                 ChessRuntimeData checkingToChess = crossScreenDataPackage.findAtPos(checkingTo);
                 if (allPosOfOtherArmy.contains(checkingTo)) {
                     // case 可移动终点是敌方棋子。吃子等级越高，得分越高。

@@ -1,4 +1,4 @@
-package hundun.militarychess.ui.screen.builder;
+package hundun.militarychess.ui.screen.board;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;

@@ -1,12 +1,10 @@
-package hundun.militarychess.ui.screen.builder;
+package hundun.militarychess.ui.screen.board;
 
-import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.screen.PlayScreen;
 import hundun.militarychess.ui.screen.shared.BasePageableTable;
-import hundun.militarychess.ui.screen.shared.ChessVM;
 import lombok.Getter;
 
-public class BuilderMainBoardVM extends BasePageableTable {
+public class MainBoardVM extends BasePageableTable {
 
     PlayScreen builderScreen;
 
@@ -19,7 +17,7 @@ public class BuilderMainBoardVM extends BasePageableTable {
         PAGE2
     }
 
-    public BuilderMainBoardVM(PlayScreen screen) {
+    public MainBoardVM(PlayScreen screen) {
         super(screen);
         init("", screen.getGame());
 

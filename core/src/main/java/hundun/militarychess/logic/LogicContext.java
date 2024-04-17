@@ -5,7 +5,7 @@ import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.chess.ChessRule.BattleResult;
 import hundun.militarychess.logic.chess.ChessType;
-import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
+import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -75,7 +75,7 @@ public class LogicContext {
         ChessRuntimeData battleToChess;
         FightResultType fightResultType;
 
-        public ChessRuntimeData findAtPos(SimplePos pos) {
+        public ChessRuntimeData findAtPos(GridPosition pos) {
             for (var armyRuntimeData : armyMap.values()) {
                 var result = armyRuntimeData.getChessRuntimeDataList().stream()
                     .filter(chessRuntimeData -> chessRuntimeData.getPos().equals(pos))

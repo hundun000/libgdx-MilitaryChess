@@ -2,18 +2,15 @@ package hundun.militarychess.ui.screen.shared;
 
 import java.util.*;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.GameboardPosRule;
-import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
+import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.PlayScreen;
@@ -87,7 +84,7 @@ public class DeskAreaVM extends Table {
         CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
         if (crossScreenDataPackage.getCurrentChessShowSides().contains(from.getDeskData().getChessSide())) {
             nodes.values().forEach(it -> {
-                Set<SimplePos> all = GameboardPosRule.finaAllMoveCandidates(from.getDeskData(), crossScreenDataPackage);
+                Set<GridPosition> all = GameboardPosRule.finaAllMoveCandidates(from.getDeskData(), crossScreenDataPackage);
                 it.updateMask(all.contains(it.getDeskData().getPos()) ? MaskType.MOVE_CANDIDATE : MaskType.EMPTY);
             });
         }

@@ -15,33 +15,33 @@ import java.util.*;
  * 和棋盘位置有关的规则
  */
 public class GameboardPosRule {
-    private static final List<SimplePos> XING_YING_POS_MAP = List.of(
-        new SimplePos(7, 1),
-        new SimplePos(7, 3),
-        new SimplePos(8, 2),
-        new SimplePos(9, 1),
-        new SimplePos(9, 3),
-        new SimplePos(2, 1),
-        new SimplePos(2, 3),
-        new SimplePos(3, 2),
-        new SimplePos(4, 1),
-        new SimplePos(4, 3)
+    private static final List<GridPosition> XING_YING_POS_MAP = List.of(
+        new GridPosition(7, 1),
+        new GridPosition(7, 3),
+        new GridPosition(8, 2),
+        new GridPosition(9, 1),
+        new GridPosition(9, 3),
+        new GridPosition(2, 1),
+        new GridPosition(2, 3),
+        new GridPosition(3, 2),
+        new GridPosition(4, 1),
+        new GridPosition(4, 3)
     );
 
-    private static final List<SimplePos> DA_BEN_YING_POS_MAP = List.of(
-        new SimplePos(11, 1),
-        new SimplePos(11, 3),
-        new SimplePos(0, 1),
-        new SimplePos(0, 3)
+    private static final List<GridPosition> DA_BEN_YING_POS_MAP = List.of(
+        new GridPosition(11, 1),
+        new GridPosition(11, 3),
+        new GridPosition(0, 1),
+        new GridPosition(0, 3)
     );
-    public static Map<Integer, SimplePos> simplePosMap;
+    public static Map<Integer, GridPosition> simplePosMap;
     public static Map<String, GameboardPos> gameboardPosMap;
     static {
 
         simplePosMap = new HashMap<>();
         for (int row = 0; row <= 11; row++) {
             for (int col = 0; col <= 4; col++) {
-                simplePosMap.put(simplePosMapKey(row, col), new SimplePos(row, col));
+                simplePosMap.put(simplePosMapKey(row, col), new GridPosition(row, col));
             }
         }
 
@@ -55,7 +55,7 @@ public class GameboardPosRule {
 
 
 
-    private static SimplePos findSimplePos(int row, int col) {
+    private static GridPosition findSimplePos(int row, int col) {
         return simplePosMap.get(simplePosMapKey(row, col));
     }
 
@@ -65,7 +65,7 @@ public class GameboardPosRule {
 
 
 
-    private static void buildGameboardNeighbour(GameboardPos thiz, SimplePos pos, GameboardPosType gameboardPosType) {
+    private static void buildGameboardNeighbour(GameboardPos thiz, GridPosition pos, GameboardPosType gameboardPosType) {
         if (pos.getX() - 1 >= 0) {
             thiz.getNeighbourMap().put(Direction.LEFT, findSimplePos(pos.getY(), pos.getX() - 1));
         }
@@ -119,7 +119,7 @@ public class GameboardPosRule {
     }
 
 
-    private static GameboardPos buildGameboardSimplePos(SimplePos pos) {
+    private static GameboardPos buildGameboardSimplePos(GridPosition pos) {
 
         GameboardPos result = GameboardPos.builder()
             .pos(pos)
@@ -192,14 +192,14 @@ public class GameboardPosRule {
     /**
      * 搜索完整的可移动目的地
      */
-    public static Set<SimplePos> finaAllMoveCandidates(
+    public static Set<GridPosition> finaAllMoveCandidates(
         ChessRuntimeData fromChess,
         CrossScreenDataPackage crossScreenDataPackage
     ) {
-        Set<SimplePos> dirtyRailPosList = new HashSet<>();
-        Set<SimplePos> result = new HashSet<>();
+        Set<GridPosition> dirtyRailPosList = new HashSet<>();
+        Set<GridPosition> result = new HashSet<>();
 
-        SimplePos currentPos = fromChess.getPos();
+        GridPosition currentPos = fromChess.getPos();
         boolean canTurnDirection = fromChess.getChessType() == ChessType.GONG_BING;
         GameboardPos currentGameboardPos = GameboardPosRule.gameboardPosMap.get(currentPos.toId());
         // 搜索相邻的可移动目的地
@@ -222,11 +222,11 @@ public class GameboardPosRule {
     private static void findRailMoveCandidates(
         ChessRuntimeData fromChess,
         @Null Direction currentDirection,
-        SimplePos currentPos,
+        GridPosition currentPos,
         boolean canTurnDirection,
         CrossScreenDataPackage crossScreenDataPackage,
-        Set<SimplePos> result,
-        Set<SimplePos> dirtyRailPosList
+        Set<GridPosition> result,
+        Set<GridPosition> dirtyRailPosList
     ) {
         if (dirtyRailPosList.contains(currentPos)) {
             return;
@@ -236,7 +236,7 @@ public class GameboardPosRule {
         GameboardPos currentGameboardPos = GameboardPosRule.gameboardPosMap.get(currentPos.toId());
         // 对于铁路，只尝试4种方向
         for (Direction direction : Direction.XYValues) {
-            SimplePos checkingPos = currentGameboardPos.getNeighbourMap().get(direction);
+            GridPosition checkingPos = currentGameboardPos.getNeighbourMap().get(direction);
             if (checkingPos == null) {
                 continue;
             }
@@ -283,8 +283,8 @@ public class GameboardPosRule {
     @NoArgsConstructor
     @Builder
     public static class GameboardPos {
-        SimplePos pos;
-        Map<Direction, SimplePos> neighbourMap;
+        GridPosition pos;
+        Map<Direction, GridPosition> neighbourMap;
         GameboardPosType gameboardPosType;
     }
 
@@ -300,9 +300,9 @@ public class GameboardPosRule {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class SimplePos {
-        int y;
+    public static class GridPosition {
         int x;
+        int y;
 
         public String toId() {
             return "(" + x + "," + y + ")";

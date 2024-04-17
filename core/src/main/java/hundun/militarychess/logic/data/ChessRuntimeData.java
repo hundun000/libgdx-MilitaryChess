@@ -5,7 +5,7 @@ import hundun.militarychess.logic.chess.ChessType;
 import hundun.militarychess.logic.chess.GameboardPosRule;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
 import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
-import hundun.militarychess.logic.chess.GameboardPosRule.SimplePos;
+import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
 import hundun.militarychess.ui.screen.LayoutConst;
 import lombok.*;
 
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class ChessRuntimeData {
     String id;
-    SimplePos pos;
+    GridPosition pos;
     int uiX;
     int uiY;
     ChessType chessType;
@@ -85,7 +85,7 @@ public class ChessRuntimeData {
                 chessType = ChessType.EMPTY;
                 chessRuntimeData = ChessRuntimeData.builder()
                     .id(id)
-                    .pos(new SimplePos(row, col))
+                    .pos(new GridPosition(row, col))
                     .chessType(chessType)
                     .chessSide(ChessSide.EMPTY)
                     .build();
@@ -96,7 +96,7 @@ public class ChessRuntimeData {
                 chessType = ChessType.fromCode(code);
                 chessRuntimeData = ChessRuntimeData.builder()
                     .id(id)
-                    .pos(new SimplePos(row, col))
+                    .pos(new GridPosition(row, col))
                     .chessType(chessType)
                     .chessSide(chessSide)
                     .build();
