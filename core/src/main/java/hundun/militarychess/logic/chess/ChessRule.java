@@ -1,8 +1,8 @@
 package hundun.militarychess.logic.chess;
 
 import com.badlogic.gdx.utils.Json;
-import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
-import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
+import hundun.militarychess.logic.LogicContext;
+import hundun.militarychess.logic.TileModel;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import lombok.*;
@@ -18,8 +18,12 @@ import java.util.Map;
  */
 public class ChessRule {
 
+    final LogicContext logicContext;
+    public ChessRule(LogicContext logicContext) {
+        this.logicContext = logicContext;
+    }
 
-    public static boolean canMove(ChessRuntimeData from, ChessRuntimeData to) {
+    public boolean canMove(ChessRuntimeData from, ChessRuntimeData to) {
         // 不能重叠自己的棋子
         if (from.getChessSide() == to.getChessSide()) {
             return false;
@@ -28,8 +32,8 @@ public class ChessRule {
         if (!from.getChessType().isCanMove()) {
             return false;
         }
-        GameboardPos fromGameboardPos = GameboardPosRule.gameboardPosMap.get(from.getPos().toId());
-        GameboardPos toGameboardPos = GameboardPosRule.gameboardPosMap.get(to.getPos().toId());
+        TileModel fromGameboardPos = logicContext.getTileMap().getWorldConstructionAt(from.getPos());
+        TileModel toGameboardPos = logicContext.getTileMap().getWorldConstructionAt(to.getPos());
         // 不能从大本营移出
         if (fromGameboardPos.getGameboardPosType() == GameboardPosType.DA_BEN_YING) {
             return false;
@@ -41,7 +45,7 @@ public class ChessRule {
         return true;
     }
 
-    public static FightResultType fightResultPreview(ChessRuntimeData from, ChessRuntimeData to) {
+    public FightResultType fightResultPreview(ChessRuntimeData from, ChessRuntimeData to) {
         if (!canMove(from, to)) {
             return FightResultType.CAN_NOT;
         }

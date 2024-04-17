@@ -124,6 +124,7 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
                         ChessSide.RED_SIDE,
                         ArmyRuntimeData.builder()
                             .chessRuntimeDataList(ChessRuntimeData.fromCodes(
+                                game.getLogicContext(),
                                 redSideTextField.getText(),
                                 game.getScreenContext().getLayoutConst(),
                                 ChessSide.RED_SIDE))
@@ -131,6 +132,7 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
                         ChessSide.BLUE_SIDE,
                         ArmyRuntimeData.builder()
                             .chessRuntimeDataList(ChessRuntimeData.fromCodes(
+                                game.getLogicContext(),
                                 blueSideTextField.getText(),
                                 game.getScreenContext().getLayoutConst(),
                                 ChessSide.BLUE_SIDE))

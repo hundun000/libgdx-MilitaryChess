@@ -9,8 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
-import hundun.militarychess.logic.chess.GameboardPosRule;
-import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
+import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.PlayScreen;
@@ -84,7 +83,7 @@ public class DeskAreaVM extends Table {
         CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
         if (crossScreenDataPackage.getCurrentChessShowSides().contains(from.getDeskData().getChessSide())) {
             nodes.values().forEach(it -> {
-                Set<GridPosition> all = GameboardPosRule.finaAllMoveCandidates(from.getDeskData(), crossScreenDataPackage);
+                Set<GridPosition> all = screen.getGame().getLogicContext().getTileMap().finaAllMoveCandidates(from.getDeskData(), crossScreenDataPackage);
                 it.updateMask(all.contains(it.getDeskData().getPos()) ? MaskType.MOVE_CANDIDATE : MaskType.EMPTY);
             });
         }

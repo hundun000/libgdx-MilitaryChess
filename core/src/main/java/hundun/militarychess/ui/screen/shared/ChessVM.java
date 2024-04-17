@@ -9,9 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
+import hundun.militarychess.logic.LogicContext;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
-import hundun.militarychess.logic.chess.GameboardPosRule;
-import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
+import hundun.militarychess.logic.TileModel;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
@@ -67,7 +67,7 @@ public class ChessVM extends Table {
 
         updateUIForChessChanged();
         // ------ ui for tile ------
-        GameboardPos gameboardPos = GameboardPosRule.gameboardPosMap.get(deskData.getPos().toId());
+        TileModel gameboardPos = game.getLogicContext().getTileMap().getWorldConstructionAt(deskData.getPos());
         TextureRegion textureRegion = game.getTextureManager().getTileImage(gameboardPos);
         tileImage.setDrawable(new TextureRegionDrawable(textureRegion));
     }

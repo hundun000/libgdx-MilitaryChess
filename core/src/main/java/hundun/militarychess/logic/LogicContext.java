@@ -5,7 +5,7 @@ import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.chess.ChessRule.BattleResult;
 import hundun.militarychess.logic.chess.ChessType;
-import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
+import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -24,9 +24,17 @@ public class LogicContext {
     @Setter
     @Getter
     CrossScreenDataPackage crossScreenDataPackage;
-
+    @Getter
+    ChessRule chessRule;
+    @Getter
+    MilitaryChessTileMap tileMap;
+    @Getter
+    AiLogic aiLogic;
     public LogicContext(MilitaryChessGame game) {
         this.game = game;
+        this.chessRule = new ChessRule(this);
+        this.tileMap = new MilitaryChessTileMap(this);
+        this.aiLogic = new AiLogic(this);
     }
 
     public void lazyInitOnCreateStage1() {
@@ -95,7 +103,7 @@ public class LogicContext {
             // PVC时生成aiAction
             if (playerMode == PlayerMode.PVC) {
                 if (currentSide != pvcPlayerSide) {
-                    aiAction = AiLogic.generateAiAction(
+                    aiAction = game.getLogicContext().getAiLogic().generateAiAction(
                         armyMap.get(ChessSide.BLUE_SIDE),
                         armyMap.get(ChessSide.RED_SIDE),
                         this

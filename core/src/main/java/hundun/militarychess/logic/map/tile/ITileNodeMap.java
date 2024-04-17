@@ -1,6 +1,6 @@
 package hundun.militarychess.logic.map.tile;
 
-import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
+import hundun.militarychess.logic.chess.GridPosition;
 
 public interface ITileNodeMap<T> {
 

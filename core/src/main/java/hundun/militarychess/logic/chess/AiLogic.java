@@ -1,9 +1,9 @@
 package hundun.militarychess.logic.chess;
 
+import hundun.militarychess.logic.LogicContext;
 import hundun.militarychess.logic.LogicContext.AiAction;
 import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
-import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 
@@ -15,6 +15,11 @@ import java.util.Set;
 public class AiLogic {
 
     private static int DIE_SCORE = -1;
+    LogicContext logicContext;
+    public AiLogic(LogicContext logicContext) {
+        this.logicContext = logicContext;
+    }
+
     private static int killScore(ChessType chessType){
         if (chessType == ChessType.JUN_QI) {
             return 20;
@@ -22,7 +27,7 @@ public class AiLogic {
         return ('z' - chessType.getCode().charAt(0));
     }
 
-    public static AiAction generateAiAction(ArmyRuntimeData fromArmy, ArmyRuntimeData toArmy, CrossScreenDataPackage crossScreenDataPackage) {
+    public AiAction generateAiAction(ArmyRuntimeData fromArmy, ArmyRuntimeData toArmy, CrossScreenDataPackage crossScreenDataPackage) {
         Set<GridPosition> allPosOfOtherArmy = new HashSet<>();
         toArmy.getChessRuntimeDataList().forEach(it -> allPosOfOtherArmy.add(it.getPos()));
 
@@ -32,14 +37,14 @@ public class AiLogic {
         int maxScore = -100;
         // 遍历每个我方棋子
         for (ChessRuntimeData checkingFromChess : fromArmy.getChessRuntimeDataList()) {
-            Set<GridPosition> all = GameboardPosRule.finaAllMoveCandidates(checkingFromChess, crossScreenDataPackage);
+            Set<GridPosition> all = logicContext.getTileMap().finaAllMoveCandidates(checkingFromChess, crossScreenDataPackage);
             Map<GridPosition, Integer> scoreMap = new HashMap<>();
             // 遍历每个可移动终点
             for (GridPosition checkingTo : all) {
                 ChessRuntimeData checkingToChess = crossScreenDataPackage.findAtPos(checkingTo);
                 if (allPosOfOtherArmy.contains(checkingTo)) {
                     // case 可移动终点是敌方棋子。吃子等级越高，得分越高。
-                    FightResultType fightResultType = ChessRule.fightResultPreview(checkingFromChess, checkingToChess);
+                    FightResultType fightResultType = logicContext.getChessRule().fightResultPreview(checkingFromChess, checkingToChess);
                     if (fightResultType == FightResultType.FROM_WIN) {
                         scoreMap.put(checkingTo, killScore(checkingToChess.getChessType()) * 100);
                     } else if (fightResultType == FightResultType.BOTH_DIE) {
@@ -51,7 +56,7 @@ public class AiLogic {
                     // case 可移动终点是空地。这个空地距离的得分，来自该位置对于所有敌军的得分以及距离的加权平均
                     int totalScore = 0;
                     for (ChessRuntimeData it : toArmy.getChessRuntimeDataList()) {
-                        FightResultType fightResultType = ChessRule.fightResultPreview(checkingFromChess, it);
+                        FightResultType fightResultType = logicContext.getChessRule().fightResultPreview(checkingFromChess, it);
                         int distance = Math.abs(it.getPos().getY() - checkingTo.getY()) + Math.abs(it.getPos().getX() - checkingTo.getX());
                         int distanceScore = 21 - distance;
                         int baseKillScore;

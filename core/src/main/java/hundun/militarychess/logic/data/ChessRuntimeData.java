@@ -1,11 +1,11 @@
 package hundun.militarychess.logic.data;
 
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
+import hundun.militarychess.logic.LogicContext;
+import hundun.militarychess.logic.TileModel;
 import hundun.militarychess.logic.chess.ChessType;
-import hundun.militarychess.logic.chess.GameboardPosRule;
-import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPosType;
-import hundun.militarychess.logic.chess.GameboardPosRule.GameboardPos;
-import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
+import hundun.militarychess.logic.chess.GameboardPosType;
+import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.ui.screen.LayoutConst;
 import lombok.*;
 
@@ -62,8 +62,8 @@ public class ChessRuntimeData {
         }
     }
 
-    public static List<ChessRuntimeData> fromCodes(String codes, LayoutConst layoutConst, ChessSide chessSide) {
-        List<GameboardPos> xingyingList = GameboardPosRule.gameboardPosMap.values().stream()
+    public static List<ChessRuntimeData> fromCodes(LogicContext logicContext, String codes, LayoutConst layoutConst, ChessSide chessSide) {
+        List<TileModel> xingyingList = logicContext.getTileMap().getTileModelMap().values().stream()
             .filter(it -> it.getGameboardPosType() == GameboardPosType.XING_YING)
             .collect(Collectors.toList());
 
@@ -77,8 +77,8 @@ public class ChessRuntimeData {
             final int tempRow = row;
             final String id = UUID.randomUUID().toString();
             boolean isXingying = xingyingList.stream()
-                .anyMatch(it -> it.getPos().getX() == tempCol
-                    && it.getPos().getY() == tempRow
+                .anyMatch(it -> it.getPosition().getX() == tempCol
+                    && it.getPosition().getY() == tempRow
                 );
             if (isXingying) {
                 // 向行营位置放置空白

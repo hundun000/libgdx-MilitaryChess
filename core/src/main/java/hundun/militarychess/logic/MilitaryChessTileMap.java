@@ -1,13 +1,17 @@
 package hundun.militarychess.logic;
 
-import hundun.militarychess.logic.chess.GameboardPosRule.GridPosition;
+import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.chess.ChessType;
+import hundun.militarychess.logic.chess.GameboardPosType;
+import hundun.militarychess.logic.chess.GridPosition;
+import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.map.tile.ITileNode;
 import hundun.militarychess.logic.map.tile.ITileNodeMap;
 import hundun.militarychess.logic.map.tile.TileNeighborDirection;
+import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class MilitaryChessTileMap implements ITileNodeMap<Void> {
 
@@ -16,8 +20,13 @@ public class MilitaryChessTileMap implements ITileNodeMap<Void> {
     }
 
     public Map<String, SpecialRuleTileConfig> specialRuleTileConfigMap = new HashMap<>();
-
+    @Getter
     public Map<String, TileModel> tileModelMap = new HashMap<>();
+
+    final LogicContext logicContext;
+    public MilitaryChessTileMap(LogicContext logicContext) {
+        this.logicContext = logicContext;
+    }
 
     public TileModel getWorldConstructionAt(GridPosition target)
     {
@@ -45,4 +54,34 @@ public class MilitaryChessTileMap implements ITileNodeMap<Void> {
         }
         return destinationTileModel;
     }
+
+    public Set<GridPosition> finaAllMoveCandidates(
+        ChessRuntimeData fromChess,
+        CrossScreenDataPackage crossScreenDataPackage
+    ) {
+        Set<GridPosition> dirtyRailPosList = new HashSet<>();
+        Set<GridPosition> result = new HashSet<>();
+
+        GridPosition currentPos = fromChess.getPos();
+        boolean canTurnDirection = fromChess.getChessType() == ChessType.GONG_BING;
+        TileModel currentGameboardPos = tileModelMap.get(currentPos.toId());
+        // 搜索相邻的可移动目的地
+        currentGameboardPos.getNeighbors().values().forEach(checkingPos -> {
+            ChessRuntimeData checkingChess = crossScreenDataPackage.findAtPos(checkingPos.getPosition());
+            if (checkingChess != null && logicContext.getChessRule().canMove(fromChess, checkingChess)) {
+                result.add(checkingPos.getPosition());
+            }
+        });
+        if (currentGameboardPos.getGameboardPosType() == GameboardPosType.RAIL) {
+            findRailMoveCandidates(fromChess, null, currentPos, canTurnDirection, crossScreenDataPackage, result, dirtyRailPosList);
+        }
+        result.remove(currentPos);
+        return result;
+    }
+
+    private void findRailMoveCandidates(ChessRuntimeData fromChess, Object o, GridPosition currentPos, boolean canTurnDirection, CrossScreenDataPackage crossScreenDataPackage, Set<GridPosition> result, Set<GridPosition> dirtyRailPosList) {
+        // TODO
+    }
+
+
 }

@@ -210,7 +210,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
                 break;
             case WAIT_SELECT_TO:
                 if (chessVM.getDeskData().getChessSide() != crossScreenDataPackage.getCurrentSide()) {
-                    FightResultType fightResultPreview = ChessRule.fightResultPreview(
+                    FightResultType fightResultPreview = game.getLogicContext().getChessRule().fightResultPreview(
                         mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
                         chessVM.getDeskData()
                         );
