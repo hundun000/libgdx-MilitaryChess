@@ -18,8 +18,7 @@ public class GridPosition {
     }
 
     public String toText() {
-        char rowChar = (char) ('A' + this.getY());
-        return "(" + rowChar + this.getX() + ")";
+        return "(" + x + "," + y + ")";
     }
 
 }

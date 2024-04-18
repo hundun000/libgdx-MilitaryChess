@@ -1,9 +1,10 @@
 package hundun.militarychess.logic.chess;
 
-public enum GameboardPosType {
+public enum LogicFlag {
     RAIL,
-    FRONT_NORMAL,
     XING_YING,
-    BACK_NORMAL,
+    NORMAL,
+    NO_STOP,
+    NO_PASS,
     DA_BEN_YING,
 }

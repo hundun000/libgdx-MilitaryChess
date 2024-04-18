@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.corelib.base.util.TextureFactory;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
-import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.chess.ChessRule.BattleDamageFrame;
 import hundun.militarychess.logic.chess.ChessRule.BattleResult;

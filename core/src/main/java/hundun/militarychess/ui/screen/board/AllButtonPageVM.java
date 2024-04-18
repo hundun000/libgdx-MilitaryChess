@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
-import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.CrossScreenDataPackage;
 import hundun.militarychess.logic.LogicContext.PlayerMode;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;

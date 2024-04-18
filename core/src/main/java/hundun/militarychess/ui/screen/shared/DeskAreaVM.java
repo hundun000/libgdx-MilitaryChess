@@ -1,6 +1,7 @@
 package hundun.militarychess.ui.screen.shared;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -8,10 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
-import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
+import hundun.militarychess.ui.other.CameraGestureListener;
+import hundun.militarychess.ui.other.CameraMouseListener;
 import hundun.militarychess.ui.screen.PlayScreen;
 import hundun.militarychess.ui.screen.shared.ChessVM.MaskType;
 import lombok.Getter;
@@ -35,6 +38,9 @@ public class DeskAreaVM extends Table {
 
     public void updateDeskDatas(
             List<ChessRuntimeData> chessRuntimeDataList) {
+        String logMsg = chessRuntimeDataList.stream().map(it -> it.toText()).collect(Collectors.joining(", "));
+        screen.getGame().getFrontend().log(this.getClass().getSimpleName(), "updateDeskDatas by: " + logMsg);
+
         this.clear();
         nodes.clear();
 
@@ -48,8 +54,8 @@ public class DeskAreaVM extends Table {
         background.setBounds(0, 0, roomWidth, roomHeight);
 
         this.addActor(background);
-        //this.addListener(new CameraGestureListener(cameraDataPackage));
-        //this.addListener(new CameraMouseListener(cameraDataPackage));
+        this.addListener(new CameraGestureListener(cameraDataPackage));
+        this.addListener(new CameraMouseListener(cameraDataPackage));
 /*        this.getCameraDataPackage().forceSet(
             roomWidth / 2.0f + 800,
             roomHeight/ 2.0f,

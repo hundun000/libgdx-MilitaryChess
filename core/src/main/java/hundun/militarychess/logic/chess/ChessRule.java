@@ -35,11 +35,11 @@ public class ChessRule {
         TileModel fromGameboardPos = logicContext.getTileMap().getWorldConstructionAt(from.getPos());
         TileModel toGameboardPos = logicContext.getTileMap().getWorldConstructionAt(to.getPos());
         // 不能从大本营移出
-        if (fromGameboardPos.getGameboardPosType() == GameboardPosType.DA_BEN_YING) {
+        if (fromGameboardPos.getLogicFlags().contains(LogicFlag.DA_BEN_YING)) {
             return false;
         }
         // 不能移入非空行营
-        if (toGameboardPos.getGameboardPosType() == GameboardPosType.XING_YING && to.getChessSide() != ChessSide.EMPTY) {
+        if (toGameboardPos.getLogicFlags().contains(LogicFlag.XING_YING) && to.getChessSide() != ChessSide.EMPTY) {
             return false;
         }
         return true;

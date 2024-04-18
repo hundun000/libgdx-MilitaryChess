@@ -9,19 +9,19 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.corelib.base.BaseHundunScreen;
 import hundun.gdxgame.corelib.base.util.TextureFactory;
-import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
 import hundun.militarychess.logic.LogicContext.ChessState;
-import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.CrossScreenDataPackage;
 import hundun.militarychess.logic.LogicContext.PlayerMode;
-import hundun.militarychess.logic.data.ArmyRuntimeData;
-import hundun.militarychess.logic.data.ChessRuntimeData;
+import hundun.militarychess.logic.chess.LogicFlag;
+import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
+import hundun.militarychess.logic.map.StageConfig;
+import hundun.militarychess.logic.map.tile.TileBuilder;
 import hundun.militarychess.ui.MilitaryChessGame;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 
 public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
@@ -30,11 +30,6 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
 
     public PrepareScreen(MilitaryChessGame game) {
         super(game, game.getSharedViewport());
-
-        Label titleLabel = new Label(
-            JavaFeatureForGwt.stringFormat("     %s     ", "军旗游戏"),
-            game.getMainSkin());
-        titleLabel.setFontScale(1.5f);
 
         this.backImage = new Image(new TextureRegionDrawable(new TextureRegion(TextureFactory.getSimpleBoardBackground())));
 
@@ -92,13 +87,13 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
 
         Table codesHorizontalGroup;
         codesHorizontalGroup = new Table();
-        TextField redSideTextField = new TextField("abccddeeffggghhhiiijjkklj", game.getMainSkin());
+        TextField redSideTextField = new TextField("jlkkijiiihhhgggffeeddccba", game.getMainSkin());
         codesHorizontalGroup.add(new Label("红方：", game.getMainSkin()));
         codesHorizontalGroup.add(redSideTextField).width(400);
         uiRootTable.add(codesHorizontalGroup);
         uiRootTable.row();
         codesHorizontalGroup = new Table();
-        TextField blueSideTextField = new TextField("jlkkijiiihhhgggffeeddccba", game.getMainSkin());
+        TextField blueSideTextField = new TextField("abccddeeffggghhhiiijjkklj", game.getMainSkin());
         codesHorizontalGroup.add(new Label("蓝方：", game.getMainSkin()));
         codesHorizontalGroup.add(blueSideTextField).width(400);
         uiRootTable.add(codesHorizontalGroup);
@@ -120,27 +115,82 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
                     .pvcPlayerSide(ChessSide.RED_SIDE)
                     .currentSide(pvcPlayerAsFirst ? ChessSide.RED_SIDE : ChessSide.BLUE_SIDE)
                     .currentState(ChessState.WAIT_SELECT_FROM)
-                    .armyMap(Map.of(
-                        ChessSide.RED_SIDE,
-                        ArmyRuntimeData.builder()
-                            .chessRuntimeDataList(ChessRuntimeData.fromCodes(
-                                game.getLogicContext(),
-                                redSideTextField.getText(),
-                                game.getScreenContext().getLayoutConst(),
-                                ChessSide.RED_SIDE))
-                            .build(),
-                        ChessSide.BLUE_SIDE,
-                        ArmyRuntimeData.builder()
-                            .chessRuntimeDataList(ChessRuntimeData.fromCodes(
-                                game.getLogicContext(),
-                                blueSideTextField.getText(),
-                                game.getScreenContext().getLayoutConst(),
-                                ChessSide.BLUE_SIDE))
-                            .build()
-                    ))
                     .build();
-                crossScreenDataPackage.updateAfterFightOrStart();
-                game.getLogicContext().setCrossScreenDataPackage(crossScreenDataPackage);
+
+
+
+                List<GridPosition> xingyingPositions = List.of(
+                    new GridPosition(1, 8),
+                    new GridPosition(3, 8),
+                    new GridPosition(2, 9),
+                    new GridPosition(1, 10),
+                    new GridPosition(3, 10),
+                    new GridPosition(1, 2),
+                    new GridPosition(3, 2),
+                    new GridPosition(2, 3),
+                    new GridPosition(1, 4),
+                    new GridPosition(3, 4)
+                );
+                List<GridPosition> noDiagonalNeighborPositions = List.of(
+                    new GridPosition(0, 8),
+                    new GridPosition(2, 8),
+                    new GridPosition(4, 8),
+
+                    new GridPosition(1, 9),
+                    new GridPosition(3, 9),
+
+                    new GridPosition(0, 10),
+                    new GridPosition(2, 10),
+                    new GridPosition(4, 10),
+
+                    new GridPosition(0, 2),
+                    new GridPosition(2, 2),
+                    new GridPosition(4, 2),
+
+                    new GridPosition(1, 3),
+                    new GridPosition(3, 3),
+
+                    new GridPosition(0, 4),
+                    new GridPosition(2, 4),
+                    new GridPosition(4, 4)
+                );
+                List<TileBuilder> tileBuilders = new ArrayList<>();
+                for (int j = 0; j < 13; j++) {
+                    if (j == 6) {
+                        tileBuilders.add(TileBuilder.create(0, j, false, LogicFlag.NO_STOP));
+                        tileBuilders.add(TileBuilder.create(1, j, false, LogicFlag.NO_STOP, LogicFlag.NO_PASS));
+                        tileBuilders.add(TileBuilder.create(2, j, false, LogicFlag.NO_STOP));
+                        tileBuilders.add(TileBuilder.create(3, j, false, LogicFlag.NO_STOP, LogicFlag.NO_PASS));
+                        tileBuilders.add(TileBuilder.create(4, j, false, LogicFlag.NO_STOP));
+                    } else {
+
+                        for (int i = 0; i < 5; i++) {
+                            GridPosition pos = GridPosition.builder()
+                                .x(i)
+                                .y(j)
+                                .build();
+                            if (xingyingPositions.contains(pos)) {
+                                tileBuilders.add(TileBuilder.create(i, j, true, LogicFlag.XING_YING));
+                            } else {
+                                boolean hasDiagonalNeighbor = j > 0 && j < 12;
+                                if (noDiagonalNeighborPositions.contains(pos)) {
+                                    hasDiagonalNeighbor = false;
+                                }
+                                tileBuilders.add(TileBuilder.create(i, j, hasDiagonalNeighbor));
+                            }
+                        }
+                    }
+                }
+
+
+                StageConfig stageConfig = StageConfig.builder()
+                    .redArmyCode(redSideTextField.getText())
+                    .blueArmyCode(blueSideTextField.getText())
+                    .tileBuilders(tileBuilders)
+                    .build();
+
+
+                game.getLogicContext().prepareDone(crossScreenDataPackage, stageConfig);
                 game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
             }
         });

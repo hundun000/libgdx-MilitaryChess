@@ -1,16 +1,12 @@
 package hundun.militarychess.logic.data;
 
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
-import hundun.militarychess.logic.LogicContext;
-import hundun.militarychess.logic.TileModel;
 import hundun.militarychess.logic.chess.ChessType;
-import hundun.militarychess.logic.chess.GameboardPosType;
 import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.ui.screen.LayoutConst;
 import lombok.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -34,7 +30,7 @@ public class ChessRuntimeData {
         LayoutConst layoutConst
     ) {
         int x = this.getPos().getX() * layoutConst.TILE_WIDTH;
-        int y =  (12 - this.getPos().getY()) * layoutConst.TILE_HEIGHT;
+        int y =  this.getPos().getY() * layoutConst.TILE_HEIGHT;
         this.setUiX(x);
         this.setUiY(y);
     }
@@ -62,13 +58,10 @@ public class ChessRuntimeData {
         }
     }
 
-    public static List<ChessRuntimeData> fromCodes(LogicContext logicContext, String codes, LayoutConst layoutConst, ChessSide chessSide) {
-        List<TileModel> xingyingList = logicContext.getTileMap().getTileModelMap().values().stream()
-            .filter(it -> it.getGameboardPosType() == GameboardPosType.XING_YING)
-            .collect(Collectors.toList());
+    public static List<ChessRuntimeData> fromCodes(List<GridPosition> xingyingList, String codes, LayoutConst layoutConst, ChessSide chessSide) {
 
         List<ChessRuntimeData> result = new ArrayList<>();
-        int row = chessSide == ChessSide.RED_SIDE ? 6 : 0;
+        int row = chessSide == ChessSide.BLUE_SIDE ? 7 : 0;
         int col = 0;
         for (int i = 0; i < codes.length(); ) {
             ChessRuntimeData chessRuntimeData;
@@ -77,34 +70,25 @@ public class ChessRuntimeData {
             final int tempRow = row;
             final String id = UUID.randomUUID().toString();
             boolean isXingying = xingyingList.stream()
-                .anyMatch(it -> it.getPosition().getX() == tempCol
-                    && it.getPosition().getY() == tempRow
+                .anyMatch(it -> it.getX() == tempCol
+                    && it.getY() == tempRow
                 );
-            if (isXingying) {
-                // 向行营位置放置空白
-                chessType = ChessType.EMPTY;
-                chessRuntimeData = ChessRuntimeData.builder()
-                    .id(id)
-                    .pos(new GridPosition(row, col))
-                    .chessType(chessType)
-                    .chessSide(ChessSide.EMPTY)
-                    .build();
-
-            } else {
+            if (!isXingying) {
                 // 放置棋子
                 String code = String.valueOf(codes.charAt(i));
                 chessType = ChessType.fromCode(code);
                 chessRuntimeData = ChessRuntimeData.builder()
                     .id(id)
-                    .pos(new GridPosition(row, col))
+                    .pos(new GridPosition(col, row))
                     .chessType(chessType)
                     .chessSide(chessSide)
                     .build();
+                chessRuntimeData.updateUiPos(layoutConst);
+                chessRuntimeData.setChessBattleStatus(ChessBattleStatus.createStatus(chessRuntimeData.getChessType()));
+                result.add(chessRuntimeData);
                 i++;
             }
-            chessRuntimeData.updateUiPos(layoutConst);
-            chessRuntimeData.setChessBattleStatus(ChessBattleStatus.createStatus(chessRuntimeData.getChessType()));
-            result.add(chessRuntimeData);
+
             col++;
             if (col > 4) {
                 col = 0;

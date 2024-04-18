@@ -2,7 +2,7 @@ package hundun.militarychess.logic.chess;
 
 import hundun.militarychess.logic.LogicContext;
 import hundun.militarychess.logic.LogicContext.AiAction;
-import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;

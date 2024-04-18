@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface ITileNode<T> {
     GridPosition getPosition();
-    Map<TileNeighborDirection, ITileNode<T>> getNeighbors();
-    void setNeighbors(Map<TileNeighborDirection, ITileNode<T>> value);
+    Map<TileNeighborDirection, ITileNode<T>> getPhysicalNeighbors();
+    void setPhysicalNeighbors(Map<TileNeighborDirection, ITileNode<T>> value);
 }

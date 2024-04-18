@@ -10,8 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.logic.LogicContext.ChessState;
-import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
-import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.CrossScreenDataPackage;
 import hundun.militarychess.logic.chess.ChessRule.FightResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -124,6 +123,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
             // 构造棋子
             List<ChessRuntimeData> allChessRuntimeDataList = new ArrayList<>();
             crossScreenDataPackage.getArmyMap().values().forEach(it -> allChessRuntimeDataList.addAll(it.getChessRuntimeDataList()));
+            allChessRuntimeDataList.addAll(crossScreenDataPackage.getMoreChessList());
             deskAreaVM.updateDeskDatas(allChessRuntimeDataList);
 
             mainBoardVM.getAllButtonPageVM().updateForNewSide();

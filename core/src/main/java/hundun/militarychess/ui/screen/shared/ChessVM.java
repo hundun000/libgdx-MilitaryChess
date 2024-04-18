@@ -9,8 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
-import hundun.militarychess.logic.LogicContext;
-import hundun.militarychess.logic.LogicContext.CrossScreenDataPackage;
+import hundun.militarychess.logic.CrossScreenDataPackage;
 import hundun.militarychess.logic.TileModel;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -69,7 +68,11 @@ public class ChessVM extends Table {
         // ------ ui for tile ------
         TileModel gameboardPos = game.getLogicContext().getTileMap().getWorldConstructionAt(deskData.getPos());
         TextureRegion textureRegion = game.getTextureManager().getTileImage(gameboardPos);
-        tileImage.setDrawable(new TextureRegionDrawable(textureRegion));
+        if (textureRegion != null) {
+            tileImage.setDrawable(new TextureRegionDrawable(textureRegion));
+        } else {
+            game.getFrontend().log(this.getClass().getSimpleName(), "TileImage not found " + gameboardPos.getPosition().toText());
+        }
     }
 
 
@@ -81,7 +84,7 @@ public class ChessVM extends Table {
 
     private void updateUIAsNotEmpty(CrossScreenDataPackage crossScreenDataPackage) {
         if (crossScreenDataPackage.getCurrentChessShowSides().contains(deskData.getChessSide())) {
-            chessTypeLabel.setText(deskData.getChessType().getChinese());
+            chessTypeLabel.setText(deskData.getChessType().getChinese() + deskData.getPos().toText());
             chessStatusLabel.setText(deskData.getChessBattleStatus().getChinese());
             if (deskData.getChessSide() == ChessSide.RED_SIDE) {
                 colorImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.RED, 0.8f));
