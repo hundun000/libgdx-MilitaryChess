@@ -56,8 +56,9 @@ public class CrossScreenDataPackage {
     FightResultType fightResultType;
 
     public ChessRuntimeData findAtPos(GridPosition pos) {
+        ChessRuntimeData result = null;
         for (var armyRuntimeData : armyMap.values()) {
-            var result = armyRuntimeData.getChessRuntimeDataList().stream()
+            result = armyRuntimeData.getChessRuntimeDataList().stream()
                 .filter(chessRuntimeData -> chessRuntimeData.getPos().equals(pos))
                 .findAny()
                 .orElse(null);
@@ -65,7 +66,11 @@ public class CrossScreenDataPackage {
                 return result;
             }
         }
-        return null;
+        result = moreChessList.stream()
+            .filter(chessRuntimeData -> chessRuntimeData.getPos().equals(pos))
+            .findAny()
+            .orElse(null);
+        return result;
     }
 
     /**

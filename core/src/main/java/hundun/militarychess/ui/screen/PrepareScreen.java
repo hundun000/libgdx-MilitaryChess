@@ -87,13 +87,15 @@ public class PrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
 
         Table codesHorizontalGroup;
         codesHorizontalGroup = new Table();
-        TextField redSideTextField = new TextField("jlkkijiiihhhgggffeeddccba", game.getMainSkin());
+        // jlkkijiiihhhgggffeeddccba
+        TextField redSideTextField = new TextField("jlkkijii", game.getMainSkin());
         codesHorizontalGroup.add(new Label("红方：", game.getMainSkin()));
         codesHorizontalGroup.add(redSideTextField).width(400);
         uiRootTable.add(codesHorizontalGroup);
         uiRootTable.row();
         codesHorizontalGroup = new Table();
-        TextField blueSideTextField = new TextField("abccddeeffggghhhiiijjkklj", game.getMainSkin());
+        // abccddeeffggghhhiiijjkklj
+        TextField blueSideTextField = new TextField("abccddeef", game.getMainSkin());
         codesHorizontalGroup.add(new Label("蓝方：", game.getMainSkin()));
         codesHorizontalGroup.add(blueSideTextField).width(400);
         uiRootTable.add(codesHorizontalGroup);

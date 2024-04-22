@@ -112,7 +112,7 @@ public class MilitaryChessTileMap implements ITileNodeMap<Void> {
         boolean canTurnDirection = fromChess.getChessType() == ChessType.GONG_BING;
         TileModel currentGameboardPos = tileModelMap.get(currentPos.toId());
         // 搜索相邻的可移动目的地
-        currentGameboardPos.getPhysicalNeighbors().values().forEach(checkingPos -> {
+        currentGameboardPos.getLogicalNeighbors().values().forEach(checkingPos -> {
             ChessRuntimeData checkingChess = crossScreenDataPackage.findAtPos(checkingPos.getPosition());
             if (checkingChess != null && logicContext.getChessRule().canMove(fromChess, checkingChess)) {
                 result.add(checkingPos.getPosition());
