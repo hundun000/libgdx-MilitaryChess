@@ -130,6 +130,7 @@ public class CrossScreenDataPackage {
         logicContext.getChessRule().onBattleCommit(this.battleResult);
 
         var commitedBattleResultType = battleResult.getBattleResultType();
+        game.getFrontend().log(this.getClass().getSimpleName(), "commitedBattleResultType " + commitedBattleResultType);
         // 更新当前方
         if (currentSide == ChessSide.RED_SIDE) {
             currentSide = ChessSide.BLUE_SIDE;

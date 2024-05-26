@@ -44,7 +44,8 @@ public class AiLogic {
                 ChessRuntimeData checkingToChess = crossScreenDataPackage.findAtPos(checkingTo);
                 if (allPosOfOtherArmy.contains(checkingTo)) {
                     // case 可移动终点是敌方棋子。吃子等级越高，得分越高。
-                    BattleResultType battleResultType = logicContext.getChessRule().fightResultPreview(checkingFromChess, checkingToChess);
+                    final var battleResult = logicContext.getChessRule().getFightV2Result(checkingFromChess, checkingToChess);
+                    final BattleResultType battleResultType = battleResult.getBattleResultType();
                     if (battleResultType == BattleResultType.FROM_WIN) {
                         scoreMap.put(checkingTo, killScore(checkingToChess.getChessType()) * 100);
                     } else if (battleResultType == BattleResultType.BOTH_DIE) {
@@ -56,7 +57,8 @@ public class AiLogic {
                     // case 可移动终点是空地。这个空地距离的得分，来自该位置对于所有敌军的得分以及距离的加权平均
                     int totalScore = 0;
                     for (ChessRuntimeData it : toArmy.getChessRuntimeDataList()) {
-                        BattleResultType battleResultType = logicContext.getChessRule().fightResultPreview(checkingFromChess, it);
+                        final var battleResult = logicContext.getChessRule().getFightV2Result(checkingFromChess, it);
+                        final BattleResultType battleResultType = battleResult.getBattleResultType();
                         int distance = Math.abs(it.getPos().getY() - checkingTo.getY()) + Math.abs(it.getPos().getX() - checkingTo.getX());
                         int distanceScore = 21 - distance;
                         int baseKillScore;

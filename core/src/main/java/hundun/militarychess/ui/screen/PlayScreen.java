@@ -204,16 +204,19 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
                 if (chessVM.getDeskData().getChessSide() == crossScreenDataPackage.getCurrentSide()) {
                     mainBoardVM.getAllButtonPageVM().setFrom(chessVM);
                     deskAreaVM.updateMask(chessVM);
+                    crossScreenDataPackage.setBattleFromChess(chessVM.getDeskData());
                     crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_TO);
                 }
                 break;
             case WAIT_SELECT_TO:
                 if (chessVM.getDeskData().getChessSide() != crossScreenDataPackage.getCurrentSide()) {
-                    BattleResultType fightResultPreview = game.getLogicContext().getChessRule().fightResultPreview(
-                        mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
-                        chessVM.getDeskData()
-                        );
-                    mainBoardVM.getAllButtonPageVM().setTo(chessVM, fightResultPreview);
+                    crossScreenDataPackage.setBattleToChess(chessVM.getDeskData());
+                    var battleResult = game.getLogicContext().getChessRule().getFightV2Result(
+                        crossScreenDataPackage.getBattleFromChess(),
+                        crossScreenDataPackage.getBattleToChess()
+                    );
+                    crossScreenDataPackage.setBattleResult(battleResult);
+                    mainBoardVM.getAllButtonPageVM().setTo(chessVM, battleResult.getBattleResultType());
                     crossScreenDataPackage.setCurrentState(ChessState.WAIT_COMMIT);
                 }
                 break;
@@ -225,16 +228,9 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      */
     public void onBattleStartButtonClicked() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        crossScreenDataPackage.setBattleFromChess(mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData());
-        crossScreenDataPackage.setBattleToChess(mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData());
-        var battleResult = ChessRule.getFightV2Result(
-            crossScreenDataPackage.getBattleFromChess(),
-            crossScreenDataPackage.getBattleToChess()
-        );
-        crossScreenDataPackage.setBattleResult(battleResult);
-        if (battleResult.getBattleResultType() == BattleResultType.JUST_MOVE) {
+        if (crossScreenDataPackage.getBattleResult().getBattleResultType() == BattleResultType.JUST_MOVE) {
             crossScreenDataPackage.commitFightResult(game.getLogicContext());
-            afterFight(battleResult.getBattleResultType());
+            afterFight(crossScreenDataPackage.getBattleResult().getBattleResultType());
         } else {
             game.getScreenManager().pushScreen(BattleScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
         }
@@ -300,6 +296,8 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         mainBoardVM.getAllButtonPageVM().setFrom(null);
         mainBoardVM.getAllButtonPageVM().setTo(null, null);
         deskAreaVM.afterFightOrClear();
+        crossScreenDataPackage.setBattleFromChess(null);
+        crossScreenDataPackage.setBattleToChess(null);
         crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_FROM);
     }
 
