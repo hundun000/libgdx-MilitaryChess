@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
 import hundun.militarychess.logic.CrossScreenDataPackage;
 import hundun.militarychess.logic.LogicContext.PlayerMode;
-import hundun.militarychess.logic.chess.ChessRule.FightResultType;
+import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.screen.PlayScreen;
 import hundun.militarychess.ui.screen.shared.ChessVM;
@@ -22,7 +22,7 @@ public class AllButtonPageVM extends Table {
     ChessVM fromChessVM;
     @Getter
     ChessVM toChessVM;
-    FightResultType fightResultPreview;
+    BattleResultType fightResultPreview;
     ChessSide currentSide;
 
     Label timeLabel;
@@ -85,10 +85,10 @@ public class AllButtonPageVM extends Table {
         updateByChess();
     }
 
-    public void setTo(ChessVM chessVM, FightResultType fightResultPreview) {
+    public void setTo(ChessVM chessVM, BattleResultType fightResultPreview) {
         this.toChessVM = chessVM;
         this.fightResultPreview = fightResultPreview;
-        this.commitButton.setDisabled(fightResultPreview == null || fightResultPreview == FightResultType.CAN_NOT);
+        this.commitButton.setDisabled(fightResultPreview == null || fightResultPreview == BattleResultType.CAN_NOT);
         updateByChess();
     }
 
@@ -122,8 +122,8 @@ public class AllButtonPageVM extends Table {
         }
         if (fightResultPreview != null) {
             if (crossScreenDataPackage.getChessShowMode() == ChessShowMode.MING_QI
-                || fightResultPreview == FightResultType.JUST_MOVE
-                || fightResultPreview == FightResultType.CAN_NOT
+                || fightResultPreview == BattleResultType.JUST_MOVE
+                || fightResultPreview == BattleResultType.CAN_NOT
             ) {
                 this.fightResultPreviewLabel.setText("预测: "
                     + fightResultPreview.getChinese()

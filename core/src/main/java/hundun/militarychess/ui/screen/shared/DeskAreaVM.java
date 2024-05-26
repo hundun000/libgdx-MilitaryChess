@@ -21,7 +21,8 @@ import lombok.Getter;
 
 
 public class DeskAreaVM extends Table {
-    public PlayScreen screen;
+    @Getter
+    PlayScreen screen;
     @Getter
     Map<String, ChessVM> nodes = new LinkedHashMap<>();
     @Getter
@@ -62,26 +63,10 @@ public class DeskAreaVM extends Table {
             null);*/
 
         chessRuntimeDataList.forEach(deskData -> {
-
-            ChessVM actor = new ChessVM(this, deskData);
-            nodes.put(deskData.getId(), actor);
-            this.addActor(actor);
-
-        });
-
-        nodes.values().forEach(hexCellVM -> {
-            Actor hitBox = new Image();
-            hitBox.setBounds(
-                hexCellVM.getX() + screen.getGame().getScreenContext().getLayoutConst().HIT_BOX_X,
-                hexCellVM.getY() + screen.getGame().getScreenContext().getLayoutConst().HIT_BOX_Y,
-                screen.getGame().getScreenContext().getLayoutConst().HIT_BOX_WIDTH,
-                screen.getGame().getScreenContext().getLayoutConst().HIT_BOX_HEIGHT
-            );
-            if (screen.getGame().debugMode) {
-                hitBox.debug();
-            }
-            this.addActor(hitBox);
-            hitBox.addListener(new DeskClickListener(screen, hexCellVM));
+            ChessVM chessVM = new ChessVM(this, deskData);
+            nodes.put(deskData.getId(), chessVM);
+            this.addActor(chessVM);
+            this.addActor(chessVM.getHitBox());
         });
     }
 

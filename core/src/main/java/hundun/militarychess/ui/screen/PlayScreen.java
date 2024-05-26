@@ -11,7 +11,8 @@ import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.CrossScreenDataPackage;
-import hundun.militarychess.logic.chess.ChessRule.FightResultType;
+import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
@@ -115,10 +116,8 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     public void updateUIAfterRoomChanged() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
 
-
-
-        if (crossScreenDataPackage.getBattleFromChess() != null) {
-            afterFight(crossScreenDataPackage.getFightResultType());
+        if (crossScreenDataPackage.getBattleResult() != null) {
+            afterFight(crossScreenDataPackage.getBattleResult().getBattleResultType());
         } else {
             // 构造棋子
             List<ChessRuntimeData> allChessRuntimeDataList = new ArrayList<>();
@@ -210,7 +209,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
                 break;
             case WAIT_SELECT_TO:
                 if (chessVM.getDeskData().getChessSide() != crossScreenDataPackage.getCurrentSide()) {
-                    FightResultType fightResultPreview = game.getLogicContext().getChessRule().fightResultPreview(
+                    BattleResultType fightResultPreview = game.getLogicContext().getChessRule().fightResultPreview(
                         mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData(),
                         chessVM.getDeskData()
                         );
@@ -228,7 +227,17 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
         crossScreenDataPackage.setBattleFromChess(mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData());
         crossScreenDataPackage.setBattleToChess(mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData());
-        game.getScreenManager().pushScreen(BattleScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
+        var battleResult = ChessRule.getFightV2Result(
+            crossScreenDataPackage.getBattleFromChess(),
+            crossScreenDataPackage.getBattleToChess()
+        );
+        crossScreenDataPackage.setBattleResult(battleResult);
+        if (battleResult.getBattleResultType() == BattleResultType.JUST_MOVE) {
+            crossScreenDataPackage.commitFightResult(game.getLogicContext());
+            afterFight(battleResult.getBattleResultType());
+        } else {
+            game.getScreenManager().pushScreen(BattleScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
+        }
     }
 
     /**
@@ -256,7 +265,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     /**
      * 战斗后的处理
      */
-    private void afterFight(FightResultType fightResultType) {
+    private void afterFight(BattleResultType battleResultType) {
         game.getFrontend().log(this.getClass().getSimpleName(),
             "afterFight, from = {0}, to = {1}",
             mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData().toText(),

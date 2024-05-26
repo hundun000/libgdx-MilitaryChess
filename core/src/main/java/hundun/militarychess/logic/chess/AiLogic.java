@@ -3,7 +3,7 @@ package hundun.militarychess.logic.chess;
 import hundun.militarychess.logic.LogicContext;
 import hundun.militarychess.logic.LogicContext.AiAction;
 import hundun.militarychess.logic.CrossScreenDataPackage;
-import hundun.militarychess.logic.chess.ChessRule.FightResultType;
+import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 
@@ -44,27 +44,27 @@ public class AiLogic {
                 ChessRuntimeData checkingToChess = crossScreenDataPackage.findAtPos(checkingTo);
                 if (allPosOfOtherArmy.contains(checkingTo)) {
                     // case 可移动终点是敌方棋子。吃子等级越高，得分越高。
-                    FightResultType fightResultType = logicContext.getChessRule().fightResultPreview(checkingFromChess, checkingToChess);
-                    if (fightResultType == FightResultType.FROM_WIN) {
+                    BattleResultType battleResultType = logicContext.getChessRule().fightResultPreview(checkingFromChess, checkingToChess);
+                    if (battleResultType == BattleResultType.FROM_WIN) {
                         scoreMap.put(checkingTo, killScore(checkingToChess.getChessType()) * 100);
-                    } else if (fightResultType == FightResultType.BOTH_DIE) {
+                    } else if (battleResultType == BattleResultType.BOTH_DIE) {
                         scoreMap.put(checkingTo, killScore(checkingToChess.getChessType()) * 50);
-                    } else if (fightResultType == FightResultType.TO_WIN) {
+                    } else if (battleResultType == BattleResultType.TO_WIN) {
                         scoreMap.put(checkingTo, DIE_SCORE);
                     }
                 } else {
                     // case 可移动终点是空地。这个空地距离的得分，来自该位置对于所有敌军的得分以及距离的加权平均
                     int totalScore = 0;
                     for (ChessRuntimeData it : toArmy.getChessRuntimeDataList()) {
-                        FightResultType fightResultType = logicContext.getChessRule().fightResultPreview(checkingFromChess, it);
+                        BattleResultType battleResultType = logicContext.getChessRule().fightResultPreview(checkingFromChess, it);
                         int distance = Math.abs(it.getPos().getY() - checkingTo.getY()) + Math.abs(it.getPos().getX() - checkingTo.getX());
                         int distanceScore = 21 - distance;
                         int baseKillScore;
-                        if (fightResultType == FightResultType.FROM_WIN) {
+                        if (battleResultType == BattleResultType.FROM_WIN) {
                             baseKillScore = killScore(checkingToChess.getChessType()) * 10;
-                        } else if (fightResultType == FightResultType.BOTH_DIE) {
+                        } else if (battleResultType == BattleResultType.BOTH_DIE) {
                             baseKillScore = killScore(checkingToChess.getChessType()) * 5;
-                        } else if (fightResultType == FightResultType.TO_WIN) {
+                        } else if (battleResultType == BattleResultType.TO_WIN) {
                             baseKillScore = DIE_SCORE;
                         } else {
                             baseKillScore = 1;

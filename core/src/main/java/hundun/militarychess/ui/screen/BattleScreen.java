@@ -62,10 +62,7 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
     protected void updateUIAfterRoomChanged() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
 
-        this.battleResult = ChessRule.getFightV2Result(
-            crossScreenDataPackage.getBattleFromChess(),
-            crossScreenDataPackage.getBattleToChess()
-        );
+        this.battleResult = crossScreenDataPackage.getBattleResult();
         this.playFrameQueue = new LinkedList<>(battleResult.getFrames());
 
         if (battleResult.getFrom().getChessSide() == ChessSide.RED_SIDE) {
@@ -213,7 +210,7 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
 
     private void end() {
         CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        crossScreenDataPackage.commitFightResult(battleResult);
+        crossScreenDataPackage.commitFightResult(game.getLogicContext());
         game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
     }
 

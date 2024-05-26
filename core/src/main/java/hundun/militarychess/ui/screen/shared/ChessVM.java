@@ -2,6 +2,7 @@ package hundun.militarychess.ui.screen.shared;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -30,6 +31,8 @@ public class ChessVM extends Table {
     Label chessStatusLabel;
     Image tileImage;
     Image colorImage;
+    @Getter
+    final Actor hitBox;
 
     public ChessVM(DeskAreaVM deskAreaVM, ChessRuntimeData deskData) {
         this.game = deskAreaVM.screen.getGame();
@@ -64,15 +67,10 @@ public class ChessVM extends Table {
         this.chessStatusLabel = new Label("", game.getMainSkin());
         this.add(chessStatusLabel);
 
+        this.hitBox = new Image();
+        hitBox.addListener(new DeskClickListener(deskAreaVM.getScreen(), this));
+
         updateUIForChessChanged();
-        // ------ ui for tile ------
-        TileModel gameboardPos = game.getLogicContext().getTileMap().getWorldConstructionAt(deskData.getPos());
-        TextureRegion textureRegion = game.getTextureManager().getTileImage(gameboardPos);
-        if (textureRegion != null) {
-            tileImage.setDrawable(new TextureRegionDrawable(textureRegion));
-        } else {
-            game.getFrontend().log(this.getClass().getSimpleName(), "TileImage not found " + gameboardPos.getPosition().toText());
-        }
     }
 
 
@@ -114,6 +112,22 @@ public class ChessVM extends Table {
             game.getScreenContext().getLayoutConst().TILE_WIDTH,
             game.getScreenContext().getLayoutConst().TILE_HEIGHT
         );
+
+        hitBox.setBounds(
+            this.getX() + game.getScreenContext().getLayoutConst().HIT_BOX_X,
+            this.getY() + game.getScreenContext().getLayoutConst().HIT_BOX_Y,
+            game.getScreenContext().getLayoutConst().HIT_BOX_WIDTH,
+            game.getScreenContext().getLayoutConst().HIT_BOX_HEIGHT
+        );
+
+        // ------ ui for tile ------
+        TileModel gameboardPos = game.getLogicContext().getTileMap().getWorldConstructionAt(deskData.getPos());
+        TextureRegion textureRegion = game.getTextureManager().getTileImage(gameboardPos);
+        if (textureRegion != null) {
+            tileImage.setDrawable(new TextureRegionDrawable(textureRegion));
+        } else {
+            game.getFrontend().log(this.getClass().getSimpleName(), "TileImage not found " + gameboardPos.getPosition().toText());
+        }
     }
 
 

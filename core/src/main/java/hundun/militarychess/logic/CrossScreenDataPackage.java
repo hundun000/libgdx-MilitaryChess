@@ -4,9 +4,8 @@ import hundun.militarychess.logic.LogicContext.AiAction;
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
 import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.LogicContext.PlayerMode;
-import hundun.militarychess.logic.chess.ChessRule;
 import hundun.militarychess.logic.chess.ChessRule.BattleResult;
-import hundun.militarychess.logic.chess.ChessRule.FightResultType;
+import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.chess.ChessType;
 import hundun.militarychess.logic.chess.LogicFlag;
 import hundun.militarychess.logic.chess.GridPosition;
@@ -53,7 +52,7 @@ public class CrossScreenDataPackage {
 
     ChessRuntimeData battleFromChess;
     ChessRuntimeData battleToChess;
-    FightResultType fightResultType;
+    BattleResult battleResult;
 
     public ChessRuntimeData findAtPos(GridPosition pos) {
         ChessRuntimeData result = null;
@@ -127,10 +126,10 @@ public class CrossScreenDataPackage {
         }
     }
 
-    public void commitFightResult(BattleResult battleResult) {
-        ChessRule.onBattleCommit(battleResult);
+    public void commitFightResult(LogicContext logicContext) {
+        logicContext.getChessRule().onBattleCommit(this.battleResult);
 
-        this.fightResultType = battleResult.getFightResultType();
+        var commitedBattleResultType = battleResult.getBattleResultType();
         // 更新当前方
         if (currentSide == ChessSide.RED_SIDE) {
             currentSide = ChessSide.BLUE_SIDE;
@@ -141,9 +140,9 @@ public class CrossScreenDataPackage {
         // 更新阶段
         this.setCurrentState(ChessState.WAIT_SELECT_FROM);
         // 更新连续未吃子计数器
-        if (fightResultType != FightResultType.FROM_WIN
-            && fightResultType != FightResultType.TO_WIN
-            && fightResultType != FightResultType.BOTH_DIE) {
+        if (commitedBattleResultType != BattleResultType.FROM_WIN
+            && commitedBattleResultType != BattleResultType.TO_WIN
+            && commitedBattleResultType != BattleResultType.BOTH_DIE) {
             notKillTurnCount++;
         } else {
             notKillTurnCount = 0;

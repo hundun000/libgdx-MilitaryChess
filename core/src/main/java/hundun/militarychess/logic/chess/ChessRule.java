@@ -45,15 +45,15 @@ public class ChessRule {
         return true;
     }
 
-    public FightResultType fightResultPreview(ChessRuntimeData from, ChessRuntimeData to) {
+    public BattleResultType fightResultPreview(ChessRuntimeData from, ChessRuntimeData to) {
         if (!canMove(from, to)) {
-            return FightResultType.CAN_NOT;
+            return BattleResultType.CAN_NOT;
         }
         return getFightResult(from, to);
     }
 
     @Getter
-    public enum FightResultType {
+    public enum BattleResultType {
         CAN_NOT("不合法"),
         JUST_MOVE("移动"),
         FROM_WIN("发起者胜"),
@@ -61,7 +61,7 @@ public class ChessRule {
         BOTH_DIE("同尽"),
         ;
         final String chinese;
-        FightResultType(String chinese){
+        BattleResultType(String chinese){
             this.chinese = chinese;
         }
 
@@ -113,7 +113,7 @@ public class ChessRule {
     public static class BattleResult {
         ChessRuntimeData from;
         ChessRuntimeData to;
-        FightResultType fightResultType;
+        BattleResultType battleResultType;
         List<BattleDamageFrame> frames;
         boolean specialBattle;
     }
@@ -131,7 +131,7 @@ public class ChessRule {
     }
 
     public static BattleResult getFightV2Result(ChessRuntimeData from, ChessRuntimeData to) {
-        FightResultType fightResultType = null;
+        BattleResultType battleResultType = null;
         boolean specialBattle;
         List<BattleDamageFrame> subFrames = new ArrayList<>();
         Map<String, BattleFrameTempData> tempDataMap = Map.of(
@@ -140,18 +140,18 @@ public class ChessRule {
         );
 
         if (from.getChessType() == ChessType.ZHA_DAN || to.getChessType() == ChessType.ZHA_DAN) {
-            fightResultType = FightResultType.BOTH_DIE;
+            battleResultType = BattleResultType.BOTH_DIE;
             specialBattle = true;
         } else if (to.getChessType() == ChessType.DI_LEI) {
             specialBattle = true;
             if (from.getChessType() == ChessType.GONG_BING) {
-                fightResultType = FightResultType.FROM_WIN;
+                battleResultType = BattleResultType.FROM_WIN;
             } else {
-                fightResultType = FightResultType.BOTH_DIE;
+                battleResultType = BattleResultType.BOTH_DIE;
             }
         } else if (to.getChessType() == ChessType.EMPTY) {
             specialBattle = true;
-            fightResultType = FightResultType.JUST_MOVE;
+            battleResultType = BattleResultType.JUST_MOVE;
         } else {
             specialBattle = false;
 
@@ -172,11 +172,11 @@ public class ChessRule {
 
                 if (fromDead || toDead) {
                     if (!fromDead) {
-                        fightResultType = FightResultType.FROM_WIN;
+                        battleResultType = BattleResultType.FROM_WIN;
                     } else if (!toDead) {
-                        fightResultType = FightResultType.TO_WIN;
+                        battleResultType = BattleResultType.TO_WIN;
                     } else {
-                        fightResultType = FightResultType.BOTH_DIE;
+                        battleResultType = BattleResultType.BOTH_DIE;
                     }
                     break;
                 }
@@ -186,26 +186,26 @@ public class ChessRule {
         return BattleResult.builder()
             .from(from)
             .to(to)
-            .fightResultType(fightResultType)
+            .battleResultType(battleResultType)
             .frames(subFrames)
             .specialBattle(specialBattle)
             .build();
     }
 
-    public static void onBattleCommit(BattleResult battleResult) {
+    public void onBattleCommit(BattleResult battleResult) {
         if (!battleResult.getFrames().isEmpty()) {
             Map<String, BattleFrameTempData> lastMap = battleResult.getFrames().get(battleResult.getFrames().size() - 1).getTempDataMapSnapshot();
             battleResult.from.getChessBattleStatus().setHp(lastMap.get(battleResult.from.getId()).getHp());
             battleResult.to.getChessBattleStatus().setHp(lastMap.get(battleResult.to.getId()).getHp());
         }
 
-        if (battleResult.fightResultType == FightResultType.BOTH_DIE || battleResult.fightResultType == FightResultType.TO_WIN) {
+        if (battleResult.battleResultType == BattleResultType.BOTH_DIE || battleResult.battleResultType == BattleResultType.TO_WIN) {
             setAsDead(battleResult.from);
         }
-        if (battleResult.fightResultType == FightResultType.BOTH_DIE || battleResult.fightResultType == FightResultType.FROM_WIN) {
+        if (battleResult.battleResultType == BattleResultType.BOTH_DIE || battleResult.battleResultType == BattleResultType.FROM_WIN) {
             setAsDead(battleResult.to);
         }
-        if (battleResult.fightResultType == FightResultType.FROM_WIN || battleResult.fightResultType == FightResultType.JUST_MOVE) {
+        if (battleResult.battleResultType == BattleResultType.FROM_WIN || battleResult.battleResultType == BattleResultType.JUST_MOVE) {
             switchPos(battleResult.from, battleResult.to);
         }
     }
@@ -221,33 +221,39 @@ public class ChessRule {
     /**
      * 交换位置。和空地交换位置即为移动。
      */
-    private static void switchPos(ChessRuntimeData from, ChessRuntimeData to) {
+    private void switchPos(ChessRuntimeData from, ChessRuntimeData to) {
+        logicContext.getCrossScreenDataPackage().getGame().getFrontend().log(
+            this.getClass().getSimpleName(),
+            "switchPos from %s to %s",
+            from.toText(),
+            to.toText()
+        );
         var temp = from.getPos();
         from.setPos(to.getPos());
         to.setPos(temp);
     }
 
-    private static FightResultType getFightResult(ChessRuntimeData from, ChessRuntimeData to) {
+    private static BattleResultType getFightResult(ChessRuntimeData from, ChessRuntimeData to) {
         if (from.getChessType() == ChessType.ZHA_DAN || to.getChessType() == ChessType.ZHA_DAN) {
-            return FightResultType.BOTH_DIE;
+            return BattleResultType.BOTH_DIE;
         }
         if (to.getChessType() == ChessType.DI_LEI) {
             if (from.getChessType() == ChessType.GONG_BING) {
-                return FightResultType.FROM_WIN;
+                return BattleResultType.FROM_WIN;
             } else {
-                return FightResultType.BOTH_DIE;
+                return BattleResultType.BOTH_DIE;
             }
         }
         if (to.getChessType() == ChessType.EMPTY) {
-            return FightResultType.JUST_MOVE;
+            return BattleResultType.JUST_MOVE;
         }
         int delta = from.getChessType().getCode().charAt(0) - to.getChessType().getCode().charAt(0);
         if (delta < 0) {
-            return FightResultType.FROM_WIN;
+            return BattleResultType.FROM_WIN;
         } else if (delta > 0) {
-            return FightResultType.TO_WIN;
+            return BattleResultType.TO_WIN;
         } else {
-            return FightResultType.BOTH_DIE;
+            return BattleResultType.BOTH_DIE;
         }
     }
 }
