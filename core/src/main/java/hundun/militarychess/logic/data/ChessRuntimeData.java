@@ -58,46 +58,6 @@ public class ChessRuntimeData {
         }
     }
 
-    public static List<ChessRuntimeData> fromCodes(List<GridPosition> xingyingList, String codes, LayoutConst layoutConst, ChessSide chessSide) {
-
-        List<ChessRuntimeData> result = new ArrayList<>();
-        int row = chessSide == ChessSide.BLUE_SIDE ? 7 : 0;
-        int col = 0;
-        for (int i = 0; i < codes.length(); ) {
-            ChessRuntimeData chessRuntimeData;
-            ChessType chessType;
-            final int tempCol = col;
-            final int tempRow = row;
-            final String id = UUID.randomUUID().toString();
-            boolean isXingying = xingyingList.stream()
-                .anyMatch(it -> it.getX() == tempCol
-                    && it.getY() == tempRow
-                );
-            if (!isXingying) {
-                // 放置棋子
-                String code = String.valueOf(codes.charAt(i));
-                chessType = ChessType.fromCode(code);
-                chessRuntimeData = ChessRuntimeData.builder()
-                    .id(id)
-                    .pos(new GridPosition(col, row))
-                    .chessType(chessType)
-                    .chessSide(chessSide)
-                    .build();
-                chessRuntimeData.updateUiPos(layoutConst);
-                chessRuntimeData.setChessBattleStatus(ChessBattleStatus.createStatus(chessRuntimeData.getChessType()));
-                result.add(chessRuntimeData);
-                i++;
-            }
-
-            col++;
-            if (col > 4) {
-                col = 0;
-                row++;
-            }
-        }
-        return result;
-    }
-
 
 
     @Data

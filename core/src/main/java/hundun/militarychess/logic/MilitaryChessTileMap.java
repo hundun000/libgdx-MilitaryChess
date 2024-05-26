@@ -29,7 +29,6 @@ public class MilitaryChessTileMap implements ITileNodeMap<Void> {
     }
 
     public void prepareDone(StageConfig stageConfig) {
-
         stageConfig.getTileBuilders().forEach(it -> {
             TileModel tileModel = new TileModel(
                 it.getPosition(),

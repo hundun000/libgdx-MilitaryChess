@@ -2,13 +2,17 @@ package hundun.militarychess.logic;
 
 import hundun.militarychess.logic.chess.AiLogic;
 import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
+import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.logic.map.StageConfig;
 import hundun.militarychess.ui.MilitaryChessGame;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Map;
 
 public class LogicContext {
 

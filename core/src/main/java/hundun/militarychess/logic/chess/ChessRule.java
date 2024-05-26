@@ -125,7 +125,7 @@ public class ChessRule {
     }
 
     public BattleResult getFightV2Result(ChessRuntimeData from, ChessRuntimeData to) {
-        BattleResultType battleResultType = null;
+        BattleResultType battleResultType;
         boolean specialBattle;
         List<BattleDamageFrame> subFrames = new ArrayList<>();
         Map<String, BattleFrameTempData> tempDataMap = Map.of(
@@ -133,7 +133,10 @@ public class ChessRule {
             to.getId(), BattleFrameTempData.fromRuntimeData(to)
         );
 
-        if (from.getChessType() == ChessType.ZHA_DAN || to.getChessType() == ChessType.ZHA_DAN) {
+        if (!canMove(from, to)) {
+            battleResultType = BattleResultType.CAN_NOT;
+            specialBattle = false;
+        } else if (from.getChessType() == ChessType.ZHA_DAN || to.getChessType() == ChessType.ZHA_DAN) {
             battleResultType = BattleResultType.BOTH_DIE;
             specialBattle = true;
         } else if (to.getChessType() == ChessType.DI_LEI) {

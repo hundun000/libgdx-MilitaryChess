@@ -7,12 +7,12 @@ import hundun.militarychess.logic.LogicContext.PlayerMode;
 import hundun.militarychess.logic.chess.ChessRule.BattleResult;
 import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.chess.ChessType;
-import hundun.militarychess.logic.chess.LogicFlag;
 import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessBattleStatus;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
+import hundun.militarychess.logic.chess.lose.ILoseChecker;
 import hundun.militarychess.logic.map.StageConfig;
 import hundun.militarychess.ui.MilitaryChessGame;
 import lombok.AllArgsConstructor;
@@ -43,6 +43,7 @@ public class CrossScreenDataPackage {
     List<ChessRuntimeData> moreChessList;
     Map<ChessSide, ArmyRuntimeData> armyMap;
     AiAction aiAction;
+    ILoseChecker loseChecker;
     ChessSide loseSide;
     String loseReason;
     /**
@@ -107,17 +108,17 @@ public class CrossScreenDataPackage {
             if (noneCanMove) {
                 loseSide = key;
                 loseReason = "没有棋子可走";
-            }
-            boolean junqiDied = value.getChessRuntimeDataList().stream()
-                .noneMatch(chess -> chess.getChessType() == ChessType.JUN_QI);
-            if (junqiDied) {
-                loseSide = key;
-                loseReason = "军棋已死亡";
+                return;
             }
             boolean timeout = value.getUsedTime() > 30 * 60;
             if (timeout) {
                 loseSide = key;
                 loseReason = "累计用时超过30分钟";
+            }
+            var tempLoseReason = loseChecker.checkLoseByArmy(value);
+            if (tempLoseReason != null) {
+                loseSide = key;
+                loseReason = tempLoseReason;
             }
         });
         if (notKillTurnCount == 31) {
@@ -160,31 +161,11 @@ public class CrossScreenDataPackage {
     }
 
     public void prepareDone(StageConfig stageConfig) {
-        List<GridPosition> xingyingList = stageConfig.getTileBuilders().stream()
-            .filter(it -> it.getLogicFlags().contains(LogicFlag.XING_YING))
-            .map(it -> it.getPosition())
-            .collect(Collectors.toList());
-        this.armyMap = Map.of(
-            ChessSide.RED_SIDE,
-            ArmyRuntimeData.builder()
-                .chessRuntimeDataList(ChessRuntimeData.fromCodes(
-                    xingyingList,
-                    stageConfig.getRedArmyCode(),
-                    game.getScreenContext().getLayoutConst(),
-                    ChessSide.RED_SIDE))
-                .build(),
-            ChessSide.BLUE_SIDE,
-            ArmyRuntimeData.builder()
-                .chessRuntimeDataList(ChessRuntimeData.fromCodes(
-                    xingyingList,
-                    stageConfig.getBlueArmyCode(),
-                    game.getScreenContext().getLayoutConst(),
-                    ChessSide.BLUE_SIDE))
-                .build()
-        );
+        this.armyMap = stageConfig.getArmyMap();
+        this.loseChecker = stageConfig.getLoseChecker();
         List<GridPosition> armyPosList = Stream.concat(
-            armyMap.get(ChessSide.RED_SIDE).getChessRuntimeDataList().stream(),
-            armyMap.get(ChessSide.BLUE_SIDE).getChessRuntimeDataList().stream()
+            this.armyMap.get(ChessSide.RED_SIDE).getChessRuntimeDataList().stream(),
+            this.armyMap.get(ChessSide.BLUE_SIDE).getChessRuntimeDataList().stream()
         )
             .map(it -> it.getPos())
             .collect(Collectors.toList());

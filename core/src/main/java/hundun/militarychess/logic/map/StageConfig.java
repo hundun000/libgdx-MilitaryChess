@@ -1,7 +1,8 @@
 package hundun.militarychess.logic.map;
 
-import hundun.militarychess.logic.MilitaryChessTileMap.SpecialRuleTileConfig;
-import hundun.militarychess.logic.chess.GridPosition;
+import hundun.militarychess.logic.chess.lose.ILoseChecker;
+import hundun.militarychess.logic.data.ArmyRuntimeData;
+import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.logic.map.tile.TileBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,8 +17,8 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 public class StageConfig {
-    String redArmyCode;
-    String blueArmyCode;
+    ILoseChecker loseChecker;
+    Map<ChessSide, ArmyRuntimeData> armyMap;
     List<TileBuilder> tileBuilders;
 
 }
