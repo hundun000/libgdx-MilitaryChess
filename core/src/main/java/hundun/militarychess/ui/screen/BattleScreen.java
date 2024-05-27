@@ -12,8 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.corelib.base.util.TextureFactory;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
-import hundun.militarychess.logic.CrossScreenDataPackage;
-import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.chess.ChessRule.BattleDamageFrame;
 import hundun.militarychess.logic.chess.ChessRule.BattleResult;
 import hundun.militarychess.logic.data.ChessRuntimeData;
@@ -60,9 +59,9 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
 
     @Override
     protected void updateUIAfterRoomChanged() {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
 
-        this.battleResult = crossScreenDataPackage.getBattleResult();
+        this.battleResult = game.getLogicContext().getAfterBattleManager().getBattleResult();
         this.playFrameQueue = new LinkedList<>(battleResult.getFrames());
 
         if (battleResult.getFrom().getChessSide() == ChessSide.RED_SIDE) {
@@ -209,8 +208,7 @@ public class BattleScreen extends AbstractMilitaryChessScreen {
     }
 
     private void end() {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        crossScreenDataPackage.commitFightResult(game.getLogicContext());
+        game.getLogicContext().commitFightResult();
         game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
     }
 

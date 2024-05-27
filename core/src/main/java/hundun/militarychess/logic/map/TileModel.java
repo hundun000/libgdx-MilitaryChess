@@ -1,4 +1,4 @@
-package hundun.militarychess.logic;
+package hundun.militarychess.logic.map;
 
 import hundun.militarychess.logic.chess.LogicFlag;
 import hundun.militarychess.logic.chess.GridPosition;
@@ -22,7 +22,7 @@ public class TileModel implements ITileNode<Void> {
     @Getter
     Map<TileNeighborDirection, ITileNode<Void>> logicalNeighbors;
 
-    TileModel(GridPosition position, List<LogicFlag> logicFlags, boolean hasDiagonalNeighbor) {
+    public TileModel(GridPosition position, List<LogicFlag> logicFlags, boolean hasDiagonalNeighbor) {
         this.position = position;
         this.logicFlags = logicFlags;
         this.hasDiagonalNeighbor = hasDiagonalNeighbor;

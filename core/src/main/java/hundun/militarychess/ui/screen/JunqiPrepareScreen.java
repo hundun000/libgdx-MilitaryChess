@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.corelib.base.BaseHundunScreen;
 import hundun.gdxgame.corelib.base.util.TextureFactory;
-import hundun.militarychess.logic.CrossScreenDataPackage;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
 import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.LogicContext.PlayerMode;
@@ -17,12 +17,11 @@ import hundun.militarychess.logic.chess.ChessType;
 import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.logic.chess.LogicFlag;
 import hundun.militarychess.logic.chess.lose.JunQiLoseChecker;
-import hundun.militarychess.logic.chess.lose.ZhanQiLoseChecker;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessBattleStatus;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
-import hundun.militarychess.logic.map.StageConfig;
+import hundun.militarychess.logic.StageConfig;
 import hundun.militarychess.logic.map.tile.TileBuilder;
 import hundun.militarychess.ui.MilitaryChessGame;
 
@@ -116,15 +115,6 @@ public class JunqiPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void
                 var playerMode = playerModeCheckBoxMap.get(playerModeButtonGroup.getChecked());
                 var chessShowMode = chessShowModeCheckBoxMap.get(chessShowModeButtonGroup.getChecked());
                 var pvcPlayerAsFirst = pvcPlayerSideCheckBoxMap.get(pvcPlayerSideButtonGroup.getChecked());
-                var crossScreenDataPackage = CrossScreenDataPackage.builder()
-                    .game(game)
-                    .playerMode(playerMode)
-                    .chessShowMode(chessShowMode)
-                    .currentChessShowSides(new HashSet<>())
-                    .pvcPlayerSide(ChessSide.RED_SIDE)
-                    .currentSide(pvcPlayerAsFirst ? ChessSide.RED_SIDE : ChessSide.BLUE_SIDE)
-                    .currentState(ChessState.WAIT_SELECT_FROM)
-                    .build();
 
 
 
@@ -218,11 +208,15 @@ public class JunqiPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void
                         .build()
                 );
                 StageConfig stageConfig = StageConfig.builder()
+                    .playerMode(playerMode)
+                    .chessShowMode(chessShowMode)
+                    .pvcPlayerSide(ChessSide.RED_SIDE)
+                    .currentSide(pvcPlayerAsFirst ? ChessSide.RED_SIDE : ChessSide.BLUE_SIDE)
                     .loseChecker(new JunQiLoseChecker())
                     .armyMap(armyMap)
                     .tileBuilders(tileBuilders)
                     .build();
-                game.getLogicContext().prepareDone(crossScreenDataPackage, stageConfig);
+                game.getLogicContext().prepareDone(stageConfig);
                 game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
             }
         });

@@ -2,7 +2,7 @@ package hundun.militarychess.logic.chess;
 
 import com.badlogic.gdx.utils.Json;
 import hundun.militarychess.logic.LogicContext;
-import hundun.militarychess.logic.TileModel;
+import hundun.militarychess.logic.map.TileModel;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import lombok.*;
@@ -32,8 +32,8 @@ public class ChessRule {
         if (!from.getChessType().isCanMove()) {
             return false;
         }
-        TileModel fromGameboardPos = logicContext.getTileMap().getWorldConstructionAt(from.getPos());
-        TileModel toGameboardPos = logicContext.getTileMap().getWorldConstructionAt(to.getPos());
+        TileModel fromGameboardPos = logicContext.getChessTileManager().getWorldConstructionAt(from.getPos());
+        TileModel toGameboardPos = logicContext.getChessTileManager().getWorldConstructionAt(to.getPos());
         // 不能从大本营移出
         if (fromGameboardPos.getLogicFlags().contains(LogicFlag.DA_BEN_YING)) {
             return false;
@@ -220,7 +220,7 @@ public class ChessRule {
      * 交换位置。和空地交换位置即为移动。
      */
     private void switchPos(ChessRuntimeData from, ChessRuntimeData to) {
-        logicContext.getCrossScreenDataPackage().getGame().getFrontend().log(
+        logicContext.getGame().getFrontend().log(
             this.getClass().getSimpleName(),
             "switchPos from %s to %s",
             from.toText(),

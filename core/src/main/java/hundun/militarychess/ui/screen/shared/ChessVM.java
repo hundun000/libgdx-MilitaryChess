@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
-import hundun.militarychess.logic.CrossScreenDataPackage;
-import hundun.militarychess.logic.TileModel;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
+import hundun.militarychess.logic.map.TileModel;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
@@ -80,8 +80,8 @@ public class ChessVM extends Table {
         colorImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.WHITE, 0.5f));
     }
 
-    private void updateUIAsNotEmpty(CrossScreenDataPackage crossScreenDataPackage) {
-        if (crossScreenDataPackage.getCurrentChessShowSides().contains(deskData.getChessSide())) {
+    private void updateUIAsNotEmpty(CrossScreenDataManager crossScreenDataManager) {
+        if (crossScreenDataManager.getCurrentChessShowSides().contains(deskData.getChessSide())) {
             chessTypeLabel.setText(deskData.getChessType().getChinese() + deskData.getPos().toText());
             chessStatusLabel.setText(deskData.getChessBattleStatus().getChinese());
             if (deskData.getChessSide() == ChessSide.RED_SIDE) {
@@ -97,12 +97,12 @@ public class ChessVM extends Table {
     }
 
     public void updateUIForChessChanged(){
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
 
         if (deskData.getChessSide() == ChessSide.EMPTY) {
             updateUIAsEmpty();
         } else {
-            updateUIAsNotEmpty(crossScreenDataPackage);
+            updateUIAsNotEmpty(crossScreenDataManager);
         }
 
         this.getDeskData().updateUiPos(game.getScreenContext().getLayoutConst());
@@ -121,7 +121,7 @@ public class ChessVM extends Table {
         );
 
         // ------ ui for tile ------
-        TileModel gameboardPos = game.getLogicContext().getTileMap().getWorldConstructionAt(deskData.getPos());
+        TileModel gameboardPos = game.getLogicContext().getChessTileManager().getWorldConstructionAt(deskData.getPos());
         TextureRegion textureRegion = game.getTextureManager().getTileImage(gameboardPos);
         if (textureRegion != null) {
             tileImage.setDrawable(new TextureRegionDrawable(textureRegion));
@@ -138,7 +138,7 @@ public class ChessVM extends Table {
     }
 
     public void updateMask(MaskType maskType) {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
         if (maskType == MaskType.MOVE_CANDIDATE) {
             this.setBackground(DrawableFactory.createAlphaBoard(1, 1, Color.YELLOW, 0.5f));
         } else if (maskType == MaskType.FROM) {

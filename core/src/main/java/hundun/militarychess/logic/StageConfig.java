@@ -1,5 +1,8 @@
-package hundun.militarychess.logic.map;
+package hundun.militarychess.logic;
 
+import hundun.militarychess.logic.LogicContext.ChessShowMode;
+import hundun.militarychess.logic.LogicContext.PlayerMode;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.chess.lose.ILoseChecker;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -17,6 +20,11 @@ import java.util.Map;
 @NoArgsConstructor
 @Builder
 public class StageConfig {
+    PlayerMode playerMode;
+    ChessShowMode chessShowMode;
+    ChessSide pvcPlayerSide;
+    ChessSide currentSide;
+
     ILoseChecker loseChecker;
     Map<ChessSide, ArmyRuntimeData> armyMap;
     List<TileBuilder> tileBuilders;

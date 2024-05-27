@@ -10,8 +10,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.gamelib.base.util.JavaFeatureForGwt;
 import hundun.militarychess.logic.LogicContext.ChessState;
-import hundun.militarychess.logic.CrossScreenDataPackage;
-import hundun.militarychess.logic.chess.ChessRule;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -114,15 +113,15 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
 
     @Override
     public void updateUIAfterRoomChanged() {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
 
-        if (crossScreenDataPackage.getBattleResult() != null) {
-            afterFight(crossScreenDataPackage.getBattleResult().getBattleResultType());
+        if (game.getLogicContext().getAfterBattleManager().getBattleResult() != null) {
+            afterFight(game.getLogicContext().getAfterBattleManager().getBattleResult().getBattleResultType());
         } else {
             // 构造棋子
             List<ChessRuntimeData> allChessRuntimeDataList = new ArrayList<>();
-            crossScreenDataPackage.getArmyMap().values().forEach(it -> allChessRuntimeDataList.addAll(it.getChessRuntimeDataList()));
-            allChessRuntimeDataList.addAll(crossScreenDataPackage.getMoreChessList());
+            game.getLogicContext().getChessTileManager().getArmyMap().values().forEach(it -> allChessRuntimeDataList.addAll(it.getChessRuntimeDataList()));
+            allChessRuntimeDataList.addAll(game.getLogicContext().getChessTileManager().getMoreChessList());
             deskAreaVM.updateDeskDatas(allChessRuntimeDataList);
 
             mainBoardVM.getAllButtonPageVM().updateForNewSide();
@@ -141,34 +140,34 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      */
     @Override
     public void onLogicFrame() {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
         // 当前执棋方统计耗时
-        crossScreenDataPackage.currentSideAddTime(1);
-        mainBoardVM.getAllButtonPageVM().updateTime(crossScreenDataPackage);
+        crossScreenDataManager.currentSideAddTime(1);
+        mainBoardVM.getAllButtonPageVM().updateTime(game.getLogicContext());
         // 若有AiAction，则执行它
-        if (crossScreenDataPackage.getAiAction() == null) {
+        if (crossScreenDataManager.getAiAction() == null) {
             return;
         }
-        switch (crossScreenDataPackage.getCurrentState()) {
+        switch (crossScreenDataManager.getCurrentState()) {
             case WAIT_SELECT_FROM:
                 game.getFrontend().log(this.getClass().getSimpleName(),
                     "AiAction score = {0}, from = {1}, to = {2}",
-                    crossScreenDataPackage.getAiAction().getScore(),
-                    crossScreenDataPackage.getAiAction().getFrom().toText(),
-                    crossScreenDataPackage.getAiAction().getTo().toText()
+                    crossScreenDataManager.getAiAction().getScore(),
+                    crossScreenDataManager.getAiAction().getFrom().toText(),
+                    crossScreenDataManager.getAiAction().getTo().toText()
                 );
-                if (crossScreenDataPackage.getAiAction().isCapitulated()) {
+                if (crossScreenDataManager.getAiAction().isCapitulated()) {
                     // 模拟Ai点击认输
                     onCapitulated();
                 } else {
                     // 模拟Ai点击棋子
-                    onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getFrom()));
+                    onDeskClicked(findVM(crossScreenDataManager.getAiAction().getFrom()));
                 }
 
                 break;
             case WAIT_SELECT_TO:
                 // 模拟Ai点击棋子
-                onDeskClicked(findVM(crossScreenDataPackage.getAiAction().getTo()));
+                onDeskClicked(findVM(crossScreenDataManager.getAiAction().getTo()));
                 break;
             case WAIT_COMMIT:
                 // 模拟Ai点击确认
@@ -181,12 +180,12 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      * 当认输被点击
      */
     public void onCapitulated() {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
 
         String message = JavaFeatureForGwt.stringFormat(
             "%s已认输。\n%s胜利。",
-            crossScreenDataPackage.getCurrentSide().getChinese(),
-            ChessSide.getOpposite(crossScreenDataPackage.getCurrentSide()).getChinese()
+            crossScreenDataManager.getCurrentSide().getChinese(),
+            ChessSide.getOpposite(crossScreenDataManager.getCurrentSide()).getChinese()
         );
         startDialog(message,"对局结束", () -> {
             // 回到菜单页
@@ -198,26 +197,26 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      * 当棋子被点击
      */
     public void onDeskClicked(ChessVM chessVM) {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        switch (crossScreenDataPackage.getCurrentState()) {
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
+        switch (crossScreenDataManager.getCurrentState()) {
             case WAIT_SELECT_FROM:
-                if (chessVM.getDeskData().getChessSide() == crossScreenDataPackage.getCurrentSide()) {
+                if (chessVM.getDeskData().getChessSide() == crossScreenDataManager.getCurrentSide()) {
                     mainBoardVM.getAllButtonPageVM().setFrom(chessVM);
                     deskAreaVM.updateMask(chessVM);
-                    crossScreenDataPackage.setBattleFromChess(chessVM.getDeskData());
-                    crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_TO);
+                    game.getLogicContext().getAfterBattleManager().setBattleFromChess(chessVM.getDeskData());
+                    crossScreenDataManager.setCurrentState(ChessState.WAIT_SELECT_TO);
                 }
                 break;
             case WAIT_SELECT_TO:
-                if (chessVM.getDeskData().getChessSide() != crossScreenDataPackage.getCurrentSide()) {
-                    crossScreenDataPackage.setBattleToChess(chessVM.getDeskData());
+                if (chessVM.getDeskData().getChessSide() != crossScreenDataManager.getCurrentSide()) {
+                    game.getLogicContext().getAfterBattleManager().setBattleToChess(chessVM.getDeskData());
                     var battleResult = game.getLogicContext().getChessRule().getFightV2Result(
-                        crossScreenDataPackage.getBattleFromChess(),
-                        crossScreenDataPackage.getBattleToChess()
+                        game.getLogicContext().getAfterBattleManager().getBattleFromChess(),
+                        game.getLogicContext().getAfterBattleManager().getBattleToChess()
                     );
-                    crossScreenDataPackage.setBattleResult(battleResult);
+                    game.getLogicContext().getAfterBattleManager().setBattleResult(battleResult);
                     mainBoardVM.getAllButtonPageVM().setTo(chessVM, battleResult.getBattleResultType());
-                    crossScreenDataPackage.setCurrentState(ChessState.WAIT_COMMIT);
+                    crossScreenDataManager.setCurrentState(ChessState.WAIT_COMMIT);
                 }
                 break;
             default:
@@ -227,10 +226,10 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      * 当确认被点击
      */
     public void onBattleStartButtonClicked() {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
-        if (crossScreenDataPackage.getBattleResult().getBattleResultType() == BattleResultType.JUST_MOVE) {
-            crossScreenDataPackage.commitFightResult(game.getLogicContext());
-            afterFight(crossScreenDataPackage.getBattleResult().getBattleResultType());
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
+        if (game.getLogicContext().getAfterBattleManager().getBattleResult().getBattleResultType() == BattleResultType.JUST_MOVE) {
+            game.getLogicContext().commitFightResult();
+            afterFight(game.getLogicContext().getAfterBattleManager().getBattleResult().getBattleResultType());
         } else {
             game.getScreenManager().pushScreen(BattleScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
         }
@@ -267,19 +266,19 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
             mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData().toText(),
             mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData().toText()
             );
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
         // 若干UI重置
         mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUIForChessChanged();
         mainBoardVM.getAllButtonPageVM().getToChessVM().updateUIForChessChanged();
         mainBoardVM.getAllButtonPageVM().updateForNewSide();
         deskAreaVM.afterFightOrClear();
         // 若已对局结束，则展示
-        if (crossScreenDataPackage.getLoseSide() != null) {
+        if (game.getLogicContext().getAfterBattleManager().getLoseSide() != null) {
             String message = JavaFeatureForGwt.stringFormat(
                 "%s失败，原因：%s。\n%s胜利。",
-                crossScreenDataPackage.getLoseSide().getChinese(),
-                crossScreenDataPackage.getLoseReason(),
-                ChessSide.getOpposite(crossScreenDataPackage.getLoseSide()).getChinese()
+                game.getLogicContext().getAfterBattleManager().getLoseSide().getChinese(),
+                game.getLogicContext().getAfterBattleManager().getLoseReason(),
+                ChessSide.getOpposite(game.getLogicContext().getAfterBattleManager().getLoseSide()).getChinese()
             );
             startDialog(message,"对局结束", () -> {
                 // 回到菜单页
@@ -292,13 +291,13 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
      * 当清空被点击
      */
     public void onClearButtonClicked() {
-        CrossScreenDataPackage crossScreenDataPackage = game.getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
         mainBoardVM.getAllButtonPageVM().setFrom(null);
         mainBoardVM.getAllButtonPageVM().setTo(null, null);
         deskAreaVM.afterFightOrClear();
-        crossScreenDataPackage.setBattleFromChess(null);
-        crossScreenDataPackage.setBattleToChess(null);
-        crossScreenDataPackage.setCurrentState(ChessState.WAIT_SELECT_FROM);
+        game.getLogicContext().getAfterBattleManager().setBattleFromChess(null);
+        game.getLogicContext().getAfterBattleManager().setBattleToChess(null);
+        crossScreenDataManager.setCurrentState(ChessState.WAIT_SELECT_FROM);
     }
 
     @Override

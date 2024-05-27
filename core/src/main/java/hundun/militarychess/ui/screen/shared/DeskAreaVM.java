@@ -4,12 +4,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
-import hundun.militarychess.logic.CrossScreenDataPackage;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.chess.GridPosition;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.ui.other.CameraDataPackage;
@@ -71,10 +70,10 @@ public class DeskAreaVM extends Table {
     }
 
     public void updateMask(ChessVM from) {
-        CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
-        if (crossScreenDataPackage.getCurrentChessShowSides().contains(from.getDeskData().getChessSide())) {
+        CrossScreenDataManager crossScreenDataManager = screen.getGame().getLogicContext().getCrossScreenDataManager();
+        if (crossScreenDataManager.getCurrentChessShowSides().contains(from.getDeskData().getChessSide())) {
             nodes.values().forEach(it -> {
-                Set<GridPosition> all = screen.getGame().getLogicContext().getTileMap().finaAllMoveCandidates(from.getDeskData(), crossScreenDataPackage);
+                Set<GridPosition> all = screen.getGame().getLogicContext().getChessTileManager().finaAllMoveCandidates(from.getDeskData(), crossScreenDataManager);
                 it.updateMask(all.contains(it.getDeskData().getPos()) ? MaskType.MOVE_CANDIDATE : MaskType.EMPTY);
             });
         }

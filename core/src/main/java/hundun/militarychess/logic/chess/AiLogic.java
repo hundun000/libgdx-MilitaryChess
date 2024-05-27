@@ -2,7 +2,7 @@ package hundun.militarychess.logic.chess;
 
 import hundun.militarychess.logic.LogicContext;
 import hundun.militarychess.logic.LogicContext.AiAction;
-import hundun.militarychess.logic.CrossScreenDataPackage;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
@@ -27,7 +27,7 @@ public class AiLogic {
         return ('z' - chessType.getCode().charAt(0));
     }
 
-    public AiAction generateAiAction(ArmyRuntimeData fromArmy, ArmyRuntimeData toArmy, CrossScreenDataPackage crossScreenDataPackage) {
+    public AiAction generateAiAction(ArmyRuntimeData fromArmy, ArmyRuntimeData toArmy, CrossScreenDataManager crossScreenDataManager) {
         Set<GridPosition> allPosOfOtherArmy = new HashSet<>();
         toArmy.getChessRuntimeDataList().forEach(it -> allPosOfOtherArmy.add(it.getPos()));
 
@@ -37,11 +37,11 @@ public class AiLogic {
         int maxScore = -100;
         // 遍历每个我方棋子
         for (ChessRuntimeData checkingFromChess : fromArmy.getChessRuntimeDataList()) {
-            Set<GridPosition> all = logicContext.getTileMap().finaAllMoveCandidates(checkingFromChess, crossScreenDataPackage);
+            Set<GridPosition> all = logicContext.getChessTileManager().finaAllMoveCandidates(checkingFromChess, crossScreenDataManager);
             Map<GridPosition, Integer> scoreMap = new HashMap<>();
             // 遍历每个可移动终点
             for (GridPosition checkingTo : all) {
-                ChessRuntimeData checkingToChess = crossScreenDataPackage.findAtPos(checkingTo);
+                ChessRuntimeData checkingToChess = logicContext.getChessTileManager().findAtPos(checkingTo);
                 if (allPosOfOtherArmy.contains(checkingTo)) {
                     // case 可移动终点是敌方棋子。吃子等级越高，得分越高。
                     final var battleResult = logicContext.getChessRule().getFightV2Result(checkingFromChess, checkingToChess);
@@ -88,7 +88,7 @@ public class AiLogic {
         if (maxScoreFromChess != null) {
             return AiAction.builder()
                 .from(maxScoreFromChess)
-                .to(crossScreenDataPackage.findAtPos(maxScoreToPos))
+                .to(logicContext.getChessTileManager().findAtPos(maxScoreToPos))
                 .score(maxScore)
                 .build();
         } else {

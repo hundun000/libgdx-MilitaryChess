@@ -23,7 +23,7 @@ public class DeskClickListener extends ClickListener {
         screen.onDeskClicked(vm);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(vm.getDeskData().toText()).append(" has been clicked.");
-        var relation = game.getLogicContext().getTileMap().getWorldConstructionAt(vm.getDeskData().getPos());
+        var relation = game.getLogicContext().getChessTileManager().getWorldConstructionAt(vm.getDeskData().getPos());
         //stringBuilder.append("NeighbourMap{");
         //relation.getPhysicalNeighbors().forEach((k, v) -> stringBuilder.append(k).append("=").append(v != null ? v.getPosition().toText() : "null"));
         //stringBuilder.append("}");

@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import de.eskalon.commons.screen.transition.impl.BlendingTransition;
 import hundun.gdxgame.corelib.base.BaseHundunScreen;
 import hundun.gdxgame.corelib.base.util.TextureFactory;
-import hundun.militarychess.logic.CrossScreenDataPackage;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
 import hundun.militarychess.logic.LogicContext.ChessState;
 import hundun.militarychess.logic.LogicContext.PlayerMode;
@@ -21,7 +21,7 @@ import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessBattleStatus;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
-import hundun.militarychess.logic.map.StageConfig;
+import hundun.militarychess.logic.StageConfig;
 import hundun.militarychess.logic.map.tile.TileBuilder;
 import hundun.militarychess.ui.MilitaryChessGame;
 
@@ -56,29 +56,10 @@ public class MainPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void>
                 super.clicked(event, x, y);
                 var playerMode = PlayerMode.PVC;
                 var chessShowMode = ChessShowMode.MING_QI;
-                var crossScreenDataPackage = CrossScreenDataPackage.builder()
-                    .game(game)
-                    .playerMode(playerMode)
-                    .chessShowMode(chessShowMode)
-                    .currentChessShowSides(new HashSet<>())
-                    .pvcPlayerSide(ChessSide.RED_SIDE)
-                    .currentSide(ChessSide.RED_SIDE)
-                    .currentState(ChessState.WAIT_SELECT_FROM)
-                    .build();
 
 
 
                 List<GridPosition> xingyingPositions = List.of(
-                    new GridPosition(1, 8),
-                    new GridPosition(3, 8),
-                    new GridPosition(2, 9),
-                    new GridPosition(1, 10),
-                    new GridPosition(3, 10),
-                    new GridPosition(1, 2),
-                    new GridPosition(3, 2),
-                    new GridPosition(2, 3),
-                    new GridPosition(1, 4),
-                    new GridPosition(3, 4)
                 );
                 List<GridPosition> noDiagonalNeighborPositions = List.of(
                     new GridPosition(0, 8),
@@ -140,7 +121,7 @@ public class MainPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void>
                             fromCode(
                                 0,
                                 5,
-                                "a",
+                                "b",
                                 game.getScreenContext().getLayoutConst(),
                                 ChessSide.RED_SIDE
                             )
@@ -152,7 +133,7 @@ public class MainPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void>
                             fromCode(
                                 1,
                                 5,
-                                "b",
+                                "a",
                                 game.getScreenContext().getLayoutConst(),
                                 ChessSide.BLUE_SIDE
                             )
@@ -161,11 +142,15 @@ public class MainPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void>
                 );
 
                 StageConfig stageConfig = StageConfig.builder()
+                    .playerMode(playerMode)
+                    .chessShowMode(chessShowMode)
+                    .pvcPlayerSide(ChessSide.RED_SIDE)
+                    .currentSide(ChessSide.RED_SIDE)
                     .loseChecker(new ZhanQiLoseChecker())
                     .armyMap(armyMap)
                     .tileBuilders(tileBuilders)
                     .build();
-                game.getLogicContext().prepareDone(crossScreenDataPackage, stageConfig);
+                game.getLogicContext().prepareDone(stageConfig);
                 game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
             }
         });

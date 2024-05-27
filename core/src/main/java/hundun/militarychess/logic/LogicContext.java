@@ -2,44 +2,66 @@ package hundun.militarychess.logic;
 
 import hundun.militarychess.logic.chess.AiLogic;
 import hundun.militarychess.logic.chess.ChessRule;
-import hundun.militarychess.logic.data.ArmyRuntimeData;
 import hundun.militarychess.logic.data.ChessRuntimeData;
-import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
-import hundun.militarychess.logic.map.StageConfig;
+import hundun.militarychess.logic.manager.AfterBattleManager;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
+import hundun.militarychess.logic.manager.IManager;
+import hundun.militarychess.logic.manager.MilitaryChessTileManager;
 import hundun.militarychess.ui.MilitaryChessGame;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Map;
+import java.util.List;
 
 public class LogicContext {
-
+    @Getter
     MilitaryChessGame game;
     @Getter
-    CrossScreenDataPackage crossScreenDataPackage;
+    CrossScreenDataManager crossScreenDataManager;
     @Getter
     ChessRule chessRule;
     @Getter
-    MilitaryChessTileMap tileMap;
+    MilitaryChessTileManager chessTileManager;
     @Getter
     AiLogic aiLogic;
+    @Getter
+    AfterBattleManager afterBattleManager;
+
+    List<IManager> managers;
+
     public LogicContext(MilitaryChessGame game) {
         this.game = game;
         this.chessRule = new ChessRule(this);
-        this.tileMap = new MilitaryChessTileMap(this);
+        this.chessTileManager = new MilitaryChessTileManager(this);
         this.aiLogic = new AiLogic(this);
+        this.afterBattleManager = new AfterBattleManager(this);
+        this.crossScreenDataManager = new CrossScreenDataManager(this);
+
+        this.managers = List.of(
+            crossScreenDataManager,
+            chessTileManager,
+            afterBattleManager
+        );
     }
 
     public void lazyInitOnCreateStage1() {
     }
 
+    public void prepareDone(StageConfig stageConfig) {
 
-    public void prepareDone(CrossScreenDataPackage crossScreenDataPackage, StageConfig stageConfig) {
-        this.crossScreenDataPackage = crossScreenDataPackage;
-        crossScreenDataPackage.prepareDone(stageConfig);
-        tileMap.prepareDone(stageConfig);
+        managers.forEach(manager -> manager.prepareDone(stageConfig));
+        this.updateAfterFightOrStart();
+    }
+
+    public void commitFightResult() {
+        managers.forEach(manager -> manager.commitFightResult());
+        this.updateAfterFightOrStart();
+    }
+
+    public void updateAfterFightOrStart() {
+        managers.forEach(manager -> manager.updateAfterFightOrStart());
     }
 
     /**

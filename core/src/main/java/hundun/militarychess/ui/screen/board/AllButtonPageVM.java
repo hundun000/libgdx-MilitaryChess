@@ -6,8 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
+import hundun.militarychess.logic.LogicContext;
 import hundun.militarychess.logic.LogicContext.ChessShowMode;
-import hundun.militarychess.logic.CrossScreenDataPackage;
+import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.LogicContext.PlayerMode;
 import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
@@ -97,9 +98,9 @@ public class AllButtonPageVM extends Table {
      * From/To棋子设置/清空后，更新对应UI
      */
     private void updateByChess() {
-        CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
+        CrossScreenDataManager crossScreenDataManager = screen.getGame().getLogicContext().getCrossScreenDataManager();
         if (fromChessVM != null) {
-            if (crossScreenDataPackage.getCurrentChessShowSides().contains(fromChessVM.getDeskData().getChessSide())) {
+            if (crossScreenDataManager.getCurrentChessShowSides().contains(fromChessVM.getDeskData().getChessSide())) {
                 this.fromLabel.setText("发起者: "
                     + fromChessVM.getDeskData().toText()
                 );
@@ -110,7 +111,7 @@ public class AllButtonPageVM extends Table {
             this.fromLabel.setText("发起者: 待选择");
         }
         if (toChessVM != null) {
-            if (crossScreenDataPackage.getCurrentChessShowSides().contains(toChessVM.getDeskData().getChessSide())) {
+            if (crossScreenDataManager.getCurrentChessShowSides().contains(toChessVM.getDeskData().getChessSide())) {
                 this.toLabel.setText("目标: "
                     + toChessVM.getDeskData().toText()
                 );
@@ -121,7 +122,7 @@ public class AllButtonPageVM extends Table {
             this.toLabel.setText("目标: 待选择");
         }
         if (fightResultPreview != null) {
-            if (crossScreenDataPackage.getChessShowMode() == ChessShowMode.MING_QI
+            if (crossScreenDataManager.getChessShowMode() == ChessShowMode.MING_QI
                 || fightResultPreview == BattleResultType.JUST_MOVE
                 || fightResultPreview == BattleResultType.CAN_NOT
             ) {
@@ -141,9 +142,9 @@ public class AllButtonPageVM extends Table {
      * 当前操作方变动时调用
      */
     public void updateForNewSide() {
-        CrossScreenDataPackage crossScreenDataPackage = screen.getGame().getLogicContext().getCrossScreenDataPackage();
-        ChessSide currentSide = crossScreenDataPackage.getCurrentSide();
-        boolean isAiSide = crossScreenDataPackage.getPlayerMode() == PlayerMode.PVC && currentSide != crossScreenDataPackage.getPvcPlayerSide();
+        CrossScreenDataManager crossScreenDataManager = screen.getGame().getLogicContext().getCrossScreenDataManager();
+        ChessSide currentSide = crossScreenDataManager.getCurrentSide();
+        boolean isAiSide = crossScreenDataManager.getPlayerMode() == PlayerMode.PVC && currentSide != crossScreenDataManager.getPvcPlayerSide();
         this.fromChessVM = null;
         this.toChessVM = null;
         this.fightResultPreview = null;
@@ -160,9 +161,9 @@ public class AllButtonPageVM extends Table {
     /**
      * 时间变化后，更新对应UI
      */
-    public void updateTime(CrossScreenDataPackage crossScreenDataPackage) {
+    public void updateTime(LogicContext logicContext) {
         StringBuilder stringBuilder = new StringBuilder();
-        crossScreenDataPackage.getArmyMap().forEach((k, v) -> {
+        logicContext.getChessTileManager().getArmyMap().forEach((k, v) -> {
             int minute = v.getUsedTime() / 60;
             int second = v.getUsedTime() % 60;
             stringBuilder.append(k.getChinese()).append("累计用时：")

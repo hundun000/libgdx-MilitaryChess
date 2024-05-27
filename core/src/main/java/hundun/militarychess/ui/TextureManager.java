@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 
-import hundun.militarychess.logic.TileModel;
+import hundun.militarychess.logic.map.TileModel;
 import hundun.militarychess.logic.chess.LogicFlag;
 import hundun.militarychess.logic.map.tile.TileNeighborDirection;
 import lombok.Getter;
