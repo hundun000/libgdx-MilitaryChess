@@ -83,8 +83,10 @@ public class MilitaryChessTileManager implements ITileNodeMap<Void>, IManager {
         });
 
         tileModelMap.values().forEach(it -> {
-            Map<TileNeighborDirection, ITileNode<Void>> logicalNeighbors = calculateLogicalNeighbors(it);
+            Map<TileNeighborDirection, ITileNode<Void>> logicalNeighbors = calculateLogicalNeighbors(it, stageConfig);
             it.setLogicalNeighbors(logicalNeighbors);
+            Map<TileNeighborDirection, ITileNode<Void>> railNeighbors = calculateRailNeighbors(it);
+            it.setRailNeighbors(railNeighbors);
         });
 
         this.armyMap = stageConfig.getArmyMap();
@@ -150,18 +152,53 @@ public class MilitaryChessTileManager implements ITileNodeMap<Void>, IManager {
         TileNeighborDirection.RIGHT_DOWN
     );
 
-
-    private Map<TileNeighborDirection, ITileNode<Void>> calculateLogicalNeighbors(TileModel tileModel) {
+    /**
+     * only call after set PhysicalNeighbors
+     */
+    private Map<TileNeighborDirection, ITileNode<Void>> calculateLogicalNeighbors(TileModel tileModel, StageConfig stageConfig) {
         Map<TileNeighborDirection, ITileNode<Void>> result = new HashMap<>(tileModel.getPhysicalNeighbors());
-        if (!tileModel.isHasDiagonalNeighbor()) {
-            result.entrySet().removeIf(it -> DIAGONAL_DIRECTIONS.contains(it.getKey()));
-        }
         result.entrySet().removeIf(it -> {
             TileModel destinationTileModel = getWorldConstructionAt(it.getValue().getPosition());
+            boolean forceKeep = stageConfig.getExtraAddLogicNeighborPair().stream()
+                .anyMatch(itt -> {
+                    return (tileModel.getPosition().equals(itt.getFirst()) && destinationTileModel.getPosition().equals(itt.getSecond()))
+                        || (tileModel.getPosition().equals(itt.getSecond()) && destinationTileModel.getPosition().equals(itt.getFirst()))
+                        ;
+                });
+            if (forceKeep) {
+                return false;
+            }
+            boolean forceRemove = stageConfig.getExtraRemoveLogicNeighborPair().stream()
+                .anyMatch(itt -> {
+                    return (tileModel.getPosition().equals(itt.getFirst()) && destinationTileModel.getPosition().equals(itt.getSecond()))
+                        || (tileModel.getPosition().equals(itt.getSecond()) && destinationTileModel.getPosition().equals(itt.getFirst()))
+                        ;
+                });
+            if (forceRemove) {
+                return true;
+            }
+            if (DIAGONAL_DIRECTIONS.contains(it.getKey()) && !tileModel.isHasDiagonalNeighbor()) {
+                return true;
+            }
             if (destinationTileModel.getLogicFlags().contains(LogicFlag.NO_PASS)) {
                 return true;
             }
             if (DIAGONAL_DIRECTIONS.contains(it.getKey()) && !destinationTileModel.isHasDiagonalNeighbor()) {
+                return true;
+            }
+            return false;
+        });
+        return result;
+    }
+
+    /**
+     * only call after set LogicalNeighbors
+     */
+    private Map<TileNeighborDirection, ITileNode<Void>> calculateRailNeighbors(TileModel tileModel) {
+        Map<TileNeighborDirection, ITileNode<Void>> result = new HashMap<>(tileModel.getLogicalNeighbors());
+        result.entrySet().removeIf(it -> {
+            TileModel destinationTileModel = getWorldConstructionAt(it.getValue().getPosition());
+            if (!destinationTileModel.getLogicFlags().contains(LogicFlag.RAIL)) {
                 return true;
             }
             return false;

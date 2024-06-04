@@ -24,6 +24,7 @@ import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.logic.StageConfig;
 import hundun.militarychess.logic.map.tile.TileBuilder;
 import hundun.militarychess.ui.MilitaryChessGame;
+import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
 import java.util.List;
@@ -115,72 +116,24 @@ public class JunqiPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void
                 var playerMode = playerModeCheckBoxMap.get(playerModeButtonGroup.getChecked());
                 var chessShowMode = chessShowModeCheckBoxMap.get(chessShowModeButtonGroup.getChecked());
                 var pvcPlayerAsFirst = pvcPlayerSideCheckBoxMap.get(pvcPlayerSideButtonGroup.getChecked());
+                List<Pair<GridPosition, GridPosition>> extraAddLogicNeighborPair = List.of(
+                    new Pair<>(new GridPosition(0, 6), new GridPosition(1, 7)),
+                    new Pair<>(new GridPosition(2, 6), new GridPosition(1, 7)),
+                    new Pair<>(new GridPosition(2, 6), new GridPosition(3, 7)),
+                    new Pair<>(new GridPosition(4, 6), new GridPosition(3, 7)),
 
-
-
-                List<GridPosition> xingyingPositions = List.of(
-                    new GridPosition(1, 8),
-                    new GridPosition(3, 8),
-                    new GridPosition(2, 9),
-                    new GridPosition(1, 10),
-                    new GridPosition(3, 10),
-                    new GridPosition(1, 2),
-                    new GridPosition(3, 2),
-                    new GridPosition(2, 3),
-                    new GridPosition(1, 4),
-                    new GridPosition(3, 4)
+                    new Pair<>(new GridPosition(0, 5), new GridPosition(1, 4)),
+                    new Pair<>(new GridPosition(2, 5), new GridPosition(1, 4)),
+                    new Pair<>(new GridPosition(2, 5), new GridPosition(3, 4)),
+                    new Pair<>(new GridPosition(4, 5), new GridPosition(3, 4))
                 );
-                List<GridPosition> noDiagonalNeighborPositions = List.of(
-                    new GridPosition(0, 8),
-                    new GridPosition(2, 8),
-                    new GridPosition(4, 8),
-
-                    new GridPosition(1, 9),
-                    new GridPosition(3, 9),
-
-                    new GridPosition(0, 10),
-                    new GridPosition(2, 10),
-                    new GridPosition(4, 10),
-
-                    new GridPosition(0, 2),
-                    new GridPosition(2, 2),
-                    new GridPosition(4, 2),
-
-                    new GridPosition(1, 3),
-                    new GridPosition(3, 3),
-
-                    new GridPosition(0, 4),
-                    new GridPosition(2, 4),
-                    new GridPosition(4, 4)
+                List<Pair<GridPosition, GridPosition>> extraRemoveLogicNeighborPair = List.of(
+                    new Pair<>(new GridPosition(1, 6), new GridPosition(1, 5)),
+                    new Pair<>(new GridPosition(3, 6), new GridPosition(3, 5))
                 );
-                List<TileBuilder> tileBuilders = new ArrayList<>();
-                for (int j = 0; j < 13; j++) {
-                    if (j == 6) {
-                        tileBuilders.add(TileBuilder.create(0, j, false, LogicFlag.NO_STOP));
-                        tileBuilders.add(TileBuilder.create(1, j, false, LogicFlag.NO_STOP, LogicFlag.NO_PASS));
-                        tileBuilders.add(TileBuilder.create(2, j, false, LogicFlag.NO_STOP));
-                        tileBuilders.add(TileBuilder.create(3, j, false, LogicFlag.NO_STOP, LogicFlag.NO_PASS));
-                        tileBuilders.add(TileBuilder.create(4, j, false, LogicFlag.NO_STOP));
-                    } else {
 
-                        for (int i = 0; i < 5; i++) {
-                            GridPosition pos = GridPosition.builder()
-                                .x(i)
-                                .y(j)
-                                .build();
-                            if (xingyingPositions.contains(pos)) {
-                                tileBuilders.add(TileBuilder.create(i, j, true, LogicFlag.XING_YING));
-                            } else {
-                                boolean hasDiagonalNeighbor = j > 0 && j < 12;
-                                if (noDiagonalNeighborPositions.contains(pos)) {
-                                    hasDiagonalNeighbor = false;
-                                }
-                                tileBuilders.add(TileBuilder.create(i, j, hasDiagonalNeighbor));
-                            }
-                        }
-                    }
-                }
-
+                // first: left-down-node; second: right-up-node;
+                List<TileBuilder> tileBuilders = junqiTileBuilders();
                 List<GridPosition> xingyingList = tileBuilders.stream()
                     .filter(it -> it.getLogicFlags().contains(LogicFlag.XING_YING))
                     .map(it -> it.getPosition())
@@ -203,7 +156,7 @@ public class JunqiPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void
                             blueSideTextField.getText(),
                             game.getScreenContext().getLayoutConst(),
                             ChessSide.BLUE_SIDE,
-                            7
+                            6
                         ))
                         .build()
                 );
@@ -215,12 +168,98 @@ public class JunqiPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void
                     .loseChecker(new JunQiLoseChecker())
                     .armyMap(armyMap)
                     .tileBuilders(tileBuilders)
+                    .extraAddLogicNeighborPair(extraAddLogicNeighborPair)
+                    .extraRemoveLogicNeighborPair(extraRemoveLogicNeighborPair)
                     .build();
                 game.getLogicContext().prepareDone(stageConfig);
                 game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());
             }
         });
         uiRootTable.add(buttonNewGame);
+    }
+
+    public static List<TileBuilder> junqiTileBuilders() {
+        List<Pair<GridPosition, GridPosition>> railPairs = List.of(
+            new Pair<>(new GridPosition(0, 5), new GridPosition(4, 5))
+        );
+        List<GridPosition> xingyingPositions = List.of(
+            new GridPosition(1, 7),
+            new GridPosition(3, 7),
+            new GridPosition(2, 8),
+            new GridPosition(1, 9),
+            new GridPosition(3, 9),
+            new GridPosition(1, 2),
+            new GridPosition(3, 2),
+            new GridPosition(2, 3),
+            new GridPosition(1, 4),
+            new GridPosition(3, 4)
+        );
+        List<GridPosition> noDiagonalNeighborPositions = List.of(
+            new GridPosition(0, 6),
+            new GridPosition(1, 6),
+            new GridPosition(2, 6),
+            new GridPosition(3, 6),
+            new GridPosition(4, 6),
+
+            new GridPosition(0, 7),
+            new GridPosition(2, 7),
+            new GridPosition(4, 7),
+
+            new GridPosition(1, 8),
+            new GridPosition(3, 8),
+
+            new GridPosition(0, 9),
+            new GridPosition(2, 9),
+            new GridPosition(4, 9),
+
+            new GridPosition(0, 2),
+            new GridPosition(2, 2),
+            new GridPosition(4, 2),
+
+            new GridPosition(1, 3),
+            new GridPosition(3, 3),
+
+            new GridPosition(0, 4),
+            new GridPosition(2, 4),
+            new GridPosition(4, 4),
+
+            new GridPosition(0, 5),
+            new GridPosition(1, 5),
+            new GridPosition(2, 5),
+            new GridPosition(3, 5),
+            new GridPosition(4, 5)
+        );
+        List<TileBuilder> tileBuilders = new ArrayList<>();
+        for (int j = 0; j < 13; j++) {
+            for (int i = 0; i < 5; i++) {
+                GridPosition pos = GridPosition.builder()
+                    .x(i)
+                    .y(j)
+                    .build();
+                TileBuilder tileBuilder;
+                if (xingyingPositions.contains(pos)) {
+                    tileBuilder = TileBuilder.create(i, j, true, LogicFlag.XING_YING);
+                } else {
+                    boolean isRail = railPairs.stream()
+                        .anyMatch(railPair -> {
+                            boolean xMatch = pos.getX() >= railPair.getFirst().getX() && pos.getX() <= railPair.getSecond().getX();
+                            boolean yMatch = pos.getY() >= railPair.getFirst().getY() && pos.getY() <= railPair.getSecond().getY();
+                            return xMatch && yMatch;
+                        });
+                    boolean hasDiagonalNeighbor = j > 0 && j < 12;
+                    if (noDiagonalNeighborPositions.contains(pos)) {
+                        hasDiagonalNeighbor = false;
+                    }
+                    if (isRail) {
+                        tileBuilder = TileBuilder.create(i, j, hasDiagonalNeighbor, LogicFlag.RAIL);
+                    } else {
+                        tileBuilder = TileBuilder.create(i, j, hasDiagonalNeighbor);
+                    }
+                }
+                tileBuilders.add(tileBuilder);
+            }
+        }
+        return tileBuilders;
     }
 
     @Override

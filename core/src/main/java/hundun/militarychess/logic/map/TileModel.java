@@ -21,7 +21,9 @@ public class TileModel implements ITileNode<Void> {
     @Setter
     @Getter
     Map<TileNeighborDirection, ITileNode<Void>> logicalNeighbors;
-
+    @Setter
+    @Getter
+    Map<TileNeighborDirection, ITileNode<Void>> railNeighbors;
     public TileModel(GridPosition position, List<LogicFlag> logicFlags, boolean hasDiagonalNeighbor) {
         this.position = position;
         this.logicFlags = logicFlags;

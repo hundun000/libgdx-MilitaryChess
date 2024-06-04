@@ -24,6 +24,7 @@ import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.logic.StageConfig;
 import hundun.militarychess.logic.map.tile.TileBuilder;
 import hundun.militarychess.ui.MilitaryChessGame;
+import org.apache.commons.math3.util.Pair;
 
 import java.util.List;
 import java.util.*;
@@ -56,63 +57,24 @@ public class MainPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void>
                 super.clicked(event, x, y);
                 var playerMode = PlayerMode.PVC;
                 var chessShowMode = ChessShowMode.MING_QI;
-
-
-
-                List<GridPosition> xingyingPositions = List.of(
+                List<Pair<GridPosition, GridPosition>> extraAddLogicNeighborPair = List.of(
                 );
-                List<GridPosition> noDiagonalNeighborPositions = List.of(
-                    new GridPosition(0, 8),
-                    new GridPosition(2, 8),
-                    new GridPosition(4, 8),
-
-                    new GridPosition(1, 9),
-                    new GridPosition(3, 9),
-
-                    new GridPosition(0, 10),
-                    new GridPosition(2, 10),
-                    new GridPosition(4, 10),
-
-                    new GridPosition(0, 2),
-                    new GridPosition(2, 2),
-                    new GridPosition(4, 2),
-
-                    new GridPosition(1, 3),
-                    new GridPosition(3, 3),
-
-                    new GridPosition(0, 4),
-                    new GridPosition(2, 4),
-                    new GridPosition(4, 4)
+                List<Pair<GridPosition, GridPosition>> extraRemoveLogicNeighborPair = List.of(
                 );
-                List<TileBuilder> tileBuilders = new ArrayList<>();
-                for (int j = 0; j < 13; j++) {
-                    if (j == 6) {
-                        tileBuilders.add(TileBuilder.create(0, j, false, LogicFlag.NO_STOP));
-                        tileBuilders.add(TileBuilder.create(1, j, false, LogicFlag.NO_STOP, LogicFlag.NO_PASS));
-                        tileBuilders.add(TileBuilder.create(2, j, false, LogicFlag.NO_STOP));
-                        tileBuilders.add(TileBuilder.create(3, j, false, LogicFlag.NO_STOP, LogicFlag.NO_PASS));
-                        tileBuilders.add(TileBuilder.create(4, j, false, LogicFlag.NO_STOP));
-                    } else {
 
-                        for (int i = 0; i < 5; i++) {
-                            GridPosition pos = GridPosition.builder()
-                                .x(i)
-                                .y(j)
-                                .build();
-                            if (xingyingPositions.contains(pos)) {
-                                tileBuilders.add(TileBuilder.create(i, j, true, LogicFlag.XING_YING));
-                            } else {
-                                boolean hasDiagonalNeighbor = j > 0 && j < 12;
-                                if (noDiagonalNeighborPositions.contains(pos)) {
-                                    hasDiagonalNeighbor = false;
-                                }
-                                tileBuilders.add(TileBuilder.create(i, j, hasDiagonalNeighbor));
-                            }
-                        }
+
+                List<TileBuilder> tileBuilders =  JunqiPrepareScreen.junqiTileBuilders();
+                tileBuilders.removeIf(it -> {
+                    int posX = it.getPosition().getX();
+                    int posY = it.getPosition().getY();
+                    if (posX > 3) {
+                        return true;
                     }
-                }
-
-
+                    if (posY < 4 || posY > 6) {
+                        return true;
+                    }
+                    return false;
+                });
 
                 Map<ChessSide, ArmyRuntimeData> armyMap = Map.of(
                     ChessSide.RED_SIDE,
@@ -149,6 +111,8 @@ public class MainPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void>
                     .loseChecker(new ZhanQiLoseChecker())
                     .armyMap(armyMap)
                     .tileBuilders(tileBuilders)
+                    .extraAddLogicNeighborPair(extraAddLogicNeighborPair)
+                    .extraRemoveLogicNeighborPair(extraRemoveLogicNeighborPair)
                     .build();
                 game.getLogicContext().prepareDone(stageConfig);
                 game.getScreenManager().pushScreen(PlayScreen.class.getSimpleName(), BlendingTransition.class.getSimpleName());

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import hundun.gdxgame.corelib.base.util.DrawableFactory;
+import hundun.militarychess.logic.chess.LogicFlag;
 import hundun.militarychess.logic.manager.CrossScreenDataManager;
 import hundun.militarychess.logic.map.TileModel;
 import hundun.militarychess.logic.data.ChessRuntimeData;
@@ -30,6 +31,7 @@ public class ChessVM extends Table {
     Label chessTypeLabel;
     Label chessStatusLabel;
     Image tileImage;
+    Image buildingImage;
     Image colorImage;
     @Getter
     final Actor hitBox;
@@ -47,6 +49,15 @@ public class ChessVM extends Table {
             this.game.getScreenContext().getLayoutConst().TILE_HEIGHT
         );
         this.addActor(tileImage);
+
+        this.buildingImage = new Image();
+        buildingImage.setBounds(
+            0,
+            0,
+            this.game.getScreenContext().getLayoutConst().TILE_WIDTH,
+            this.game.getScreenContext().getLayoutConst().TILE_HEIGHT
+        );
+        this.addActor(buildingImage);
 
         this.colorImage = new Image();
         colorImage.setBounds(
@@ -92,12 +103,14 @@ public class ChessVM extends Table {
         } else {
             chessTypeLabel.setText("");
             chessStatusLabel.setText("");
-            colorImage.setDrawable(DrawableFactory.createAlphaBoard(1, 1, Color.GRAY, 0.8f));
+
+
         }
     }
 
     public void updateUIForChessChanged(){
         CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
+        TileModel tileModel = game.getLogicContext().getChessTileManager().getWorldConstructionAt(deskData.getPos());
 
         if (deskData.getChessSide() == ChessSide.EMPTY) {
             updateUIAsEmpty();
@@ -121,12 +134,14 @@ public class ChessVM extends Table {
         );
 
         // ------ ui for tile ------
-        TileModel gameboardPos = game.getLogicContext().getChessTileManager().getWorldConstructionAt(deskData.getPos());
-        TextureRegion textureRegion = game.getTextureManager().getTileImage(gameboardPos);
-        if (textureRegion != null) {
-            tileImage.setDrawable(new TextureRegionDrawable(textureRegion));
-        } else {
-            game.getFrontend().log(this.getClass().getSimpleName(), "TileImage not found " + gameboardPos.getPosition().toText());
+        TextureRegion tileTextureRegion = game.getTextureManager().getTileImage(tileModel);
+        if (tileTextureRegion != null) {
+            tileImage.setDrawable(new TextureRegionDrawable(tileTextureRegion));
+        }
+
+        TextureRegion buildingTextureRegion = game.getTextureManager().getBuildingImage(tileModel);
+        if (buildingTextureRegion != null) {
+            buildingImage.setDrawable(new TextureRegionDrawable(buildingTextureRegion));
         }
     }
 

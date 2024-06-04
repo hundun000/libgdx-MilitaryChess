@@ -8,7 +8,7 @@ public class LayoutConst {
     public final int TILE_WIDTH = 400;
     public final int TILE_HEIGHT = 400;
 
-    public final int CHESS_AND_DESK_SPACE = 50;
+    public final int CHESS_AND_DESK_SPACE = 100;
 
     public int HIT_BOX_X = 4;
     public int HIT_BOX_Y = 4;

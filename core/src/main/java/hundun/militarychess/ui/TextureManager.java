@@ -28,9 +28,47 @@ public class TextureManager {
     @Getter
     Drawable deskBackground;
     protected Map<String, TextureRegion> tileNormalSubRegionMap = new HashMap<>();
-
+    protected Map<String, TextureRegion> tileRailSubRegionMap = new HashMap<>();
     public TextureManager(MilitaryChessGame game) {
         this.game = game;
+    }
+
+
+    private static void fillSubRegionMap(Map<String, TextureRegion> map, TextureRegion[][] regions) {
+        map.put("111,111,111", regions[0][0]);
+
+        map.put("010,011,011", regions[0][1]);
+        map.put("010,111,111", regions[0][2]);
+        map.put("010,110,110", regions[0][3]);
+        map.put("011,011,010", regions[1][1]);
+        map.put("111,111,010", regions[1][2]);
+        map.put("110,110,010", regions[1][3]);
+
+        map.put("011,011,011", regions[0][4]);
+        map.put("110,110,110", regions[0][5]);
+        map.put("000,111,111", regions[1][4]);
+        map.put("111,111,000", regions[1][5]);
+
+        map.put("010,000,010", regions[0][6]);
+        map.put("000,111,000", regions[1][6]);
+        map.put("010,010,010", regions[1][7]);
+
+        map.put("000,011,011", regions[0][8]);
+        map.put("000,110,110", regions[0][9]);
+        map.put("011,011,000", regions[1][8]);
+        map.put("110,110,000", regions[1][9]);
+
+        map.put("010,111,010", regions[2][0]);
+
+        map.put("000,011,010", regions[2][1]);
+        map.put("000,110,010", regions[2][2]);
+        map.put("010,011,000", regions[2][3]);
+        map.put("010,110,000", regions[2][4]);
+
+        map.put("000,111,010", regions[2][5]);
+        map.put("010,111,000", regions[2][6]);
+        map.put("010,110,010", regions[2][7]);
+        map.put("010,011,010", regions[2][8]);
     }
 
     public void lazyInitOnCreateStage1() {
@@ -61,43 +99,15 @@ public class TextureManager {
         deskBackground = new NinePatchDrawable(tempNinePatch);
 
         {
-            Texture texture = new Texture(Gdx.files.internal("caves-rails-tileset-beta-1.0.png"));
+            Texture texture = new Texture(Gdx.files.internal("normal-tileset.png"));
             TextureRegion[][] regions = TextureRegion.split(texture, 16, 16);
-
-            tileNormalSubRegionMap.put("111,111,111", regions[0][0]);
-
-            tileNormalSubRegionMap.put("010,011,011", regions[0][1]);
-            tileNormalSubRegionMap.put("010,111,111", regions[0][2]);
-            tileNormalSubRegionMap.put("010,110,110", regions[0][3]);
-            tileNormalSubRegionMap.put("011,011,010", regions[1][1]);
-            tileNormalSubRegionMap.put("111,111,010", regions[1][2]);
-            tileNormalSubRegionMap.put("110,110,010", regions[1][3]);
-
-            tileNormalSubRegionMap.put("011,011,011", regions[0][4]);
-            tileNormalSubRegionMap.put("110,110,110", regions[0][5]);
-            tileNormalSubRegionMap.put("000,111,111", regions[1][4]);
-            tileNormalSubRegionMap.put("111,111,000", regions[1][5]);
-
-            tileNormalSubRegionMap.put("010,000,010", regions[0][6]);
-
-            tileNormalSubRegionMap.put("000,011,011", regions[0][8]);
-            tileNormalSubRegionMap.put("000,110,110", regions[0][9]);
-            tileNormalSubRegionMap.put("011,011,000", regions[1][8]);
-            tileNormalSubRegionMap.put("110,110,000", regions[1][9]);
-
-            tileNormalSubRegionMap.put("010,111,010", regions[2][0]);
-
-            tileNormalSubRegionMap.put("000,011,010", regions[2][1]);
-            tileNormalSubRegionMap.put("000,110,010", regions[2][2]);
-            tileNormalSubRegionMap.put("010,011,000", regions[2][3]);
-            tileNormalSubRegionMap.put("010,110,000", regions[2][4]);
-
-            tileNormalSubRegionMap.put("000,111,010", regions[2][5]);
-            tileNormalSubRegionMap.put("010,111,000", regions[2][6]);
-            tileNormalSubRegionMap.put("010,110,010", regions[2][7]);
-            tileNormalSubRegionMap.put("010,011,010", regions[2][8]);
+            fillSubRegionMap(tileNormalSubRegionMap, regions);
         }
-
+        {
+            Texture texture = new Texture(Gdx.files.internal("rail-tileset.png"));
+            TextureRegion[][] regions = TextureRegion.split(texture, 16, 16);
+            fillSubRegionMap(tileRailSubRegionMap, regions);
+        }
     }
 
     private TextureRegion ignoreFirstLineTexture(String file) {
@@ -105,6 +115,29 @@ public class TextureManager {
         return new TextureRegion(texture,
                 1, 1, texture.getWidth() -1, texture.getHeight() -1
                 );
+    }
+
+    public TextureRegion getBuildingImage(TileModel tileModel) {
+        if (tileModel.getLogicFlags().contains(LogicFlag.RAIL)) {
+            StringBuilder code = new StringBuilder();
+            code.append(tileModel.getRailNeighbors().containsKey(TileNeighborDirection.LEFT_UP) ? "1" : "0");
+            code.append(tileModel.getRailNeighbors().containsKey(TileNeighborDirection.VERTICAL_UP) ? "1" : "0");
+            code.append(tileModel.getRailNeighbors().containsKey(TileNeighborDirection.RIGHT_UP) ? "1" : "0");
+            code.append(",");
+            code.append(tileModel.getRailNeighbors().containsKey(TileNeighborDirection.LEFT_MID) ? "1" : "0");
+            code.append("1");
+            code.append(tileModel.getRailNeighbors().containsKey(TileNeighborDirection.RIGHT_MID) ? "1" : "0");
+            code.append(",");
+            code.append(tileModel.getRailNeighbors().containsKey(TileNeighborDirection.LEFT_DOWN) ? "1" : "0");
+            code.append(tileModel.getRailNeighbors().containsKey(TileNeighborDirection.VERTICAL_DOWN) ? "1" : "0");
+            code.append(tileModel.getRailNeighbors().containsKey(TileNeighborDirection.RIGHT_DOWN) ? "1" : "0");
+            TextureRegion result = tileRailSubRegionMap.get(code.toString());
+            if (result == null) {
+                game.getFrontend().log(this.getClass().getSimpleName(), "RAIL getBuildingImage not found for code : " + code);
+            }
+            return result;
+        }
+        return null;
     }
 
     public TextureRegion getTileImage(TileModel tileModel) {
@@ -115,7 +148,7 @@ public class TextureManager {
             code.append(tileModel.getLogicalNeighbors().containsKey(TileNeighborDirection.RIGHT_UP) ? "1" : "0");
             code.append(",");
             code.append(tileModel.getLogicalNeighbors().containsKey(TileNeighborDirection.LEFT_MID) ? "1" : "0");
-            code.append(!tileModel.getLogicFlags().contains(LogicFlag.NO_STOP) ? "1" : "0");
+            code.append("1");
             code.append(tileModel.getLogicalNeighbors().containsKey(TileNeighborDirection.RIGHT_MID) ? "1" : "0");
             code.append(",");
             code.append(tileModel.getLogicalNeighbors().containsKey(TileNeighborDirection.LEFT_DOWN) ? "1" : "0");

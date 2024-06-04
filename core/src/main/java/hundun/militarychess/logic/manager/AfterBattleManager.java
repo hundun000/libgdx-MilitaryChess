@@ -52,7 +52,6 @@ public class AfterBattleManager implements IManager {
         } else {
             notKillTurnCount = 0;
         }
-        updateAfterFightOrStart();
     }
 
     @Override
