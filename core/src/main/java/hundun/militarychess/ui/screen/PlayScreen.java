@@ -22,6 +22,8 @@ import hundun.militarychess.ui.screen.shared.DeskAreaVM;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class PlayScreen extends AbstractMilitaryChessScreen {
@@ -268,10 +270,11 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
             );
         CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
         // 若干UI重置
-        mainBoardVM.getAllButtonPageVM().getFromGridVM().updateUIForChessChanged();
-        mainBoardVM.getAllButtonPageVM().getToGridVM().updateUIForChessChanged();
+        List<GridVM> dirtyGridVms = Stream.of(mainBoardVM.getAllButtonPageVM().getFromGridVM(), mainBoardVM.getAllButtonPageVM().getToGridVM())
+            .filter(it -> it != null)
+            .collect(Collectors.toList());
         mainBoardVM.getAllButtonPageVM().updateForNewSide();
-        deskAreaVM.afterFightOrClear();
+        deskAreaVM.afterFightOrClear(dirtyGridVms);
         // 若已对局结束，则展示
         if (game.getLogicContext().getAfterBattleManager().getLoseSide() != null) {
             String message = JavaFeatureForGwt.stringFormat(
@@ -294,7 +297,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
         mainBoardVM.getAllButtonPageVM().setFrom(null);
         mainBoardVM.getAllButtonPageVM().setTo(null, null);
-        deskAreaVM.afterFightOrClear();
+        deskAreaVM.afterFightOrClear(null);
         game.getLogicContext().getAfterBattleManager().setBattleFromChess(null);
         game.getLogicContext().getAfterBattleManager().setBattleToChess(null);
         crossScreenDataManager.setCurrentState(ChessState.WAIT_SELECT_FROM);

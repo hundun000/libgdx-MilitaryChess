@@ -80,9 +80,11 @@ public class DeskAreaVM extends Table {
         from.updateMask(MaskType.FROM);
     }
 
-    public void afterFightOrClear() {
+    public void afterFightOrClear(List<GridVM> dirtyGridVms) {
         postToGridMap.values().forEach(it -> {
-            it.updateUIForChessChanged();
+            if (dirtyGridVms != null && dirtyGridVms.contains(it)) {
+                it.updateUIForChessChanged();
+            }
             it.updateMask(MaskType.EMPTY);
         });
     }

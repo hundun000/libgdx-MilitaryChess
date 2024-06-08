@@ -27,8 +27,6 @@ public class GridVM extends Table {
     DeskAreaVM deskAreaVM;
     @Getter
     ChessRuntimeData deskData;
-    final int uiX;
-    final int uiY;
     Label chessTypeLabel;
     Label chessStatusLabel;
     Image tileImage;
@@ -42,8 +40,14 @@ public class GridVM extends Table {
         this.game = deskAreaVM.screen.getGame();
         this.deskAreaVM = deskAreaVM;
         this.position = position;
-        this.uiX = position.getX() * game.getScreenContext().getLayoutConst().TILE_WIDTH;
-        this.uiY =  position.getY() * game.getScreenContext().getLayoutConst().TILE_HEIGHT;
+        int uiX = position.getX() * game.getScreenContext().getLayoutConst().TILE_WIDTH;
+        int uiY =  position.getY() * game.getScreenContext().getLayoutConst().TILE_HEIGHT;
+        this.setBounds(
+            uiX,
+            uiY,
+            game.getScreenContext().getLayoutConst().TILE_WIDTH,
+            game.getScreenContext().getLayoutConst().TILE_HEIGHT
+        );
 
         this.tileImage = new Image();
         tileImage.setBounds(
@@ -85,16 +89,29 @@ public class GridVM extends Table {
         this.hitBox = new Image();
         hitBox.addListener(new DeskClickListener(deskAreaVM.getScreen(), this));
 
+        updateUIForTileInit();
         updateUIForChessChanged();
     }
 
+    private void updateUIForTileInit(){
+        TileModel tileModel = game.getLogicContext().getChessTileManager().getWorldConstructionAt(position);
+        // ------ ui for tile ------
+        TextureRegion tileTextureRegion = game.getTextureManager().getTileImage(tileModel);
+        if (tileTextureRegion != null) {
+            tileImage.setDrawable(new TextureRegionDrawable(tileTextureRegion));
+        }
 
+        TextureRegion buildingTextureRegion = game.getTextureManager().getBuildingImage(tileModel);
+        if (buildingTextureRegion != null) {
+            buildingImage.setDrawable(new TextureRegionDrawable(buildingTextureRegion));
+        }
+    }
 
     public void updateUIForChessChanged(){
         CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
-        TileModel tileModel = game.getLogicContext().getChessTileManager().getWorldConstructionAt(position);
-        this.deskData = game.getLogicContext().getChessTileManager().findAtPos(position);
 
+        this.deskData = game.getLogicContext().getChessTileManager().findAtPos(position);
+        // ------ chess main ------
         if (deskData.getChessSide() == ChessSide.EMPTY) {
             this.chessTypeLabel.setText("");
             chessStatusLabel.setText("");
@@ -113,31 +130,13 @@ public class GridVM extends Table {
                 chessStatusLabel.setText("");
             }
         }
-
-        this.setBounds(
-            uiX,
-            uiY,
-            game.getScreenContext().getLayoutConst().TILE_WIDTH,
-            game.getScreenContext().getLayoutConst().TILE_HEIGHT
-        );
-
+        // ------ hitBox ------
         hitBox.setBounds(
             this.getX() + game.getScreenContext().getLayoutConst().HIT_BOX_X,
             this.getY() + game.getScreenContext().getLayoutConst().HIT_BOX_Y,
             game.getScreenContext().getLayoutConst().HIT_BOX_WIDTH,
             game.getScreenContext().getLayoutConst().HIT_BOX_HEIGHT
         );
-
-        // ------ ui for tile ------
-        TextureRegion tileTextureRegion = game.getTextureManager().getTileImage(tileModel);
-        if (tileTextureRegion != null) {
-            tileImage.setDrawable(new TextureRegionDrawable(tileTextureRegion));
-        }
-
-        TextureRegion buildingTextureRegion = game.getTextureManager().getBuildingImage(tileModel);
-        if (buildingTextureRegion != null) {
-            buildingImage.setDrawable(new TextureRegionDrawable(buildingTextureRegion));
-        }
     }
 
 
