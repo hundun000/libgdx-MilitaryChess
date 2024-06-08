@@ -39,6 +39,11 @@ public class CrossScreenDataManager implements IManager {
     Set<ChessSide> currentChessShowSides;
 
 
+    public void setCurrentState(ChessState currentState) {
+        game.getFrontend().log(this.getClass().getSimpleName(), "CurrentState change from " + this.currentState + " to " + currentState);
+        this.currentState = currentState;
+    }
+
     public CrossScreenDataManager(LogicContext logicContext) {
         this.logicContext = logicContext;
         this.game = logicContext.getGame();

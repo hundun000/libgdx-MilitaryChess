@@ -10,9 +10,9 @@ import hundun.militarychess.ui.screen.PlayScreen;
 public class DeskClickListener extends ClickListener {
     MilitaryChessGame game;
     PlayScreen screen;
-    private final ChessVM vm;
+    private final GridVM vm;
 
-    public DeskClickListener(PlayScreen screen, ChessVM vm) {
+    public DeskClickListener(PlayScreen screen, GridVM vm) {
         this.game = screen.getGame();
         this.screen = screen;
         this.vm = vm;

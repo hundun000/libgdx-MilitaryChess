@@ -15,8 +15,8 @@ import java.util.*;
 public class ChessRuntimeData {
     String id;
     GridPosition pos;
-    int uiX;
-    int uiY;
+    //int uiX;
+    //int uiY;
     ChessType chessType;
     ChessSide chessSide;
     ChessBattleStatus chessBattleStatus;
@@ -24,15 +24,6 @@ public class ChessRuntimeData {
     public String toText() {
         return this.getChessType().getChinese()
             + this.getPos().toText();
-    }
-
-    public void updateUiPos(
-        LayoutConst layoutConst
-    ) {
-        int x = this.getPos().getX() * layoutConst.TILE_WIDTH;
-        int y =  this.getPos().getY() * layoutConst.TILE_HEIGHT;
-        this.setUiX(x);
-        this.setUiY(y);
     }
 
     @Getter

@@ -17,7 +17,7 @@ import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.screen.board.MainBoardVM;
-import hundun.militarychess.ui.screen.shared.ChessVM;
+import hundun.militarychess.ui.screen.shared.GridVM;
 import hundun.militarychess.ui.screen.shared.DeskAreaVM;
 
 import java.util.ArrayList;
@@ -130,8 +130,8 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     }
 
 
-    private ChessVM findVM(ChessRuntimeData chessRuntimeData) {
-        return deskAreaVM.getNodes().get(chessRuntimeData.getId());
+    private GridVM findVM(ChessRuntimeData chessRuntimeData) {
+        return deskAreaVM.getPostToGridMap().get(chessRuntimeData.getPos().toId());
     }
 
 
@@ -196,26 +196,26 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     /**
      * 当棋子被点击
      */
-    public void onDeskClicked(ChessVM chessVM) {
+    public void onDeskClicked(GridVM gridVM) {
         CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
         switch (crossScreenDataManager.getCurrentState()) {
             case WAIT_SELECT_FROM:
-                if (chessVM.getDeskData().getChessSide() == crossScreenDataManager.getCurrentSide()) {
-                    mainBoardVM.getAllButtonPageVM().setFrom(chessVM);
-                    deskAreaVM.updateMask(chessVM);
-                    game.getLogicContext().getAfterBattleManager().setBattleFromChess(chessVM.getDeskData());
+                if (gridVM.getDeskData().getChessSide() == crossScreenDataManager.getCurrentSide()) {
+                    mainBoardVM.getAllButtonPageVM().setFrom(gridVM);
+                    deskAreaVM.updateShowSideMask(gridVM);
+                    game.getLogicContext().getAfterBattleManager().setBattleFromChess(gridVM.getDeskData());
                     crossScreenDataManager.setCurrentState(ChessState.WAIT_SELECT_TO);
                 }
                 break;
             case WAIT_SELECT_TO:
-                if (chessVM.getDeskData().getChessSide() != crossScreenDataManager.getCurrentSide()) {
-                    game.getLogicContext().getAfterBattleManager().setBattleToChess(chessVM.getDeskData());
+                if (gridVM.getDeskData().getChessSide() != crossScreenDataManager.getCurrentSide()) {
+                    game.getLogicContext().getAfterBattleManager().setBattleToChess(gridVM.getDeskData());
                     var battleResult = game.getLogicContext().getChessRule().getFightV2Result(
                         game.getLogicContext().getAfterBattleManager().getBattleFromChess(),
                         game.getLogicContext().getAfterBattleManager().getBattleToChess()
                     );
                     game.getLogicContext().getAfterBattleManager().setBattleResult(battleResult);
-                    mainBoardVM.getAllButtonPageVM().setTo(chessVM, battleResult.getBattleResultType());
+                    mainBoardVM.getAllButtonPageVM().setTo(gridVM, battleResult.getBattleResultType());
                     crossScreenDataManager.setCurrentState(ChessState.WAIT_COMMIT);
                 }
                 break;
@@ -263,13 +263,13 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     private void afterFight(BattleResultType battleResultType) {
         game.getFrontend().log(this.getClass().getSimpleName(),
             "afterFight, from = {0}, to = {1}",
-            mainBoardVM.getAllButtonPageVM().getFromChessVM().getDeskData().toText(),
-            mainBoardVM.getAllButtonPageVM().getToChessVM().getDeskData().toText()
+            mainBoardVM.getAllButtonPageVM().getFromGridVM().getDeskData().toText(),
+            mainBoardVM.getAllButtonPageVM().getToGridVM().getDeskData().toText()
             );
         CrossScreenDataManager crossScreenDataManager = game.getLogicContext().getCrossScreenDataManager();
         // 若干UI重置
-        mainBoardVM.getAllButtonPageVM().getFromChessVM().updateUIForChessChanged();
-        mainBoardVM.getAllButtonPageVM().getToChessVM().updateUIForChessChanged();
+        mainBoardVM.getAllButtonPageVM().getFromGridVM().updateUIForChessChanged();
+        mainBoardVM.getAllButtonPageVM().getToGridVM().updateUIForChessChanged();
         mainBoardVM.getAllButtonPageVM().updateForNewSide();
         deskAreaVM.afterFightOrClear();
         // 若已对局结束，则展示

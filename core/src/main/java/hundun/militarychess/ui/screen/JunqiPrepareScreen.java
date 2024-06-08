@@ -313,7 +313,7 @@ public class JunqiPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void
                     .chessType(chessType)
                     .chessSide(chessSide)
                     .build();
-                chessRuntimeData.updateUiPos(layoutConst);
+                //chessRuntimeData.updateUiPos(layoutConst);
                 chessRuntimeData.setChessBattleStatus(ChessBattleStatus.createStatus(chessRuntimeData.getChessType()));
                 result.add(chessRuntimeData);
                 i++;

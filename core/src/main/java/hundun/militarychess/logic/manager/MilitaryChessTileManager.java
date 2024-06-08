@@ -111,7 +111,7 @@ public class MilitaryChessTileManager implements ITileNodeMap<Void>, IManager {
                     .build();
             })
             .peek(it -> {
-                it.updateUiPos(game.getScreenContext().getLayoutConst());
+                //it.updateUiPos(game.getScreenContext().getLayoutConst());
                 it.setChessBattleStatus(ChessBattleStatus.createStatus(it.getChessType()));
             })
             .collect(Collectors.toList());

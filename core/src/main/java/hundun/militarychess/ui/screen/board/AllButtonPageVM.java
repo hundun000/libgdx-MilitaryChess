@@ -13,16 +13,16 @@ import hundun.militarychess.logic.LogicContext.PlayerMode;
 import hundun.militarychess.logic.chess.ChessRule.BattleResultType;
 import hundun.militarychess.logic.data.ChessRuntimeData.ChessSide;
 import hundun.militarychess.ui.screen.PlayScreen;
-import hundun.militarychess.ui.screen.shared.ChessVM;
+import hundun.militarychess.ui.screen.shared.GridVM;
 import lombok.Getter;
 
 public class AllButtonPageVM extends Table {
 
     PlayScreen screen;
     @Getter
-    ChessVM fromChessVM;
+    GridVM fromGridVM;
     @Getter
-    ChessVM toChessVM;
+    GridVM toGridVM;
     BattleResultType fightResultPreview;
     ChessSide currentSide;
 
@@ -81,13 +81,13 @@ public class AllButtonPageVM extends Table {
         this.add(capitulateButton).padTop(pad * 3).row();
     }
 
-    public void setFrom(ChessVM chessVM) {
-        this.fromChessVM = chessVM;
+    public void setFrom(GridVM gridVM) {
+        this.fromGridVM = gridVM;
         updateByChess();
     }
 
-    public void setTo(ChessVM chessVM, BattleResultType fightResultPreview) {
-        this.toChessVM = chessVM;
+    public void setTo(GridVM gridVM, BattleResultType fightResultPreview) {
+        this.toGridVM = gridVM;
         this.fightResultPreview = fightResultPreview;
         this.commitButton.setDisabled(fightResultPreview == null || fightResultPreview == BattleResultType.CAN_NOT);
         updateByChess();
@@ -99,10 +99,10 @@ public class AllButtonPageVM extends Table {
      */
     private void updateByChess() {
         CrossScreenDataManager crossScreenDataManager = screen.getGame().getLogicContext().getCrossScreenDataManager();
-        if (fromChessVM != null) {
-            if (crossScreenDataManager.getCurrentChessShowSides().contains(fromChessVM.getDeskData().getChessSide())) {
+        if (fromGridVM != null) {
+            if (crossScreenDataManager.getCurrentChessShowSides().contains(fromGridVM.getDeskData().getChessSide())) {
                 this.fromLabel.setText("发起者: "
-                    + fromChessVM.getDeskData().toText()
+                    + fromGridVM.getDeskData().toText()
                 );
             } else {
                 this.fromLabel.setText("发起者: 已隐藏");
@@ -110,10 +110,10 @@ public class AllButtonPageVM extends Table {
         } else {
             this.fromLabel.setText("发起者: 待选择");
         }
-        if (toChessVM != null) {
-            if (crossScreenDataManager.getCurrentChessShowSides().contains(toChessVM.getDeskData().getChessSide())) {
+        if (toGridVM != null) {
+            if (crossScreenDataManager.getCurrentChessShowSides().contains(toGridVM.getDeskData().getChessSide())) {
                 this.toLabel.setText("目标: "
-                    + toChessVM.getDeskData().toText()
+                    + toGridVM.getDeskData().toText()
                 );
             } else {
                 this.toLabel.setText("目标: 已隐藏");
@@ -145,8 +145,8 @@ public class AllButtonPageVM extends Table {
         CrossScreenDataManager crossScreenDataManager = screen.getGame().getLogicContext().getCrossScreenDataManager();
         ChessSide currentSide = crossScreenDataManager.getCurrentSide();
         boolean isAiSide = crossScreenDataManager.getPlayerMode() == PlayerMode.PVC && currentSide != crossScreenDataManager.getPvcPlayerSide();
-        this.fromChessVM = null;
-        this.toChessVM = null;
+        this.fromGridVM = null;
+        this.toGridVM = null;
         this.fightResultPreview = null;
         this.commitButton.setDisabled(true);
         // 不能帮ai按按钮

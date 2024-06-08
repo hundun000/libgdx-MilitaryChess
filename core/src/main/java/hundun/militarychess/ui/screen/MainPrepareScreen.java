@@ -175,7 +175,7 @@ public class MainPrepareScreen extends BaseHundunScreen<MilitaryChessGame, Void>
             .chessType(chessType)
             .chessSide(chessSide)
             .build();
-        chessRuntimeData.updateUiPos(layoutConst);
+        //chessRuntimeData.updateUiPos(layoutConst);
         chessRuntimeData.setChessBattleStatus(ChessBattleStatus.createStatus(chessRuntimeData.getChessType()));
 
 

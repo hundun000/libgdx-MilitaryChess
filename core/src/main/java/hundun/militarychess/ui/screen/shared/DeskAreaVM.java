@@ -15,7 +15,7 @@ import hundun.militarychess.ui.other.CameraDataPackage;
 import hundun.militarychess.ui.other.CameraGestureListener;
 import hundun.militarychess.ui.other.CameraMouseListener;
 import hundun.militarychess.ui.screen.PlayScreen;
-import hundun.militarychess.ui.screen.shared.ChessVM.MaskType;
+import hundun.militarychess.ui.screen.shared.GridVM.MaskType;
 import lombok.Getter;
 
 
@@ -23,7 +23,7 @@ public class DeskAreaVM extends Table {
     @Getter
     PlayScreen screen;
     @Getter
-    Map<String, ChessVM> nodes = new LinkedHashMap<>();
+    Map<String, GridVM> postToGridMap = new LinkedHashMap<>();
     @Getter
     CameraDataPackage cameraDataPackage;
 
@@ -42,7 +42,7 @@ public class DeskAreaVM extends Table {
         screen.getGame().getFrontend().log(this.getClass().getSimpleName(), "updateDeskDatas by: " + logMsg);
 
         this.clear();
-        nodes.clear();
+        postToGridMap.clear();
 
         Image background = new Image();
 
@@ -62,17 +62,17 @@ public class DeskAreaVM extends Table {
             null);*/
 
         chessRuntimeDataList.forEach(deskData -> {
-            ChessVM chessVM = new ChessVM(this, deskData);
-            nodes.put(deskData.getId(), chessVM);
-            this.addActor(chessVM);
-            this.addActor(chessVM.getHitBox());
+            GridVM gridVM = new GridVM(this, deskData.getPos());
+            postToGridMap.put(gridVM.getPosition().toId(), gridVM);
+            this.addActor(gridVM);
+            this.addActor(gridVM.getHitBox());
         });
     }
 
-    public void updateMask(ChessVM from) {
+    public void updateShowSideMask(GridVM from) {
         CrossScreenDataManager crossScreenDataManager = screen.getGame().getLogicContext().getCrossScreenDataManager();
         if (crossScreenDataManager.getCurrentChessShowSides().contains(from.getDeskData().getChessSide())) {
-            nodes.values().forEach(it -> {
+            postToGridMap.values().forEach(it -> {
                 Set<GridPosition> all = screen.getGame().getLogicContext().getChessTileManager().finaAllMoveCandidates(from.getDeskData(), crossScreenDataManager);
                 it.updateMask(all.contains(it.getDeskData().getPos()) ? MaskType.MOVE_CANDIDATE : MaskType.EMPTY);
             });
@@ -81,7 +81,7 @@ public class DeskAreaVM extends Table {
     }
 
     public void afterFightOrClear() {
-        nodes.values().forEach(it -> {
+        postToGridMap.values().forEach(it -> {
             it.updateUIForChessChanged();
             it.updateMask(MaskType.EMPTY);
         });
