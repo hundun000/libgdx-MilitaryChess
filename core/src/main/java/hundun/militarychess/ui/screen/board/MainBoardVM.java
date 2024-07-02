@@ -9,7 +9,13 @@ public class MainBoardVM extends BasePageableTable {
     PlayScreen builderScreen;
 
     @Getter
-    AllButtonPageVM allButtonPageVM;
+    FirstPageVM firstPageVM;
+    @Getter
+    SecondPageVM secondPageVM;
+    public void updateForNewSide() {
+        firstPageVM.updateForNewSide();
+        secondPageVM.updateForNewSide();
+    }
 
 
     private enum BuilderMainBoardState {
@@ -19,17 +25,21 @@ public class MainBoardVM extends BasePageableTable {
 
     public MainBoardVM(PlayScreen screen) {
         super(screen);
-        init("", screen.getGame());
+        init("TITLE", screen.getGame());
 
         this.builderScreen = screen;
 
-        this.allButtonPageVM = new AllButtonPageVM(screen);
+        this.firstPageVM = new FirstPageVM(screen);
+        this.secondPageVM = new SecondPageVM(screen);
 
         addPage(BuilderMainBoardState.PAGE1.name(),
-                null,
-                allButtonPageVM
+                "PAGE1",
+            firstPageVM
         );
-
+        addPage(BuilderMainBoardState.PAGE2.name(),
+            "PAGE2",
+            secondPageVM
+        );
     }
 
     public void updateForShow() {

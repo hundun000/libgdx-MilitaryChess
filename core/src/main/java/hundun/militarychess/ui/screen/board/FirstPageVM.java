@@ -16,7 +16,7 @@ import hundun.militarychess.ui.screen.PlayScreen;
 import hundun.militarychess.ui.screen.shared.GridVM;
 import lombok.Getter;
 
-public class AllButtonPageVM extends Table {
+public class FirstPageVM extends Table {
 
     PlayScreen screen;
     @Getter
@@ -33,11 +33,11 @@ public class AllButtonPageVM extends Table {
     Label fightResultPreviewLabel;
     TextButton commitButton;
     TextButton clearButton;
-    TextButton capitulateButton;
-    public AllButtonPageVM(PlayScreen screen) {
+
+    public FirstPageVM(PlayScreen screen) {
         this.screen = screen;
 
-        int pad = 20;
+        int pad = 5;
 
         this.timeLabel = new Label("", screen.getGame().getMainSkin());
         this.add(timeLabel).padBottom(pad).row();
@@ -71,14 +71,6 @@ public class AllButtonPageVM extends Table {
             }
         });
         this.add(clearButton).padBottom(pad).row();
-        this.capitulateButton = new TextButton("认输", screen.getGame().getMainSkin());
-        this.capitulateButton.addListener(new ChangeListener(){
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                screen.onCapitulated();
-            }
-        });
-        this.add(capitulateButton).padTop(pad * 3).row();
     }
 
     public void setFrom(GridVM gridVM) {
@@ -151,7 +143,6 @@ public class AllButtonPageVM extends Table {
         this.commitButton.setDisabled(true);
         // 不能帮ai按按钮
         this.clearButton.setDisabled(isAiSide);
-        this.capitulateButton.setDisabled(isAiSide);
 
         this.currentSide = currentSide;
         updateByChess();

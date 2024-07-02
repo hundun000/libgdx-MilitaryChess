@@ -48,7 +48,7 @@ public class AiLogic {
                     final BattleResultType battleResultType = battleResult.getBattleResultType();
                     if (battleResultType == BattleResultType.FROM_WIN) {
                         scoreMap.put(checkingTo, killScore(checkingToChess.getChessType()) * 100);
-                    } else if (battleResultType == BattleResultType.BOTH_DIE) {
+                    } else if (battleResultType == BattleResultType.BOTH_DIE || battleResultType == BattleResultType.NO_WIN) {
                         scoreMap.put(checkingTo, killScore(checkingToChess.getChessType()) * 50);
                     } else if (battleResultType == BattleResultType.TO_WIN) {
                         scoreMap.put(checkingTo, DIE_SCORE);
@@ -64,7 +64,7 @@ public class AiLogic {
                         int baseKillScore;
                         if (battleResultType == BattleResultType.FROM_WIN) {
                             baseKillScore = killScore(checkingToChess.getChessType()) * 10;
-                        } else if (battleResultType == BattleResultType.BOTH_DIE) {
+                        } else if (battleResultType == BattleResultType.BOTH_DIE || battleResultType == BattleResultType.NO_WIN) {
                             baseKillScore = killScore(checkingToChess.getChessType()) * 5;
                         } else if (battleResultType == BattleResultType.TO_WIN) {
                             baseKillScore = DIE_SCORE;

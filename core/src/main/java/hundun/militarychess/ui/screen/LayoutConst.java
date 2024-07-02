@@ -21,12 +21,7 @@ public class LayoutConst {
     public final int GOOD_NODE_WIDTH = 400;
     public final int GOOD_NODE_PAD = 10;
 
-    public final int ANY_EXTRA_TOTAL_WIDTH = 400;
-
-    public final int DESK_EXTRA_AREA_LEFT_PART_WIDTH = 300;
-    public final int DESK_EXTRA_AREA_RIGHT_PART_WIDTH = ANY_EXTRA_TOTAL_WIDTH - DESK_EXTRA_AREA_LEFT_PART_WIDTH;
-    public final int DESK_EXTRA_IMAGE_SIZE = 300;
-
+    public final int MAIN_BOARD_WIDTH = 400;
 
     public final int ROOM_SWITCH_NODE_WIDTH = 250;
     public final int ROOM_SWITCH_NODE_HEIGHT = 75;

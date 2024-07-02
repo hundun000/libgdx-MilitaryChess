@@ -37,7 +37,8 @@ public class DeskAreaVM extends Table {
     }
 
     public void updateDeskDatas(
-            List<ChessRuntimeData> chessRuntimeDataList) {
+            List<ChessRuntimeData> chessRuntimeDataList
+    ) {
         String logMsg = chessRuntimeDataList.stream().map(it -> it.toText()).collect(Collectors.joining(", "));
         screen.getGame().getFrontend().log(this.getClass().getSimpleName(), "updateDeskDatas by: " + logMsg);
 

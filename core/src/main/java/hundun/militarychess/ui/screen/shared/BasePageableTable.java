@@ -39,7 +39,7 @@ public abstract class BasePageableTable extends MyWindow {
         this.rowToMain();
 
         this.addToMain(currentTableContainer)
-                .width(screen.getGame().getScreenContext().getLayoutConst().ANY_EXTRA_TOTAL_WIDTH)
+                .width(screen.getGame().getScreenContext().getLayoutConst().MAIN_BOARD_WIDTH)
                 .growY()
         ;
     }
