@@ -25,7 +25,7 @@ public class MyMenuScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
 
     Actor title;
 
-    Actor buttonNewGame;
+    TextButton buttonNewGame;
 
     Image backImage;
 
@@ -40,6 +40,9 @@ public class MyMenuScreen extends BaseHundunScreen<MilitaryChessGame, Void> {
         Image backImage = new Image(new TextureRegionDrawable(new TextureRegion(TextureFactory.getSimpleBoardBackground())));
 
         this.buttonNewGame = new TextButton("开始", game.getMainSkin());
+        game.getFrontend().log(this.getClass().getSimpleName(),
+            "buttonNewGame Width = %s, %s, %s", buttonNewGame.getPrefWidth(), buttonNewGame.getMinWidth(), buttonNewGame.getMaxWidth()
+        );
         buttonNewGame.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {

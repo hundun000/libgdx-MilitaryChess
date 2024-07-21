@@ -51,10 +51,15 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
     }
 
 
-
-
-
-
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        Gdx.app.log(this.getClass().getSimpleName(), JavaFeatureForGwt.stringFormat(
+            "resize by width = %s, height = %s",
+            width,
+            height
+        ));
+    }
 
     @Override
     protected void create() {
@@ -68,6 +73,7 @@ public class PlayScreen extends AbstractMilitaryChessScreen {
         // ------ UI layer ------
         mainBoardVM = new MainBoardVM(this);
         uiRootTable.add(mainBoardVM)
+            .width(this.getGame().getScreenContext().getLayoutConst().MAIN_BOARD_WIDTH)
             .expandX()
             .growY()
             .right()

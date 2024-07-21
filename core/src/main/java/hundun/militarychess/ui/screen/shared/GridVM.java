@@ -82,8 +82,10 @@ public class GridVM extends Table {
         ))));*/
 
         this.chessTypeLabel = new Label("", game.getMainSkin());
+        chessTypeLabel.setFontScale(2.0f);
         this.add(chessTypeLabel).row();
         this.chessStatusLabel = new Label("", game.getMainSkin());
+        chessStatusLabel.setFontScale(2.0f);
         this.add(chessStatusLabel);
 
         this.hitBox = new Image();

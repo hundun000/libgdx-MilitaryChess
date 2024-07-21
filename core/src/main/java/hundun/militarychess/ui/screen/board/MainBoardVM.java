@@ -40,6 +40,8 @@ public class MainBoardVM extends BasePageableTable {
             "PAGE2",
             secondPageVM
         );
+
+        this.debugAll();
     }
 
     public void updateForShow() {

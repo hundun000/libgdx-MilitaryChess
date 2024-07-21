@@ -71,6 +71,7 @@ public class FirstPageVM extends Table {
             }
         });
         this.add(clearButton).padBottom(pad).row();
+        this.setBackground(screen.getGame().getTextureManager().getMcStyleTable());
     }
 
     public void setFrom(GridVM gridVM) {

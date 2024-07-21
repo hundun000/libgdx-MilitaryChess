@@ -30,15 +30,15 @@ public class MilitaryChessGame extends BaseHundunGame<Void> {
     @Getter
     private final TextureManager textureManager;
 
-    public MilitaryChessGame(ISaveTool<Void> saveTool) {
-        super(640, 480, 1);
+    public MilitaryChessGame(int viewportWidth, int viewportHeight, ISaveTool<Void> saveTool) {
+        super(viewportWidth, viewportHeight, 1);
         //this.skinFilePath = "skins/orange/skin/uiskin.json";
         debugMode = true;
 
         this.sharedViewport = new ScreenViewport();
         // this project use external files, not saveHandler
         this.saveHandler = null;
-        this.mainSkinFilePath = null;
+        //this.mainSkinFilePath = "skins/MilitaryChess/skin.json";
         this.screenContext = new ScreenContext(this);
         this.logicContext = new LogicContext(this);
         this.textureManager = new TextureManager(this);
@@ -48,7 +48,7 @@ public class MilitaryChessGame extends BaseHundunGame<Void> {
     @Override
     protected void createStage1() {
         super.createStage1();
-        this.mainSkin = new FreeTypeSkin(Gdx.files.internal("skins/freetype/skin.json"));
+        this.mainSkin = new FreeTypeSkin(Gdx.files.internal("skins/MilitaryChess/skin.json"));
         this.logicContext.lazyInitOnCreateStage1();
         this.textureManager.lazyInitOnCreateStage1();
     }

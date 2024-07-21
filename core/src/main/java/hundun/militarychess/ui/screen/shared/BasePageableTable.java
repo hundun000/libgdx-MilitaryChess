@@ -13,13 +13,14 @@ import java.util.Map;
 
 import hundun.militarychess.ui.MilitaryChessGame;
 import hundun.militarychess.ui.screen.AbstractMilitaryChessScreen;
+import org.apache.poi.ss.formula.functions.T;
 
 
 public abstract class BasePageableTable extends MyWindow {
     protected final AbstractMilitaryChessScreen screen;
     private final Container<Table> currentTableContainer;
     private final Map<String, Table> pageRootTableMap = new HashMap<>();
-    private final HorizontalGroup horizontalGroup = new HorizontalGroup();
+    private final Table horizontalGroup = new Table();
     public BasePageableTable(AbstractMilitaryChessScreen screen) {
         this.screen = screen;
 
@@ -39,7 +40,7 @@ public abstract class BasePageableTable extends MyWindow {
         this.rowToMain();
 
         this.addToMain(currentTableContainer)
-                .width(screen.getGame().getScreenContext().getLayoutConst().MAIN_BOARD_WIDTH)
+                .growX()
                 .growY()
         ;
     }
@@ -59,7 +60,10 @@ public abstract class BasePageableTable extends MyWindow {
                     updateByState(pageKey);
                 }
             });
-            horizontalGroup.addActor(button);
+            screen.getGame().getFrontend().log(this.getClass().getSimpleName(),
+                "button Width = %s, %s, %s", button.getPrefWidth(), button.getMinWidth(), button.getMaxWidth()
+            );
+            horizontalGroup.add(button);
         }
 
 

@@ -34,6 +34,7 @@ public class SecondPageVM extends Table {
             }
         });
         this.add(capitulateButton).padTop(pad * 2).row();
+        this.setBackground(screen.getGame().getTextureManager().getMcStyleTable());
     }
 
     /**
